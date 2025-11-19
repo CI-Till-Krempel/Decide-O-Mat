@@ -1,6 +1,9 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {setGlobalOptions} = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const {FieldValue} = require("firebase-admin/firestore");
+
+setGlobalOptions({region: "europe-west1"});
 
 admin.initializeApp();
 const db = admin.firestore();
