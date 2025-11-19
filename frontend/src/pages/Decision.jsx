@@ -11,6 +11,7 @@ export default function Decision() {
     const [loading, setLoading] = useState(true);
     const [newArg, setNewArg] = useState({ type: 'pro', text: '' });
     const [submitting, setSubmitting] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         const decisionRef = doc(db, 'decisions', id);
@@ -62,6 +63,12 @@ export default function Decision() {
         }
     };
 
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     if (loading) return <div className="container">Loading...</div>;
     if (!decision) return <div className="container">Decision not found</div>;
 
@@ -78,6 +85,19 @@ export default function Decision() {
                 <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: score > 0 ? 'var(--color-success)' : score < 0 ? 'var(--color-danger)' : 'var(--color-text-muted)' }}>
                     Net Score: {score > 0 ? '+' : ''}{score}
                 </div>
+                <button
+                    onClick={handleCopyLink}
+                    className="btn"
+                    style={{
+                        marginTop: '1rem',
+                        background: copied ? 'var(--color-success)' : 'var(--color-secondary)',
+                        color: 'white',
+                        fontSize: '0.875rem',
+                        padding: '0.25rem 0.75rem'
+                    }}
+                >
+                    {copied ? 'Link Copied!' : 'Copy Link'}
+                </button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
