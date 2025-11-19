@@ -18,6 +18,10 @@ jobs:
         run: |
           cd frontend
           npm ci
+      - name: Lint Frontend
+        run: |
+          cd frontend
+          npm run lint
       - name: Build
         run: |
           cd frontend
@@ -34,6 +38,10 @@ jobs:
         run: |
           cd functions
           npm ci
+      - name: Lint Functions
+        run: |
+          cd functions
+          npm run lint
 
   deploy:
     needs: build
