@@ -1,6 +1,9 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
-const {FieldValue} = require("firebase-admin/firestore");
+const { FieldValue } = require("firebase-admin/firestore");
+
+setGlobalOptions({ region: "europe-west1" });
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -29,7 +32,7 @@ exports.createDecision = onCall(async (request) => {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return {id: decisionRef.id};
+  return { id: decisionRef.id };
 });
 
 /**
@@ -41,7 +44,7 @@ exports.createDecision = onCall(async (request) => {
  * @return {Promise<Object>} The created argument ID.
  */
 exports.addArgument = onCall(async (request) => {
-  const {decisionId, type, text} = request.data;
+  const { decisionId, type, text } = request.data;
 
   if (!decisionId || !type || !text) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
@@ -71,7 +74,7 @@ exports.addArgument = onCall(async (request) => {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return {id: argumentRef.id};
+  return { id: argumentRef.id };
 });
 
 /**
@@ -82,7 +85,7 @@ exports.addArgument = onCall(async (request) => {
  * @return {Promise<Object>} Success status.
  */
 exports.voteArgument = onCall(async (request) => {
-  const {decisionId, argumentId} = request.data;
+  const { decisionId, argumentId } = request.data;
 
   if (!decisionId || !argumentId) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
@@ -95,5 +98,5 @@ exports.voteArgument = onCall(async (request) => {
     votes: FieldValue.increment(1),
   });
 
-  return {success: true};
+  return { success: true };
 });
