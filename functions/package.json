@@ -5,8 +5,7 @@
         "lint": "eslint .",
         "serve": "firebase emulators:start --only functions",
         "shell": "firebase functions:shell",
-        "start": "node -e 'require(\"http\").createServer((_,r)=>r.end(\"Decide-O-Mat Functions Container\")).listen(process.env.PORT||8080);'",
-        "start:shell": "npm run shell",
+        "start": "npm run shell",
         "deploy": "firebase deploy --only functions",
         "logs": "firebase functions:log"
     },
