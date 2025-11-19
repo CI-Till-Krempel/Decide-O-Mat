@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: PRODUCTION
 
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +44,6 @@ jobs:
 
       - name: Deploy to Firebase
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        environment: PRODUCTION
         run: |
           npm install -g firebase-tools
           firebase deploy --project decide-o-mat --token "${{ secrets.FIREBASE_TOKEN }}"
