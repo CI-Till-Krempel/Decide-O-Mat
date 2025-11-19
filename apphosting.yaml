@@ -13,4 +13,18 @@ env:
     value: production
   - variable: PORT
     value: "8080"
+  - variable: VITE_FIREBASE_API_KEY
+    value: "AIzaSyC9mNXI73UugDyGiIzWoDg_5e8vKdFfosM"
+  - variable: VITE_FIREBASE_AUTH_DOMAIN
+    value: "decide-o-mat.firebaseapp.com"
+  - variable: VITE_FIREBASE_PROJECT_ID
+    value: "decide-o-mat"
+  - variable: VITE_FIREBASE_STORAGE_BUCKET
+    value: "decide-o-mat.firebasestorage.app"
+  - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
+    value: "392455957988"
+  - variable: VITE_FIREBASE_APP_ID
+    value: "1:392455957988:web:eb89fe86cee30aef5b6bf1"
+  - variable: VITE_FIREBASE_MEASUREMENT_ID
+    value: "G-6BKMBG3HJ5"
 
