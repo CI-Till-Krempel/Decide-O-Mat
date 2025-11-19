@@ -1,6 +1,6 @@
-const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const { FieldValue } = require("firebase-admin/firestore");
+const {FieldValue} = require("firebase-admin/firestore");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -12,24 +12,24 @@ const db = admin.firestore();
  * @return {Promise<Object>} The created decision ID.
  */
 exports.createDecision = onCall(async (request) => {
-    const question = request.data.question;
+  const question = request.data.question;
 
-    if (!question || typeof question !== "string" || question.trim().length === 0) {
-        throw new HttpsError("invalid-argument", "The function must be called with a valid 'question' argument.");
-    }
+  if (!question || typeof question !== "string" || question.trim().length === 0) {
+    throw new HttpsError("invalid-argument", "The function must be called with a valid 'question' argument.");
+  }
 
-    if (question.length > 200) {
-        throw new HttpsError("invalid-argument", "Question must be under 200 characters.");
-    }
+  if (question.length > 200) {
+    throw new HttpsError("invalid-argument", "Question must be under 200 characters.");
+  }
 
-    const decisionRef = db.collection("decisions").doc();
+  const decisionRef = db.collection("decisions").doc();
 
-    await decisionRef.set({
-        question: question.trim(),
-        createdAt: FieldValue.serverTimestamp(),
-    });
+  await decisionRef.set({
+    question: question.trim(),
+    createdAt: FieldValue.serverTimestamp(),
+  });
 
-    return { id: decisionRef.id };
+  return {id: decisionRef.id};
 });
 
 /**
@@ -41,37 +41,37 @@ exports.createDecision = onCall(async (request) => {
  * @return {Promise<Object>} The created argument ID.
  */
 exports.addArgument = onCall(async (request) => {
-    const { decisionId, type, text } = request.data;
+  const {decisionId, type, text} = request.data;
 
-    if (!decisionId || !type || !text) {
-        throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
-    }
+  if (!decisionId || !type || !text) {
+    throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
+  }
 
-    if (type !== "pro" && type !== "con") {
-        throw new HttpsError("invalid-argument", "Type must be 'pro' or 'con'.");
-    }
+  if (type !== "pro" && type !== "con") {
+    throw new HttpsError("invalid-argument", "Type must be 'pro' or 'con'.");
+  }
 
-    if (text.trim().length === 0 || text.length > 500) {
-        throw new HttpsError("invalid-argument", "Text must be between 1 and 500 characters.");
-    }
+  if (text.trim().length === 0 || text.length > 500) {
+    throw new HttpsError("invalid-argument", "Text must be between 1 and 500 characters.");
+  }
 
-    const decisionRef = db.collection("decisions").doc(decisionId);
-    const doc = await decisionRef.get();
+  const decisionRef = db.collection("decisions").doc(decisionId);
+  const doc = await decisionRef.get();
 
-    if (!doc.exists) {
-        throw new HttpsError("not-found", "Decision not found.");
-    }
+  if (!doc.exists) {
+    throw new HttpsError("not-found", "Decision not found.");
+  }
 
-    const argumentRef = decisionRef.collection("arguments").doc();
+  const argumentRef = decisionRef.collection("arguments").doc();
 
-    await argumentRef.set({
-        type,
-        text: text.trim(),
-        votes: 0,
-        createdAt: FieldValue.serverTimestamp(),
-    });
+  await argumentRef.set({
+    type,
+    text: text.trim(),
+    votes: 0,
+    createdAt: FieldValue.serverTimestamp(),
+  });
 
-    return { id: argumentRef.id };
+  return {id: argumentRef.id};
 });
 
 /**
@@ -82,18 +82,18 @@ exports.addArgument = onCall(async (request) => {
  * @return {Promise<Object>} Success status.
  */
 exports.voteArgument = onCall(async (request) => {
-    const { decisionId, argumentId } = request.data;
+  const {decisionId, argumentId} = request.data;
 
-    if (!decisionId || !argumentId) {
-        throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
-    }
+  if (!decisionId || !argumentId) {
+    throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
+  }
 
-    const argumentRef = db.collection("decisions").doc(decisionId).collection("arguments").doc(argumentId);
+  const argumentRef = db.collection("decisions").doc(decisionId).collection("arguments").doc(argumentId);
 
-    // Using FieldValue.increment for atomic updates
-    await argumentRef.update({
-        votes: FieldValue.increment(1)
-    });
+  // Using FieldValue.increment for atomic updates
+  await argumentRef.update({
+    votes: FieldValue.increment(1),
+  });
 
-    return { success: true };
+  return {success: true};
 });
