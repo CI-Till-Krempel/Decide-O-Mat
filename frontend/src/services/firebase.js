@@ -12,6 +12,18 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const functions = getFunctions(app, "europe-west1");
+
+// Connect to emulators if running locally
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    console.log("Connecting to Firebase Emulators...");
+    connectFirestoreEmulator(db, 'localhost', 8080);
+    connectFunctionsEmulator(functions, 'localhost', 5001);
+}
+
 export const createDecision = async (question) => {
     const createDecisionFn = httpsCallable(functions, 'createDecision');
     const result = await createDecisionFn({ question });
@@ -48,17 +60,5 @@ export const subscribeToArguments = (decisionId, callback) => {
         callback(args);
     });
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const functions = getFunctions(app, "europe-west1");
-
-// Connect to emulators if running locally
-if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    console.log("Connecting to Firebase Emulators...");
-    connectFirestoreEmulator(db, 'localhost', 8080);
-    connectFunctionsEmulator(functions, 'localhost', 5001);
-}
 
 export { db, functions };
