@@ -24,6 +24,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
         }
 
         try {
+            console.log("ArgumentList calling voteArgument with:", { decisionId, argumentId, change });
             await voteArgument(decisionId, argumentId, change);
 
             // Update local state
