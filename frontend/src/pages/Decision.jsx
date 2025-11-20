@@ -64,11 +64,11 @@ function Decision() {
 
             <div className="arguments-container" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
                 <div className="pros-column" style={{ flex: 1 }}>
-                    <ArgumentList arguments={pros} type="pro" title={decision.question || decision.text} />
+                    <ArgumentList arguments={pros} type="pro" title={decision.question || decision.text} decisionId={id} />
                     <AddArgumentForm decisionId={id} type="pro" />
                 </div>
                 <div className="cons-column" style={{ flex: 1 }}>
-                    <ArgumentList arguments={cons} type="con" title={decision.question || decision.text} />
+                    <ArgumentList arguments={cons} type="con" title={decision.question || decision.text} decisionId={id} />
                     <AddArgumentForm decisionId={id} type="con" />
                 </div>
             </div>

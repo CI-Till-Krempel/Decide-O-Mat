@@ -1,6 +1,6 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const {FieldValue} = require("firebase-admin/firestore");
+const { FieldValue } = require("firebase-admin/firestore");
 
 // setGlobalOptions({region: "europe-west1"});
 
@@ -13,7 +13,7 @@ const db = admin.firestore();
  * @param {string} request.data.question - The question to decide on.
  * @return {Promise<Object>} The created decision ID.
  */
-exports.createDecision = onCall({cors: true}, async (request) => {
+exports.createDecision = onCall({ cors: true }, async (request) => {
   console.log("createDecision called with data:", request.data);
   const question = request.data.question;
 
@@ -32,7 +32,7 @@ exports.createDecision = onCall({cors: true}, async (request) => {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return {id: decisionRef.id};
+  return { id: decisionRef.id };
 });
 
 /**
@@ -43,8 +43,8 @@ exports.createDecision = onCall({cors: true}, async (request) => {
  * @param {string} request.data.text - The argument text.
  * @return {Promise<Object>} The created argument ID.
  */
-exports.addArgument = onCall({cors: true}, async (request) => {
-  const {decisionId, type, text} = request.data;
+exports.addArgument = onCall({ cors: true }, async (request) => {
+  const { decisionId, type, text } = request.data;
 
   if (!decisionId || !type || !text) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
@@ -74,7 +74,7 @@ exports.addArgument = onCall({cors: true}, async (request) => {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return {id: argumentRef.id};
+  return { id: argumentRef.id };
 });
 
 /**
@@ -82,21 +82,26 @@ exports.addArgument = onCall({cors: true}, async (request) => {
  * @param {Object} request - The request object.
  * @param {string} request.data.decisionId - The ID of the decision.
  * @param {string} request.data.argumentId - The ID of the argument.
+ * @param {number} request.data.change - Vote change (1 to vote, -1 to unvote).
  * @return {Promise<Object>} Success status.
  */
-exports.voteArgument = onCall({cors: true}, async (request) => {
-  const {decisionId, argumentId} = request.data;
+exports.voteArgument = onCall({ cors: true }, async (request) => {
+  const { decisionId, argumentId, change } = request.data;
 
   if (!decisionId || !argumentId) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
+  }
+
+  if (change !== 1 && change !== -1) {
+    throw new HttpsError("invalid-argument", "Change must be 1 or -1.");
   }
 
   const argumentRef = db.collection("decisions").doc(decisionId).collection("arguments").doc(argumentId);
 
   // Using FieldValue.increment for atomic updates
   await argumentRef.update({
-    votes: FieldValue.increment(1),
+    votes: FieldValue.increment(change),
   });
 
-  return {success: true};
+  return { success: true };
 });
