@@ -12,14 +12,11 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-//export const createDecision = async (text) => {
-// This block seems to be a commented-out or incomplete function definition.
-// Assuming it's meant to be part of the new additions, but it's not a valid function as is.
-// For now, I'll include it as provided, but note it's syntactically incomplete/incorrect.
-// const createDecisionFn = httpsCallable(functions, 'createDecision');
-// const result = await createDecisionFn({ text });
-// return result.data.id;
-//};
+export const createDecision = async (question) => {
+    const createDecisionFn = httpsCallable(functions, 'createDecision');
+    const result = await createDecisionFn({ question });
+    return result.data.id;
+};
 
 export const addArgument = async (decisionId, type, text) => {
     const addArgumentFn = httpsCallable(functions, 'addArgument');
