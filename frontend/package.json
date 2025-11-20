@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "vite preview --port $PORT --host",
-    "prepare": "husky"
+    "prepare": "test -f node_modules/.bin/husky && husky || echo \"husky skipped\""
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.1.0",
