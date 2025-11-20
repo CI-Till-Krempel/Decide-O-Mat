@@ -3,7 +3,7 @@ import { voteArgument } from '../services/firebase';
 
 function ArgumentList({ arguments: args, type, title, decisionId }) {
     const [votedArgs, setVotedArgs] = useState(new Set());
-    const maxVotes = Math.floor(args.length / 2);
+    const maxVotes = args.length > 0 ? Math.max(1, Math.floor(args.length / 2)) : 0;
 
     // Load voted arguments from localStorage on mount
     useEffect(() => {
