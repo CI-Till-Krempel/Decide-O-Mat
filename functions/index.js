@@ -86,6 +86,7 @@ exports.addArgument = onCall({ cors: true }, async (request) => {
  * @return {Promise<Object>} Success status.
  */
 exports.voteArgument = onCall({ cors: true }, async (request) => {
+  console.log("voteArgument called with data:", request.data);
   const { decisionId, argumentId, change } = request.data;
 
   if (!decisionId || !argumentId) {
