@@ -87,7 +87,12 @@ exports.addArgument = onCall({ cors: true }, async (request) => {
  */
 exports.voteArgument = onCall({ cors: true }, async (request) => {
   console.log("voteArgument called with data:", request.data);
-  const { decisionId, argumentId, change } = request.data;
+  console.log("change value:", request.data.change);
+  console.log("change type:", typeof request.data.change);
+
+  const decisionId = request.data.decisionId;
+  const argumentId = request.data.argumentId;
+  const change = request.data.change;
 
   if (!decisionId || !argumentId) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
