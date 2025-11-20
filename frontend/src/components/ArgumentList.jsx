@@ -1,9 +1,9 @@
 import React from 'react';
 
-function ArgumentList({ arguments: args, type }) {
+function ArgumentList({ arguments: args, type, title }) {
     return (
         <div className="argument-list">
-            <h3>{type === 'pro' ? 'Pros' : 'Cons'}</h3>
+            <h3>{type === 'pro' ? 'Pros' : 'Cons'} for "{title}"</h3>
             {args.length === 0 ? (
                 <p>No arguments yet.</p>
             ) : (

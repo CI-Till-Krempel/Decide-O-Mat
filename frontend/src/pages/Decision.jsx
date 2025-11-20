@@ -46,7 +46,7 @@ function Decision() {
     return (
         <div className="container">
             <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.text}</h1>
+                <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>
                 <button
                     onClick={handleCopyLink}
                     className="btn"
@@ -64,11 +64,11 @@ function Decision() {
 
             <div className="arguments-container" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
                 <div className="pros-column" style={{ flex: 1 }}>
-                    <ArgumentList arguments={pros} type="pro" />
+                    <ArgumentList arguments={pros} type="pro" title={decision.question || decision.text} />
                     <AddArgumentForm decisionId={id} type="pro" />
                 </div>
                 <div className="cons-column" style={{ flex: 1 }}>
-                    <ArgumentList arguments={cons} type="con" />
+                    <ArgumentList arguments={cons} type="con" title={decision.question || decision.text} />
                     <AddArgumentForm decisionId={id} type="con" />
                 </div>
             </div>
