@@ -92,7 +92,12 @@ exports.voteArgument = onCall({ cors: true }, async (request) => {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
   }
 
-  if (change !== 1 && change !== -1) {
+  if (change === undefined || change === null) {
+    throw new HttpsError("invalid-argument", "Missing required argument: change.");
+  }
+
+  const changeNum = Number(change);
+  if (changeNum !== 1 && changeNum !== -1) {
     throw new HttpsError("invalid-argument", "Change must be 1 or -1.");
   }
 
@@ -100,7 +105,7 @@ exports.voteArgument = onCall({ cors: true }, async (request) => {
 
   // Using FieldValue.increment for atomic updates
   await argumentRef.update({
-    votes: FieldValue.increment(change),
+    votes: FieldValue.increment(changeNum),
   });
 
   return { success: true };
