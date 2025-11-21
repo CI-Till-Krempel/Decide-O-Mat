@@ -1,18 +1,14 @@
+```javascript
 import React, { useState, useEffect } from 'react';
 import { voteArgument } from '../services/firebase';
 
 function ArgumentList({ arguments: args, type, title, decisionId }) {
-    const [voteCounts, setVoteCounts] = useState(new Map());
-    const maxVotes = args.length > 0 ? Math.max(1, Math.floor(args.length / 2)) : 0;
-
-    // Load vote counts from localStorage on mount
-    useEffect(() => {
-        const storageKey = `votes_${decisionId}_${type}`;
+    const [voteCounts, setVoteCounts] = useState(() => {
+        const storageKey = `votes_${ decisionId }_${ type } `;
         const stored = localStorage.getItem(storageKey);
-        if (stored) {
-            setVoteCounts(new Map(JSON.parse(stored)));
-        }
-    }, [decisionId, type]);
+        return stored ? new Map(JSON.parse(stored)) : new Map();
+    });
+    const maxVotes = args.length > 0 ? Math.max(1, Math.floor(args.length / 2)) : 0;
 
     // Calculate total votes used
     const totalVotesUsed = Array.from(voteCounts.values()).reduce((sum, count) => sum + count, 0);
@@ -22,7 +18,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
 
         // Check if user has votes remaining
         if (totalVotesUsed >= maxVotes) {
-            alert(`You have used all ${maxVotes} votes for ${type === 'pro' ? 'pros' : 'cons'}.`);
+            alert(`You have used all ${ maxVotes } votes for ${ type === 'pro' ? 'pros' : 'cons'}.`);
             return;
         }
 
@@ -36,7 +32,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
             setVoteCounts(newVoteCounts);
 
             // Persist to localStorage
-            const storageKey = `votes_${decisionId}_${type}`;
+            const storageKey = `votes_${ decisionId }_${ type } `;
             localStorage.setItem(storageKey, JSON.stringify([...newVoteCounts]));
         } catch (error) {
             console.error('Error voting:', error);
@@ -64,7 +60,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
             setVoteCounts(newVoteCounts);
 
             // Persist to localStorage
-            const storageKey = `votes_${decisionId}_${type}`;
+            const storageKey = `votes_${ decisionId }_${ type } `;
             localStorage.setItem(storageKey, JSON.stringify([...newVoteCounts]));
         } catch (error) {
             console.error('Error unvoting:', error);
@@ -89,7 +85,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
                                 <span>{arg.text}</span>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                     <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                                        {arg.votes || 0} {myVotes > 0 && `(${myVotes})`}
+                                        {arg.votes || 0} {myVotes > 0 && `(${ myVotes })`}
                                     </span>
                                     <button
                                         onClick={() => handleUnvote(arg.id)}
