@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { voteArgument } from '../services/firebase';
 
 function ArgumentList({ arguments: args, type, title, decisionId }) {
     const [voteCounts, setVoteCounts] = useState(() => {
-        const storageKey = `votes_${decisionId}_${type} `;
+        const storageKey = `votes_${decisionId}_${type}`;
         const stored = localStorage.getItem(storageKey);
         return stored ? new Map(JSON.parse(stored)) : new Map();
     });
