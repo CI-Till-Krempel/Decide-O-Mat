@@ -49,6 +49,22 @@ export const toggleDecisionStatus = async (decisionId, status) => {
     return await toggleFunction({ decisionId, status });
 };
 
+export const voteDecision = async (decisionId, vote, change) => {
+    const voteDecisionFunction = httpsCallable(functions, 'voteDecision');
+    return await voteDecisionFunction({ decisionId, vote, change });
+};
+
+export const subscribeToDecision = (decisionId, callback) => {
+    const docRef = doc(db, "decisions", decisionId);
+    return onSnapshot(docRef, (doc) => {
+        if (doc.exists()) {
+            callback({ id: doc.id, ...doc.data() });
+        } else {
+            callback(null);
+        }
+    });
+};
+
 export const getDecision = async (id) => {
     const docRef = doc(db, "decisions", id);
     const docSnap = await getDoc(docRef);
