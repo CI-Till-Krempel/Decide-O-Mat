@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { voteArgument } from '../services/firebase';
 
-function ArgumentList({ arguments: args, type, title, decisionId }) {
+function ArgumentList({ arguments: args, type, title, decisionId, readOnly }) {
     const [voteCounts, setVoteCounts] = useState(() => {
-        const storageKey = `votes_${decisionId}_${type} `;
+        const storageKey = `votes_${decisionId}_${type}`;
         const stored = localStorage.getItem(storageKey);
         return stored ? new Map(JSON.parse(stored)) : new Map();
     });
@@ -14,7 +14,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
     const totalVotesUsed = Array.from(voteCounts.values()).reduce((sum, count) => sum + count, 0);
 
     const handleVote = async (argumentId) => {
-        if (isVoting) return;
+        if (isVoting || readOnly) return;
 
         const currentVotes = voteCounts.get(argumentId) || 0;
 
@@ -35,7 +35,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
             setVoteCounts(newVoteCounts);
 
             // Persist to localStorage
-            const storageKey = `votes_${decisionId}_${type} `;
+            const storageKey = `votes_${decisionId}_${type}`;
             localStorage.setItem(storageKey, JSON.stringify([...newVoteCounts]));
         } catch (error) {
             console.error('Error voting:', error);
@@ -46,7 +46,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
     };
 
     const handleUnvote = async (argumentId) => {
-        if (isVoting) return;
+        if (isVoting || readOnly) return;
 
         const currentVotes = voteCounts.get(argumentId) || 0;
 
@@ -68,7 +68,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
             setVoteCounts(newVoteCounts);
 
             // Persist to localStorage
-            const storageKey = `votes_${decisionId}_${type} `;
+            const storageKey = `votes_${decisionId}_${type}`;
             localStorage.setItem(storageKey, JSON.stringify([...newVoteCounts]));
         } catch (error) {
             console.error('Error unvoting:', error);
@@ -99,30 +99,30 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
                                     </span>
                                     <button
                                         onClick={() => handleUnvote(arg.id)}
-                                        disabled={myVotes === 0 || isVoting}
+                                        disabled={myVotes === 0 || isVoting || readOnly}
                                         style={{
                                             padding: '0.25rem 0.5rem',
                                             fontSize: '0.875rem',
-                                            background: (myVotes === 0 || isVoting) ? '#ccc' : 'var(--color-danger)',
+                                            background: (myVotes === 0 || isVoting || readOnly) ? '#ccc' : 'var(--color-danger)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '4px',
-                                            cursor: (myVotes === 0 || isVoting) ? 'not-allowed' : 'pointer'
+                                            cursor: (myVotes === 0 || isVoting || readOnly) ? 'not-allowed' : 'pointer'
                                         }}
                                     >
                                         −
                                     </button>
                                     <button
                                         onClick={() => handleVote(arg.id)}
-                                        disabled={totalVotesUsed >= maxVotes || isVoting}
+                                        disabled={totalVotesUsed >= maxVotes || isVoting || readOnly}
                                         style={{
                                             padding: '0.25rem 0.5rem',
                                             fontSize: '0.875rem',
-                                            background: (totalVotesUsed >= maxVotes || isVoting) ? '#ccc' : 'var(--color-primary)',
+                                            background: (totalVotesUsed >= maxVotes || isVoting || readOnly) ? '#ccc' : 'var(--color-primary)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '4px',
-                                            cursor: (totalVotesUsed >= maxVotes || isVoting) ? 'not-allowed' : 'pointer'
+                                            cursor: (totalVotesUsed >= maxVotes || isVoting || readOnly) ? 'not-allowed' : 'pointer'
                                         }}
                                     >
                                         +

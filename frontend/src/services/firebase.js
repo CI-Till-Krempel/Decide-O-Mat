@@ -38,9 +38,15 @@ export const addArgument = async (decisionId, type, text) => {
 };
 
 export const voteArgument = async (decisionId, argumentId, voteChange) => {
-    console.log("voteArgument called with:", { decisionId, argumentId, voteChange });
-    const voteArgumentFn = httpsCallable(functions, 'voteArgument');
-    await voteArgumentFn({ decisionId, argumentId, change: voteChange });
+    const voteArgumentFunction = httpsCallable(functions, 'voteArgument');
+    console.log("Calling voteArgument with:", { decisionId, argumentId, change: voteChange });
+    // Explicitly passing 'change' as the property name to match backend expectation
+    return await voteArgumentFunction({ decisionId, argumentId, change: voteChange });
+};
+
+export const toggleDecisionStatus = async (decisionId, status) => {
+    const toggleFunction = httpsCallable(functions, 'toggleDecisionStatus');
+    return await toggleFunction({ decisionId, status });
 };
 
 export const getDecision = async (id) => {

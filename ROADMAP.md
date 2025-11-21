@@ -5,11 +5,11 @@
 
 ### Scope
 - **Core Features**:
-    - [ ] Create Decision (Question + Unique URL)
-    - [ ] Share Decision (Copy Link)
-    - [ ] Add Arguments (Pros & Cons)
-    - [ ] Vote on Arguments (Upvote/Downvote)
-    - [ ] View Results (Net Score)
+    - [x] Create Decision (Question + Unique URL)
+    - [x] Share Decision (Copy Link)
+    - [x] Add Arguments (Pros & Cons)
+    - [x] Vote on Arguments (Upvote/Downvote)
+    - [x] View Results (Net Score)
 - **Technical Constraints**:
     - No User Authentication (Capability URLs).
     - Serverless Backend (Google Cloud Functions).
