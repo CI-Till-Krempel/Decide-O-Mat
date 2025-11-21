@@ -61,7 +61,19 @@ function Decision() {
         }
         setExporting(true);
         try {
-            const dataUrl = await toPng(decisionRef.current, { cacheBust: true, backgroundColor: 'white', style: { padding: '20px' } });
+            // Ensure the element is fully visible/sized before capture
+            const dataUrl = await toPng(decisionRef.current, {
+                cacheBust: true,
+                backgroundColor: 'white',
+                style: {
+                    padding: '20px',
+                    width: 'auto', // Allow it to expand
+                    height: 'auto'
+                },
+                // Explicitly set dimensions to include scrollable content if any
+                width: decisionRef.current.scrollWidth + 40, // + padding
+                height: decisionRef.current.scrollHeight + 40
+            });
             const link = document.createElement('a');
             link.download = `decision-${id}.png`;
             link.href = dataUrl;
@@ -82,7 +94,7 @@ function Decision() {
 
     return (
         <div className="container">
-            <div ref={decisionRef} style={{ backgroundColor: 'white' }}>
+            <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                     <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>
 
