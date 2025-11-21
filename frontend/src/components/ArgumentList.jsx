@@ -82,7 +82,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
                 <p>No arguments yet.</p>
             ) : (
                 <ul>
-                    {args.map((arg) => {
+                    {[...args].sort((a, b) => (b.votes || 0) - (a.votes || 0)).map((arg) => {
                         const myVotes = voteCounts.get(arg.id) || 0;
                         return (
                             <li key={arg.id} className="argument-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
