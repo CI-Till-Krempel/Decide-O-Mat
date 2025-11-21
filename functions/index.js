@@ -150,3 +150,39 @@ exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
 
   return {success: true, status: status};
 });
+
+exports.voteDecision = onCall({cors: true}, async (request) => {
+  const {decisionId, vote, change} = request.data;
+
+  if (!decisionId || !vote || !change) {
+    throw new HttpsError("invalid-argument", "Missing decisionId, vote, or change");
+  }
+
+  if (vote !== "yes" && vote !== "no") {
+    throw new HttpsError("invalid-argument", "Vote must be 'yes' or 'no'");
+  }
+
+  const voteChange = Number(change);
+  if (isNaN(voteChange) || (voteChange !== 1 && voteChange !== -1)) {
+    throw new HttpsError("invalid-argument", "Change must be 1 or -1");
+  }
+
+  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+
+  if (!decisionDoc.exists) {
+    throw new HttpsError("not-found", "Decision not found");
+  }
+
+  if (decisionDoc.data().status === "closed") {
+    throw new HttpsError("failed-precondition", "Decision is closed");
+  }
+
+  const updateField = vote === "yes" ? "yesVotes" : "noVotes";
+
+  await decisionRef.update({
+    [updateField]: admin.firestore.FieldValue.increment(voteChange),
+  });
+
+  return {success: true};
+});
