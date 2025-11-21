@@ -20,9 +20,10 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Write Tests**: Create a failing test case that defines the desired behavior (Red).
 - **Write Code**: Implement the minimum amount of code to make the test pass (Green).
 - **Refactor**: Improve the code structure without changing behavior (Refactor).
-- **Verify**: Run builds and tests immediately after changes.
+- **Verify**: Run builds, tests, and linting immediately after changes.
     - `npm run build`
     - `npm test`
+    - `npm run lint`
 - **Fix**: If verification fails, fix the issue immediately.
 
 ### 3. Version Control

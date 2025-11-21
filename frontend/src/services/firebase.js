@@ -37,6 +37,12 @@ export const addArgument = async (decisionId, type, text) => {
     return result.data.id;
 };
 
+export const voteArgument = async (decisionId, argumentId, voteChange) => {
+    console.log("voteArgument called with:", { decisionId, argumentId, voteChange });
+    const voteArgumentFn = httpsCallable(functions, 'voteArgument');
+    await voteArgumentFn({ decisionId, argumentId, change: voteChange });
+};
+
 export const getDecision = async (id) => {
     const docRef = doc(db, "decisions", id);
     const docSnap = await getDoc(docRef);

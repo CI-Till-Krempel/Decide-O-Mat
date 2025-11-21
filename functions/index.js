@@ -82,20 +82,36 @@ exports.addArgument = onCall({cors: true}, async (request) => {
  * @param {Object} request - The request object.
  * @param {string} request.data.decisionId - The ID of the decision.
  * @param {string} request.data.argumentId - The ID of the argument.
+ * @param {number} request.data.change - Vote change (1 to vote, -1 to unvote).
  * @return {Promise<Object>} Success status.
  */
 exports.voteArgument = onCall({cors: true}, async (request) => {
-  const {decisionId, argumentId} = request.data;
+  console.log("voteArgument called with data:", request.data);
+  console.log("change value:", request.data.change);
+  console.log("change type:", typeof request.data.change);
+
+  const decisionId = request.data.decisionId;
+  const argumentId = request.data.argumentId;
+  const change = request.data.change;
 
   if (!decisionId || !argumentId) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
+  }
+
+  if (change === undefined || change === null) {
+    throw new HttpsError("invalid-argument", "Missing required argument: change.");
+  }
+
+  const changeNum = Number(change);
+  if (changeNum !== 1 && changeNum !== -1) {
+    throw new HttpsError("invalid-argument", "Change must be 1 or -1.");
   }
 
   const argumentRef = db.collection("decisions").doc(decisionId).collection("arguments").doc(argumentId);
 
   // Using FieldValue.increment for atomic updates
   await argumentRef.update({
-    votes: FieldValue.increment(1),
+    votes: FieldValue.increment(changeNum),
   });
 
   return {success: true};
