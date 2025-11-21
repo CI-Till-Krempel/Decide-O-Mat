@@ -28,9 +28,9 @@
 ## v1.1: Enhanced Collaboration (Planned)
 - **Goal**: Improve the user experience and data integrity.
 - **Features**:
-    - Real-time updates (WebSocket/Subscription).
-    - "Close" decision functionality (prevent new votes).
-    - Export results as image.
+    - [x] Real-time updates (WebSocket/Subscription).
+    - [x] "Close" decision functionality (prevent new votes).
+    - [ ] Export results as image.
 
 ## v2.0: Multi-Option Decisions (Future)
 - **Goal**: Support complex decisions with multiple choices (not just Yes/No).

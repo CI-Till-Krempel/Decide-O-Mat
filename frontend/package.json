@@ -15,6 +15,7 @@
     "@vitejs/plugin-react": "^5.1.0",
     "firebase": "^12.6.0",
     "firebase-functions": "^7.0.0",
+    "html-to-image": "^1.11.13",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
