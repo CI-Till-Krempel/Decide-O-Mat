@@ -107,7 +107,18 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
     throw new HttpsError("invalid-argument", "Change must be 1 or -1.");
   }
 
-  const argumentRef = db.collection("decisions").doc(decisionId).collection("arguments").doc(argumentId);
+  const decisionRef = db.collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+
+  if (!decisionDoc.exists) {
+    throw new HttpsError("not-found", "Decision not found.");
+  }
+
+  if (decisionDoc.data().status === "closed") {
+    throw new HttpsError("failed-precondition", "Decision is closed.");
+  }
+
+  const argumentRef = decisionRef.collection("arguments").doc(argumentId);
 
   // Using FieldValue.increment for atomic updates
   await argumentRef.update({
@@ -115,4 +126,27 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
   });
 
   return {success: true};
+});
+
+exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
+  const {decisionId, status} = request.data;
+
+  if (!decisionId || !status) {
+    throw new HttpsError("invalid-argument", "Missing decisionId or status");
+  }
+
+  if (status !== "open" && status !== "closed") {
+    throw new HttpsError("invalid-argument", "Status must be 'open' or 'closed'");
+  }
+
+  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+
+  if (!decisionDoc.exists) {
+    throw new HttpsError("not-found", "Decision not found");
+  }
+
+  await decisionRef.update({status: status});
+
+  return {success: true, status: status};
 });
