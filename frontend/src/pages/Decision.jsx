@@ -47,6 +47,22 @@ function Decision() {
         <div className="container">
             <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                 <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>
+
+                {/* Net Score Display */}
+                <div style={{
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
+                    margin: '1rem 0',
+                    color: (pros.reduce((sum, arg) => sum + (arg.votes || 0), 0) - cons.reduce((sum, arg) => sum + (arg.votes || 0), 0)) > 0
+                        ? 'var(--color-success)'
+                        : (pros.reduce((sum, arg) => sum + (arg.votes || 0), 0) - cons.reduce((sum, arg) => sum + (arg.votes || 0), 0)) < 0
+                            ? 'var(--color-danger)'
+                            : 'var(--color-text-muted)'
+                }}>
+                    Net Score: {(pros.reduce((sum, arg) => sum + (arg.votes || 0), 0) - cons.reduce((sum, arg) => sum + (arg.votes || 0), 0)) > 0 ? '+' : ''}
+                    {pros.reduce((sum, arg) => sum + (arg.votes || 0), 0) - cons.reduce((sum, arg) => sum + (arg.votes || 0), 0)}
+                </div>
+
                 <button
                     onClick={handleCopyLink}
                     className="btn"
