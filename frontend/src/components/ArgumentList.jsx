@@ -3,16 +3,19 @@ import { voteArgument } from '../services/firebase';
 
 function ArgumentList({ arguments: args, type, title, decisionId }) {
     const [voteCounts, setVoteCounts] = useState(() => {
-        const storageKey = `votes_${decisionId}_${type}`;
+        const storageKey = `votes_${decisionId}_${type} `;
         const stored = localStorage.getItem(storageKey);
         return stored ? new Map(JSON.parse(stored)) : new Map();
     });
+    const [isVoting, setIsVoting] = useState(false);
     const maxVotes = args.length > 0 ? Math.max(1, Math.floor(args.length / 2)) : 0;
 
     // Calculate total votes used
     const totalVotesUsed = Array.from(voteCounts.values()).reduce((sum, count) => sum + count, 0);
 
     const handleVote = async (argumentId) => {
+        if (isVoting) return;
+
         const currentVotes = voteCounts.get(argumentId) || 0;
 
         // Check if user has votes remaining
@@ -21,6 +24,7 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
             return;
         }
 
+        setIsVoting(true);
         try {
             console.log("ArgumentList calling voteArgument with:", { decisionId, argumentId, change: 1 });
             await voteArgument(decisionId, argumentId, 1);
@@ -36,16 +40,21 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
         } catch (error) {
             console.error('Error voting:', error);
             alert('Failed to vote. Please try again.');
+        } finally {
+            setIsVoting(false);
         }
     };
 
     const handleUnvote = async (argumentId) => {
+        if (isVoting) return;
+
         const currentVotes = voteCounts.get(argumentId) || 0;
 
         if (currentVotes === 0) {
             return;
         }
 
+        setIsVoting(true);
         try {
             await voteArgument(decisionId, argumentId, -1);
 
@@ -64,6 +73,8 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
         } catch (error) {
             console.error('Error unvoting:', error);
             alert('Failed to unvote. Please try again.');
+        } finally {
+            setIsVoting(false);
         }
     };
 
@@ -88,30 +99,30 @@ function ArgumentList({ arguments: args, type, title, decisionId }) {
                                     </span>
                                     <button
                                         onClick={() => handleUnvote(arg.id)}
-                                        disabled={myVotes === 0}
+                                        disabled={myVotes === 0 || isVoting}
                                         style={{
                                             padding: '0.25rem 0.5rem',
                                             fontSize: '0.875rem',
-                                            background: myVotes === 0 ? '#ccc' : 'var(--color-danger)',
+                                            background: (myVotes === 0 || isVoting) ? '#ccc' : 'var(--color-danger)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '4px',
-                                            cursor: myVotes === 0 ? 'not-allowed' : 'pointer'
+                                            cursor: (myVotes === 0 || isVoting) ? 'not-allowed' : 'pointer'
                                         }}
                                     >
                                         −
                                     </button>
                                     <button
                                         onClick={() => handleVote(arg.id)}
-                                        disabled={totalVotesUsed >= maxVotes}
+                                        disabled={totalVotesUsed >= maxVotes || isVoting}
                                         style={{
                                             padding: '0.25rem 0.5rem',
                                             fontSize: '0.875rem',
-                                            background: totalVotesUsed >= maxVotes ? '#ccc' : 'var(--color-primary)',
+                                            background: (totalVotesUsed >= maxVotes || isVoting) ? '#ccc' : 'var(--color-primary)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '4px',
-                                            cursor: totalVotesUsed >= maxVotes ? 'not-allowed' : 'pointer'
+                                            cursor: (totalVotesUsed >= maxVotes || isVoting) ? 'not-allowed' : 'pointer'
                                         }}
                                     >
                                         +
