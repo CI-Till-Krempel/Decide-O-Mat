@@ -35,3 +35,4 @@ This session focused on finalizing the authentication integration and establishi
 - **Backend**: Updated `voteDecision` Cloud Function to accept a `displayName` parameter and store it in both new and updated vote records.
 - **Frontend**: Added name prompt logic to `Decision.jsx` similar to `ArgumentItem`. Users are now prompted for their name before casting a final vote if they haven't set one yet.
 - **Tests**: Updated all test assertions to expect the new function signature with the `displayName` parameter.
+- **Race Condition Fix**: Fixed an issue where the displayName wasn't being passed correctly when a user set their name and voted in the same action. The problem was that React state updates are asynchronous, so `user.displayName` wasn't updated yet when `performFinalVote` was called. Solution: Pass the name directly as a parameter to `performFinalVote` instead of relying on the state update.
