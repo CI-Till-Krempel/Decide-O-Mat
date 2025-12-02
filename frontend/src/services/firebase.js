@@ -58,9 +58,9 @@ export const toggleDecisionStatus = async (decisionId, status) => {
     return await toggleFunction({ decisionId, status });
 };
 
-export const voteDecision = async (decisionId, vote, userId) => {
+export const voteDecision = async (decisionId, vote, userId, displayName) => {
     const voteDecisionFunction = httpsCallable(functions, 'voteDecision');
-    return await voteDecisionFunction({ decisionId, vote, userId });
+    return await voteDecisionFunction({ decisionId, vote, userId, displayName });
 };
 
 export const subscribeToDecision = (decisionId, callback) => {
