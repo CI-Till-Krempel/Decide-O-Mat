@@ -30,18 +30,19 @@
 - **Features**:
     - [x] Real-time updates (WebSocket/Subscription).
     - [x] "Close" decision functionality (prevent new votes).
-    - [ ] Export results as image.
+    - [x] Export results as image.
 
 
 ## v1.2: Take decision
-    - [ ] Users should be able to vote for the final decision (yes / no)
-    - [ ] The final decision should be displayed, not only the Net Score
+    - [x] Users should be able to vote for the final decision (yes / no)
+    - [x] The final decision should be displayed, not only the Net Score
 
 ## v1.3: Make open decisions non-anonymous
-    - [ ] Ask the user for his name when accessing a decision
-    - [ ] Persist the user name for future decisions
-    - [ ] Allow the user to edit the name
-    - [ ] Visualize the user votes for arguments with chips 
+    - [x] Ask the user for his name when accessing a decision
+    - [x] Persist the user name for future decisions
+    - [x] Allow the user to edit the name
+    - [x] Visualize the user votes for arguments with chips
+    - [x] Visualize the user votes for final decision with chips 
 
 ## v1.4 User Authentication
     - [ ] Integrate Firebase Authentication to enable User Authentication

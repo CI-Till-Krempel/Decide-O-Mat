@@ -10,6 +10,7 @@ vi.mock('../services/firebase', () => ({
     subscribeToArguments: vi.fn(),
     toggleDecisionStatus: vi.fn(),
     voteDecision: vi.fn(),
+    subscribeToFinalVotes: vi.fn(),
 }));
 
 import {
@@ -17,6 +18,7 @@ import {
     subscribeToArguments as mockSubscribeToArguments,
     toggleDecisionStatus as mockToggleDecisionStatus,
     voteDecision as mockVoteDecision,
+    subscribeToFinalVotes as mockSubscribeToFinalVotes,
 } from '../services/firebase';
 
 // Mock html-to-image
@@ -25,6 +27,18 @@ vi.mock('html-to-image', () => ({
 }));
 
 import { toPng as mockToPng } from 'html-to-image';
+
+// Mock UserContext
+vi.mock('../contexts/UserContext', async () => {
+    const actual = await vi.importActual('../contexts/UserContext');
+    return {
+        ...actual,
+        useUser: vi.fn(() => ({
+            user: { userId: 'test-user-id', displayName: 'Test User' },
+            setDisplayName: vi.fn()
+        }))
+    };
+});
 
 // Mock components
 vi.mock('../components/ArgumentList', () => ({
@@ -41,6 +55,10 @@ vi.mock('../components/AddArgumentForm', () => ({
             AddArgumentForm: {type} {readOnly && '(read-only)'}
         </div>
     ),
+}));
+
+vi.mock('../components/UserSettings', () => ({
+    default: () => <div data-testid="user-settings">UserSettings</div>
 }));
 
 const renderDecision = (decisionId = 'test-decision-123') => {
@@ -80,8 +98,13 @@ describe('Decision Component', () => {
 
         mockSubscribeToArguments.mockImplementation((id, callback) => {
             callback(mockArguments);
-            return () => { }; // unsubscribe function
+            return vi.fn();
         });
+        mockSubscribeToFinalVotes.mockImplementation((id, callback) => {
+            callback([]);
+            return vi.fn();
+        });
+        mockToggleDecisionStatus.mockResolvedValue({ success: true });
     });
 
     // US-005: View Results
@@ -332,7 +355,7 @@ describe('Decision Component', () => {
             await user.click(yesButton);
 
             await waitFor(() => {
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'yes', 1);
+                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'yes', 'test-user-id');
             });
         });
 
@@ -350,7 +373,7 @@ describe('Decision Component', () => {
             await user.click(noButton);
 
             await waitFor(() => {
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 1);
+                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'test-user-id');
             });
         });
 
@@ -399,9 +422,8 @@ describe('Decision Component', () => {
             await user.click(noButton);
 
             await waitFor(() => {
-                // Should first unvote yes, then vote no
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'yes', -1);
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 1);
+                // Should call voteDecision with new vote
+                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'test-user-id');
             });
         });
 

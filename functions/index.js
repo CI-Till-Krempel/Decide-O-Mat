@@ -1,6 +1,6 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const {FieldValue} = require("firebase-admin/firestore");
+const { FieldValue } = require("firebase-admin/firestore");
 
 // setGlobalOptions({region: "europe-west1"});
 
@@ -13,7 +13,7 @@ const db = admin.firestore();
  * @param {string} request.data.question - The question to decide on.
  * @return {Promise<Object>} The created decision ID.
  */
-exports.createDecision = onCall({cors: true}, async (request) => {
+exports.createDecision = onCall({ cors: true }, async (request) => {
   console.log("createDecision called with data:", request.data);
   const question = request.data.question;
 
@@ -32,7 +32,7 @@ exports.createDecision = onCall({cors: true}, async (request) => {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return {id: decisionRef.id};
+  return { id: decisionRef.id };
 });
 
 /**
@@ -41,10 +41,12 @@ exports.createDecision = onCall({cors: true}, async (request) => {
  * @param {string} request.data.decisionId - The ID of the decision.
  * @param {string} request.data.type - 'pro' or 'con'.
  * @param {string} request.data.text - The argument text.
+ * @param {string} [request.data.authorName] - Optional display name of the author.
+ * @param {string} [request.data.authorId] - Optional unique ID of the author.
  * @return {Promise<Object>} The created argument ID.
  */
-exports.addArgument = onCall({cors: true}, async (request) => {
-  const {decisionId, type, text} = request.data;
+exports.addArgument = onCall({ cors: true }, async (request) => {
+  const { decisionId, type, text, authorName, authorId } = request.data;
 
   if (!decisionId || !type || !text) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
@@ -67,14 +69,24 @@ exports.addArgument = onCall({cors: true}, async (request) => {
 
   const argumentRef = decisionRef.collection("arguments").doc();
 
-  await argumentRef.set({
+  const argumentData = {
     type,
     text: text.trim(),
     votes: 0,
     createdAt: FieldValue.serverTimestamp(),
-  });
+  };
 
-  return {id: argumentRef.id};
+  // Add optional author information if provided
+  if (authorName) {
+    argumentData.authorName = authorName;
+  }
+  if (authorId) {
+    argumentData.authorId = authorId;
+  }
+
+  await argumentRef.set(argumentData);
+
+  return { id: argumentRef.id };
 });
 
 /**
@@ -85,26 +97,13 @@ exports.addArgument = onCall({cors: true}, async (request) => {
  * @param {number} request.data.change - Vote change (1 to vote, -1 to unvote).
  * @return {Promise<Object>} Success status.
  */
-exports.voteArgument = onCall({cors: true}, async (request) => {
+exports.voteArgument = onCall({ cors: true }, async (request) => {
   console.log("voteArgument called with data:", request.data);
-  console.log("change value:", request.data.change);
-  console.log("change type:", typeof request.data.change);
 
-  const decisionId = request.data.decisionId;
-  const argumentId = request.data.argumentId;
-  const change = request.data.change;
+  const { decisionId, argumentId, userId, displayName } = request.data;
 
-  if (!decisionId || !argumentId) {
-    throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
-  }
-
-  if (change === undefined || change === null) {
-    throw new HttpsError("invalid-argument", "Missing required argument: change.");
-  }
-
-  const changeNum = Number(change);
-  if (changeNum !== 1 && changeNum !== -1) {
-    throw new HttpsError("invalid-argument", "Change must be 1 or -1.");
+  if (!decisionId || !argumentId || !userId) {
+    throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId, userId.");
   }
 
   const decisionRef = db.collection("decisions").doc(decisionId);
@@ -119,17 +118,43 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
   }
 
   const argumentRef = decisionRef.collection("arguments").doc(argumentId);
+  const argumentDoc = await argumentRef.get();
 
-  // Using FieldValue.increment for atomic updates
-  await argumentRef.update({
-    votes: FieldValue.increment(changeNum),
+  if (!argumentDoc.exists) {
+    throw new HttpsError("not-found", "Argument not found.");
+  }
+
+  // Check if user has already voted for this argument
+  const voteRef = argumentRef.collection("votes").doc(userId);
+
+  // Use a transaction to ensure atomic updates
+  await db.runTransaction(async (transaction) => {
+    const existingVote = await transaction.get(voteRef);
+
+    if (existingVote.exists) {
+      // User is trying to vote again - remove their vote (unvote)
+      transaction.delete(voteRef);
+      transaction.update(argumentRef, {
+        votes: FieldValue.increment(-1),
+      });
+    } else {
+      // New vote
+      transaction.set(voteRef, {
+        userId: userId,
+        displayName: displayName || "Anonymous",
+        createdAt: FieldValue.serverTimestamp(),
+      });
+      transaction.update(argumentRef, {
+        votes: FieldValue.increment(1),
+      });
+    }
   });
 
-  return {success: true};
+  return { success: true };
 });
 
-exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
-  const {decisionId, status} = request.data;
+exports.toggleDecisionStatus = onCall({ cors: true }, async (request) => {
+  const { decisionId, status } = request.data;
 
   if (!decisionId || !status) {
     throw new HttpsError("invalid-argument", "Missing decisionId or status");
@@ -146,25 +171,20 @@ exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
     throw new HttpsError("not-found", "Decision not found");
   }
 
-  await decisionRef.update({status: status});
+  await decisionRef.update({ status: status });
 
-  return {success: true, status: status};
+  return { success: true, status: status };
 });
 
-exports.voteDecision = onCall({cors: true}, async (request) => {
-  const {decisionId, vote, change} = request.data;
+exports.voteDecision = onCall({ cors: true }, async (request) => {
+  const { decisionId, vote, userId } = request.data;
 
-  if (!decisionId || !vote || !change) {
-    throw new HttpsError("invalid-argument", "Missing decisionId, vote, or change");
+  if (!decisionId || !vote || !userId) {
+    throw new HttpsError("invalid-argument", "Missing decisionId, vote, or userId");
   }
 
   if (vote !== "yes" && vote !== "no") {
     throw new HttpsError("invalid-argument", "Vote must be 'yes' or 'no'");
-  }
-
-  const voteChange = Number(change);
-  if (isNaN(voteChange) || (voteChange !== 1 && voteChange !== -1)) {
-    throw new HttpsError("invalid-argument", "Change must be 1 or -1");
   }
 
   const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
@@ -178,11 +198,59 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
     throw new HttpsError("failed-precondition", "Decision is closed");
   }
 
-  const updateField = vote === "yes" ? "yesVotes" : "noVotes";
+  // Check if user has already voted
+  const voteRef = decisionRef.collection("finalVotes").doc(userId);
 
-  await decisionRef.update({
-    [updateField]: FieldValue.increment(voteChange),
+  // Use a transaction to ensure atomic updates
+  await admin.firestore().runTransaction(async (transaction) => {
+    const existingVote = await transaction.get(voteRef);
+    let yesChange = 0;
+    let noChange = 0;
+
+    if (existingVote.exists) {
+      const previousVote = existingVote.data().vote;
+
+      if (previousVote === vote) {
+        // User is trying to vote the same way again - no change needed
+        return;
+      }
+
+      // User is changing their vote
+      if (previousVote === "yes") {
+        yesChange = -1;
+        noChange = 1;
+      } else {
+        yesChange = 1;
+        noChange = -1;
+      }
+
+      // Update the vote
+      transaction.update(voteRef, {
+        vote: vote,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    } else {
+      // New vote
+      if (vote === "yes") {
+        yesChange = 1;
+      } else {
+        noChange = 1;
+      }
+
+      // Create the vote record
+      transaction.set(voteRef, {
+        vote: vote,
+        userId: userId,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
+
+    // Update the aggregate counts
+    transaction.update(decisionRef, {
+      yesVotes: FieldValue.increment(yesChange),
+      noVotes: FieldValue.increment(noChange),
+    });
   });
 
-  return {success: true};
+  return { success: true };
 });

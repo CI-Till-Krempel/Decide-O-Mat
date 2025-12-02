@@ -1,42 +1,51 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { subscribeToDecision, subscribeToArguments, toggleDecisionStatus, voteDecision } from '../services/firebase';
+import { subscribeToDecision, subscribeToArguments, toggleDecisionStatus, voteDecision, subscribeToFinalVotes } from '../services/firebase';
 import ArgumentList from '../components/ArgumentList';
 import AddArgumentForm from '../components/AddArgumentForm';
+import UserSettings from '../components/UserSettings';
+import { useUser } from '../contexts/UserContext';
 import { toPng } from 'html-to-image';
 
 function Decision() {
     const { id } = useParams();
+    const { user } = useUser();
     const [decision, setDecision] = useState(null);
     const [loading, setLoading] = useState(true);
     const [pros, setPros] = useState([]);
     const [cons, setCons] = useState([]);
     const [copied, setCopied] = useState(false);
-    const [exporting, setExporting] = useState(false);
-    const [finalVote, setFinalVote] = useState(() => {
-        return localStorage.getItem(`decision_vote_${id}`) || null;
-    });
+    const [finalVote, setFinalVote] = useState(null);
     const [isVoting, setIsVoting] = useState(false);
+    const [exporting, setExporting] = useState(false);
+    const [finalVotesList, setFinalVotesList] = useState([]);
     const decisionRef = useRef(null);
 
     useEffect(() => {
         const unsubscribeDecision = subscribeToDecision(id, (data) => {
-            if (data) {
-                setDecision(data);
-            } else {
-                setDecision(null); // Handle not found
-            }
+            setDecision(data);
             setLoading(false);
         });
 
-        const unsubscribeArgs = subscribeToArguments(id, (args) => {
+        const unsubscribeArguments = subscribeToArguments(id, (args) => {
             setPros(args.filter(arg => arg.type === 'pro'));
             setCons(args.filter(arg => arg.type === 'con'));
         });
 
+        const unsubscribeFinalVotes = subscribeToFinalVotes(id, (votes) => {
+            setFinalVotesList(votes);
+        });
+
+        // Load local vote state
+        const storedVote = localStorage.getItem(`decision_vote_${id}`);
+        if (storedVote) {
+            setFinalVote(storedVote);
+        }
+
         return () => {
             unsubscribeDecision();
-            unsubscribeArgs();
+            unsubscribeArguments();
+            unsubscribeFinalVotes();
         };
     }, [id]);
 
@@ -62,49 +71,12 @@ function Decision() {
         if (isVoting || decision.status === 'closed') return;
         setIsVoting(true);
 
-        let change = 0;
-        let newVote = voteType;
-
-        if (finalVote === voteType) {
-            // Unvote
-            change = -1;
-            newVote = null;
-        } else if (finalVote) {
-            // Change vote (not supported by backend in one go, need to decrement old and increment new? 
-            // Actually backend takes `change` and `vote`. 
-            // If I want to switch from Yes to No:
-            // I need to decrement Yes AND increment No.
-            // My backend `voteDecision` only handles one field update at a time.
-            // So I should probably make two calls or update backend to handle switch.
-            // For MVP, let's just make two calls if switching, or simpler: just support unvote then vote.
-            // Let's try to make two calls if switching.
-
-            // Wait, simpler logic:
-            // If switching, first unvote the old one.
-            try {
-                await voteDecision(id, finalVote, -1);
-            } catch (e) {
-                console.error("Error unvoting previous:", e);
-                setIsVoting(false);
-                return;
-            }
-            // Then vote the new one
-            change = 1;
-        } else {
-            // New vote
-            change = 1;
-        }
-
         try {
-            if (newVote) {
-                await voteDecision(id, newVote, change);
-            }
-            setFinalVote(newVote);
-            if (newVote) {
-                localStorage.setItem(`decision_vote_${id}`, newVote);
-            } else {
-                localStorage.removeItem(`decision_vote_${id}`);
-            }
+            await voteDecision(id, voteType, user.userId);
+
+            // Update local state
+            setFinalVote(voteType);
+            localStorage.setItem(`decision_vote_${id}`, voteType);
         } catch (error) {
             console.error("Error voting:", error);
             alert("Failed to cast vote.");
@@ -163,6 +135,7 @@ function Decision() {
 
     return (
         <div className="container">
+            <UserSettings />
             <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                     <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>
@@ -196,16 +169,10 @@ function Decision() {
                     </div>
 
                     {/* Final Voting Section */}
-                    <div style={{
-                        marginTop: '2rem',
-                        padding: '1.5rem',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: '8px',
-                        backgroundColor: 'var(--color-bg-secondary)'
-                    }}>
+                    <div style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid var(--color-border)', borderRadius: '8px', backgroundColor: 'var(--color-bg-secondary)' }}>
                         <h3 style={{ marginBottom: '1rem' }}>Final Vote</h3>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', alignItems: 'center' }}>
-                            <div style={{ textAlign: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', alignItems: 'flex-start' }}>
+                            <div style={{ textAlign: 'center', flex: 1 }}>
                                 <button
                                     onClick={() => handleFinalVote('yes')}
                                     disabled={isClosed || isVoting}
@@ -223,8 +190,24 @@ function Decision() {
                                     Yes
                                 </button>
                                 <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{yesVotes}</div>
+                                {finalVotesList.filter(v => v.vote === 'yes').length > 0 && (
+                                    <div style={{ marginTop: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+                                        {finalVotesList.filter(v => v.vote === 'yes').map(vote => (
+                                            <span key={vote.userId} style={{
+                                                fontSize: '0.75rem',
+                                                background: 'white',
+                                                padding: '0.25rem 0.75rem',
+                                                borderRadius: '12px',
+                                                color: 'var(--color-text)',
+                                                border: '1px solid var(--color-border)'
+                                            }}>
+                                                {vote.displayName || 'Anonymous'}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                            <div style={{ textAlign: 'center' }}>
+                            <div style={{ textAlign: 'center', flex: 1 }}>
                                 <button
                                     onClick={() => handleFinalVote('no')}
                                     disabled={isClosed || isVoting}
@@ -242,6 +225,22 @@ function Decision() {
                                     No
                                 </button>
                                 <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{noVotes}</div>
+                                {finalVotesList.filter(v => v.vote === 'no').length > 0 && (
+                                    <div style={{ marginTop: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+                                        {finalVotesList.filter(v => v.vote === 'no').map(vote => (
+                                            <span key={vote.userId} style={{
+                                                fontSize: '0.75rem',
+                                                background: 'white',
+                                                padding: '0.25rem 0.75rem',
+                                                borderRadius: '12px',
+                                                color: 'var(--color-text)',
+                                                border: '1px solid var(--color-border)'
+                                            }}>
+                                                {vote.displayName || 'Anonymous'}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -249,11 +248,11 @@ function Decision() {
 
                 <div className="arguments-container" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
                     <div className="pros-column" style={{ flex: 1 }}>
-                        <ArgumentList arguments={pros} type="pro" title={decision.question || decision.text} decisionId={id} readOnly={isClosed || exporting} />
+                        <ArgumentList arguments={pros} type="pro" decisionId={id} readOnly={isClosed || exporting} />
                         {!exporting && <AddArgumentForm decisionId={id} type="pro" readOnly={isClosed} />}
                     </div>
                     <div className="cons-column" style={{ flex: 1 }}>
-                        <ArgumentList arguments={cons} type="con" title={decision.question || decision.text} decisionId={id} readOnly={isClosed || exporting} />
+                        <ArgumentList arguments={cons} type="con" decisionId={id} readOnly={isClosed || exporting} />
                         {!exporting && <AddArgumentForm decisionId={id} type="con" readOnly={isClosed} />}
                     </div>
                 </div>

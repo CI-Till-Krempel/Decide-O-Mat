@@ -2,11 +2,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AddArgumentForm from './AddArgumentForm';
+import { UserProvider } from '../contexts/UserContext';
 
 // Mock the firebase module
 vi.mock('../services/firebase', () => ({
     addArgument: vi.fn(),
 }));
+
+// Mock UserContext to provide a default user with displayName
+vi.mock('../contexts/UserContext', async () => {
+    const actual = await vi.importActual('../contexts/UserContext');
+    return {
+        ...actual,
+        useUser: vi.fn(() => ({
+            user: { userId: 'test-user-id', displayName: 'Test User' },
+            setDisplayName: vi.fn()
+        }))
+    };
+});
 
 import { addArgument as mockAddArgument } from '../services/firebase';
 
@@ -54,7 +67,7 @@ describe('AddArgumentForm Component', () => {
         await user.click(button);
 
         await waitFor(() => {
-            expect(mockAddArgument).toHaveBeenCalledWith(mockDecisionId, 'pro', 'Great benefit');
+            expect(mockAddArgument).toHaveBeenCalledWith(mockDecisionId, 'pro', 'Great benefit', 'Test User', 'test-user-id');
             expect(input).toHaveValue(''); // Input should be cleared
         });
     });
