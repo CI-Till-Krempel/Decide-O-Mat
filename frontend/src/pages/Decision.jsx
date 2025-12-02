@@ -80,14 +80,14 @@ function Decision() {
             return;
         }
 
-        await performFinalVote(voteType);
+        await performFinalVote(voteType, user.displayName);
     };
 
-    const performFinalVote = async (voteType) => {
+    const performFinalVote = async (voteType, displayName) => {
         setIsVoting(true);
 
         try {
-            await voteDecision(id, voteType, user.userId, user.displayName);
+            await voteDecision(id, voteType, user.userId, displayName || user.displayName);
 
             // Update local state
             setFinalVote(voteType);
@@ -103,9 +103,9 @@ function Decision() {
     const handleNameSave = async (name) => {
         setDisplayName(name);
         setShowNamePrompt(false);
-        // Perform the vote after saving the name
+        // Perform the vote after saving the name, passing the name directly
         if (pendingVoteType) {
-            await performFinalVote(pendingVoteType);
+            await performFinalVote(pendingVoteType, name);
             setPendingVoteType(null);
         }
     };
