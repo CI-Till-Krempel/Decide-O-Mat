@@ -23,7 +23,7 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Verify**: Run builds, tests, and linting immediately after changes.
     - `npm run build`
     - `npm test`
-    - `npm run lint`
+    - `npm run lint` (Run in both `frontend` and `functions` directories)
 - **Fix**: If verification fails, fix the issue immediately.
 
 ### 3. Version Control
