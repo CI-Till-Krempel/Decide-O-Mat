@@ -177,7 +177,7 @@ exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
 });
 
 exports.voteDecision = onCall({cors: true}, async (request) => {
-  const {decisionId, vote, userId} = request.data;
+  const {decisionId, vote, userId, displayName} = request.data;
 
   if (!decisionId || !vote || !userId) {
     throw new HttpsError("invalid-argument", "Missing decisionId, vote, or userId");
@@ -227,6 +227,7 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
       // Update the vote
       transaction.update(voteRef, {
         vote: vote,
+        displayName: displayName || "Anonymous",
         updatedAt: FieldValue.serverTimestamp(),
       });
     } else {
@@ -241,6 +242,7 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
       transaction.set(voteRef, {
         vote: vote,
         userId: userId,
+        displayName: displayName || "Anonymous",
         createdAt: FieldValue.serverTimestamp(),
       });
     }

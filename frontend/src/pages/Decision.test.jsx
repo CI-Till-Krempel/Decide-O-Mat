@@ -355,7 +355,7 @@ describe('Decision Component', () => {
             await user.click(yesButton);
 
             await waitFor(() => {
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'yes', 'test-user-id');
+                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'yes', 'test-user-id', 'Test User');
             });
         });
 
@@ -373,7 +373,7 @@ describe('Decision Component', () => {
             await user.click(noButton);
 
             await waitFor(() => {
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'test-user-id');
+                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'test-user-id', 'Test User');
             });
         });
 
@@ -423,7 +423,7 @@ describe('Decision Component', () => {
 
             await waitFor(() => {
                 // Should call voteDecision with new vote
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'test-user-id');
+                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'test-user-id', 'Test User');
             });
         });
 

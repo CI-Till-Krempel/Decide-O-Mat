@@ -4,12 +4,13 @@ import { subscribeToDecision, subscribeToArguments, toggleDecisionStatus, voteDe
 import ArgumentList from '../components/ArgumentList';
 import AddArgumentForm from '../components/AddArgumentForm';
 import UserSettings from '../components/UserSettings';
+import NamePrompt from '../components/NamePrompt';
 import { useUser } from '../contexts/UserContext';
 import { toPng } from 'html-to-image';
 
 function Decision() {
     const { id } = useParams();
-    const { user } = useUser();
+    const { user, setDisplayName } = useUser();
     const [decision, setDecision] = useState(null);
     const [loading, setLoading] = useState(true);
     const [pros, setPros] = useState([]);
@@ -19,6 +20,8 @@ function Decision() {
     const [isVoting, setIsVoting] = useState(false);
     const [exporting, setExporting] = useState(false);
     const [finalVotesList, setFinalVotesList] = useState([]);
+    const [showNamePrompt, setShowNamePrompt] = useState(false);
+    const [pendingVoteType, setPendingVoteType] = useState(null);
     const decisionRef = useRef(null);
 
     useEffect(() => {
@@ -69,10 +72,22 @@ function Decision() {
 
     const handleFinalVote = async (voteType) => {
         if (isVoting || decision.status === 'closed') return;
+
+        // Check if user has a display name
+        if (!user.displayName) {
+            setPendingVoteType(voteType);
+            setShowNamePrompt(true);
+            return;
+        }
+
+        await performFinalVote(voteType);
+    };
+
+    const performFinalVote = async (voteType) => {
         setIsVoting(true);
 
         try {
-            await voteDecision(id, voteType, user.userId);
+            await voteDecision(id, voteType, user.userId, user.displayName);
 
             // Update local state
             setFinalVote(voteType);
@@ -82,6 +97,16 @@ function Decision() {
             alert("Failed to cast vote.");
         } finally {
             setIsVoting(false);
+        }
+    };
+
+    const handleNameSave = async (name) => {
+        setDisplayName(name);
+        setShowNamePrompt(false);
+        // Perform the vote after saving the name
+        if (pendingVoteType) {
+            await performFinalVote(pendingVoteType);
+            setPendingVoteType(null);
         }
     };
 
@@ -135,6 +160,15 @@ function Decision() {
 
     return (
         <div className="container">
+            {showNamePrompt && (
+                <NamePrompt
+                    onSave={handleNameSave}
+                    onCancel={() => {
+                        setShowNamePrompt(false);
+                        setPendingVoteType(null);
+                    }}
+                />
+            )}
             <UserSettings />
             <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
