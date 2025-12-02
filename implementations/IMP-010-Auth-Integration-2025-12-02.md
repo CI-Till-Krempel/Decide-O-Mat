@@ -22,3 +22,8 @@ This session focused on finalizing the authentication integration and establishi
 ### 3. Documentation Structure
 **Decision:** We moved implementation notes to a dedicated `implementations` directory with filenames referencing the Story ID (e.g., `IMP-010`).
 **Reasoning:** This creates a clear audit trail linking code changes to specific requirements and plans. It separates high-level planning (`plans/`) from the "as-built" technical documentation (`implementations/`), allowing us to capture deviations and detailed engineering decisions that don't belong in the initial plan.
+
+### 4. Anonymous Vote Display Bug
+**Issue:** Users who voted without first adding an argument saw their votes displayed as "Anonymous" even after setting their display name elsewhere.
+**Root Cause:** The `ArgumentItem` component did not prompt users for their display name before voting. The name prompt only existed in `AddArgumentForm`, so users who voted first (without adding arguments) never had `user.displayName` set, resulting in votes being stored with `displayName: null` which rendered as "Anonymous".
+**Resolution:** Added the same name prompt pattern from `AddArgumentForm` to `ArgumentItem`. Now when a user attempts to vote without a display name, they are prompted to enter their name first. The vote is then executed with the newly saved display name, ensuring all votes show the correct user identity.
