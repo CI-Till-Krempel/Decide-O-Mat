@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.3.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
+            echo "TAG_NAME=${{ inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+            echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          fi
+
+      - name: Extract Changelog
+        id: extract_changelog
+        # We use a simple awk script to extract the section for the specific version
+        # It looks for "## [Version]" and stops at the next "## ["
+        run: |
+          VERSION_NUM=${VERSION#v}
+          # Escape dots for regex
+          VERSION_REGEX="\[${VERSION_NUM//./\\.}\]"
+          
+          echo "Extracting changelog for version $VERSION_NUM"
+          
+          # Extract content between the version header and the next header
+          sed -n "/^## $VERSION_REGEX/,/^## \[/p" CHANGELOG.md | sed '$d' > release_notes.md
+          
+          # If empty (e.g. last entry), try without stripping last line
+          if [ ! -s release_notes.md ]; then
+             sed -n "/^## $VERSION_REGEX/,/^## \[/p" CHANGELOG.md > release_notes.md
+          fi
+          
+          # Remove the first line (the header itself)
+          tail -n +2 release_notes.md > release_notes_body.md
+          
+          echo "Release notes content:"
+          cat release_notes_body.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: Release ${{ env.VERSION }}
+          body_path: release_notes_body.md
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
