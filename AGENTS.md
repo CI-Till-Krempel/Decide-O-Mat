@@ -23,14 +23,19 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Verify**: Run builds, tests, and linting immediately after changes.
     - `npm run build`
     - `npm test`
-    - `npm run lint`
+    - `npm run lint` (Run in both `frontend` and `functions` directories)
 - **Fix**: If verification fails, fix the issue immediately.
 
 ### 3. Version Control
 - **Commit Frequently**: Commit code as soon as a small unit of work is stable and verified.
 - **Commit Messages**: Use descriptive messages explaining *what* changed and *why*.
 
-### 4. Review Process
+### 4. Documentation
+- **Implementation Notes**: For every non-trivial task, create a technical note in the `implementations/` directory.
+    - **Filename**: `[Story-ID]-[Description]-[Date].md` (e.g., `IMP-010-Auth-Integration-2025-12-02.md`).
+    - **Content**: Explain *why* specific changes were made, technical reasoning, and deviations from the original plan. Focus on the "why", not just the "what".
+
+### 5. Review Process
 - **Pull Requests**: All changes should be submitted via Pull Requests (PRs) on GitHub.
 - **Human Review**: The human user acts as the reviewer. The agent must address all feedback before merging.
 - **No Direct Merges**: Avoid pushing directly to the `main` branch for non-trivial changes.

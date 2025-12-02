@@ -5,8 +5,16 @@ service cloud.firestore {
     match /decisions/{decisionId} {
       allow read, write: if true;
       
+      match /finalVotes/{userId} {
+        allow read, write: if true;
+      }
+
       match /arguments/{argumentId} {
         allow read, write: if true;
+        
+        match /votes/{userId} {
+          allow read, write: if true;
+        }
       }
     }
   }

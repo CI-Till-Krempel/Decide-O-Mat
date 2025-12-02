@@ -31,17 +31,26 @@ export const createDecision = async (question) => {
     return result.data.id;
 };
 
-export const addArgument = async (decisionId, type, text) => {
+export const addArgument = async (decisionId, type, text, authorName, authorId) => {
     const addArgumentFn = httpsCallable(functions, 'addArgument');
-    const result = await addArgumentFn({ decisionId, type, text });
+    const payload = { decisionId, type, text };
+
+    // Add optional author information if provided
+    if (authorName) {
+        payload.authorName = authorName;
+    }
+    if (authorId) {
+        payload.authorId = authorId;
+    }
+
+    const result = await addArgumentFn(payload);
     return result.data.id;
 };
 
-export const voteArgument = async (decisionId, argumentId, voteChange) => {
+export const voteArgument = async (decisionId, argumentId, userId, displayName) => {
     const voteArgumentFunction = httpsCallable(functions, 'voteArgument');
-    console.log("Calling voteArgument with:", { decisionId, argumentId, change: voteChange });
-    // Explicitly passing 'change' as the property name to match backend expectation
-    return await voteArgumentFunction({ decisionId, argumentId, change: voteChange });
+    console.log("Calling voteArgument with:", { decisionId, argumentId, userId, displayName });
+    return await voteArgumentFunction({ decisionId, argumentId, userId, displayName });
 };
 
 export const toggleDecisionStatus = async (decisionId, status) => {
@@ -49,9 +58,9 @@ export const toggleDecisionStatus = async (decisionId, status) => {
     return await toggleFunction({ decisionId, status });
 };
 
-export const voteDecision = async (decisionId, vote, change) => {
+export const voteDecision = async (decisionId, vote, userId, displayName) => {
     const voteDecisionFunction = httpsCallable(functions, 'voteDecision');
-    return await voteDecisionFunction({ decisionId, vote, change });
+    return await voteDecisionFunction({ decisionId, vote, userId, displayName });
 };
 
 export const subscribeToDecision = (decisionId, callback) => {
@@ -76,6 +85,28 @@ export const getDecision = async (id) => {
     }
 };
 
+export const subscribeToArgumentVotes = (decisionId, argumentId, callback) => {
+    const votesRef = collection(db, "decisions", decisionId, "arguments", argumentId, "votes");
+    return onSnapshot(votesRef, (snapshot) => {
+        const votes = [];
+        snapshot.forEach((doc) => {
+            votes.push({ id: doc.id, ...doc.data() });
+        });
+        callback(votes);
+    });
+};
+
+export const subscribeToFinalVotes = (decisionId, callback) => {
+    const votesRef = collection(db, "decisions", decisionId, "finalVotes");
+    return onSnapshot(votesRef, (snapshot) => {
+        const votes = [];
+        snapshot.forEach((doc) => {
+            votes.push({ id: doc.id, ...doc.data() });
+        });
+        callback(votes);
+    });
+};
+
 export const subscribeToArguments = (decisionId, callback) => {
     const q = query(
         collection(db, "decisions", decisionId, "arguments"),
@@ -87,6 +118,8 @@ export const subscribeToArguments = (decisionId, callback) => {
             args.push({ id: doc.id, ...doc.data() });
         });
         callback(args);
+    }, (error) => {
+        console.error("Error subscribing to arguments:", error);
     });
 };
 
