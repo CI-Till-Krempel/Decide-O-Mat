@@ -27,3 +27,11 @@ This session focused on finalizing the authentication integration and establishi
 **Issue:** Users who voted without first adding an argument saw their votes displayed as "Anonymous" even after setting their display name elsewhere.
 **Root Cause:** The `ArgumentItem` component did not prompt users for their display name before voting. The name prompt only existed in `AddArgumentForm`, so users who voted first (without adding arguments) never had `user.displayName` set, resulting in votes being stored with `displayName: null` which rendered as "Anonymous".
 **Resolution:** Added the same name prompt pattern from `AddArgumentForm` to `ArgumentItem`. Now when a user attempts to vote without a display name, they are prompted to enter their name first. The vote is then executed with the newly saved display name, ensuring all votes show the correct user identity.
+
+### 5. Anonymous Final Vote Display Bug
+**Issue:** The same anonymous display issue occurred for final votes (Yes/No votes on the decision itself).
+**Root Cause:** The backend `voteDecision` function did not accept or store a `displayName` parameter at all. The frontend was only passing `userId` without prompting for or passing the display name.
+**Resolution:** 
+- **Backend**: Updated `voteDecision` Cloud Function to accept a `displayName` parameter and store it in both new and updated vote records.
+- **Frontend**: Added name prompt logic to `Decision.jsx` similar to `ArgumentItem`. Users are now prompted for their name before casting a final vote if they haven't set one yet.
+- **Tests**: Updated all test assertions to expect the new function signature with the `displayName` parameter.
