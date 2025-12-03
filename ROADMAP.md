@@ -32,7 +32,6 @@
     - [x] "Close" decision functionality (prevent new votes).
     - [x] Export results as image.
 
-
 ## v1.2: Take decision
     - [x] Users should be able to vote for the final decision (yes / no)
     - [x] The final decision should be displayed, not only the Net Score
@@ -53,10 +52,31 @@
     - [ ] Add a simple user self service
     - [ ] Add a list of my decisions (both open and private)
 
+## v1.4.1 Deployment
+    - [ ] Create a separate development deployment
+    - [ ] Create a separate staging deployment
+    
 ## v1.5 Private Decisions
     - [ ] When creating a decision, let the user choose wether it is open or private
     - [ ] Create a list of participants for private decisions
     - [ ] Restrict the closing of decisions to the owner
+
+## v1.6 Production Readiness and Compliance
+    - [ ] Add a productive domain address
+    - [ ] Add impress for legal requirements
+    - [ ] Add data privacy statement
+    - [ ] Add terms of service
+    - [ ] Add privacy policy
+    - [ ] GDPR Compliant use of cookies
+    - [ ] GDPR Compliant use of google services
+
+## v1.7 Security
+    - [ ] Do a security audit
+    - [ ] Add end-to-end user data encryption
+    - [ ] Audit user data access
+    - [ ] Audit data access for private decisions
+    - [ ] Audit data access for open decisions
+    - [ ] Check development setup
 
 ## v2.0: Multi-Option Decisions (Future)
 - **Goal**: Support complex decisions with multiple choices (not just Yes/No).
