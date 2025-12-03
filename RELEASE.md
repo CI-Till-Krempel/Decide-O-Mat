@@ -28,30 +28,34 @@ Each version should have a section with the version number and date:
 
 The release process is automated using GitHub Actions. To trigger a release, follow these steps:
 
-1.  **Update Changelog**:
+1.  **Generate Announcement**:
+    - Create a blog post in `announcements/vX.Y.md`.
+    - Outline new features and future plans.
+
+2.  **Update Changelog**:
     - Add a new section in `CHANGELOG.md` for the new version.
     - Move "Unreleased" items to this new section.
     - Ensure the date is correct (YYYY-MM-DD).
 
-2.  **Bump Version**:
+3.  **Bump Version**:
     - Update the `version` field in `frontend/package.json`.
     - (Optional) Update `functions/package.json` if backend changes were made.
 
-3.  **Commit Changes**:
+4.  **Commit Changes**:
     ```bash
     git add CHANGELOG.md frontend/package.json
     git commit -m "chore: bump version to x.y.z"
     git push origin main
     ```
 
-4.  **Tag and Push**:
+5.  **Tag and Push**:
     Create a git tag matching the version number (must start with `v`).
     ```bash
     git tag vx.y.z
     git push origin vx.y.z
     ```
 
-5.  **Automation**:
+6.  **Automation**:
     - The GitHub Action `release.yml` will automatically trigger.
     - It will extract the release notes from `CHANGELOG.md`.
     - It will create a GitHub Release with the corresponding tag and notes.

@@ -40,6 +40,11 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Human Review**: The human user acts as the reviewer. The agent must address all feedback before merging.
 - **No Direct Merges**: Avoid pushing directly to the `main` branch for non-trivial changes.
 
+### 6. Release Preparation
+- **Announcement Post**: For every major and minor release, generate a short blog post announcing the new version.
+    - **Location**: `announcements/v[VERSION].md`
+    - **Content**: Brief introduction, new features, and a teaser for the next version.
+
 ## Communication
 - Use the `notify_user` tool to request reviews or ask questions.
 - Be concise and specific in your communication.
