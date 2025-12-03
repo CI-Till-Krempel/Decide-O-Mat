@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, doc, query, orderBy, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
+import { getAuth, connectAuthEmulator } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,12 +17,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app);
+const auth = getAuth(app);
 
 // Connect to emulators if running locally
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     console.log("Connecting to Firebase Emulators...");
     connectFirestoreEmulator(db, 'localhost', 8080);
     connectFunctionsEmulator(functions, 'localhost', 5001);
+    connectAuthEmulator(auth, "http://localhost:9099");
     console.log("Functions region:", functions.region);
 }
 
@@ -123,4 +126,4 @@ export const subscribeToArguments = (decisionId, callback) => {
     });
 };
 
-export { db, functions };
+export { db, functions, auth };
