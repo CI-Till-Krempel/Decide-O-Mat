@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "decide-o-mat"
+    "default": "decide-o-mat",
+    "staging": "decide-o-mat-staging",
+    "prod": "decide-o-mat"
   }
 }
