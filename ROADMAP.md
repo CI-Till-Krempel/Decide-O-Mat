@@ -32,7 +32,6 @@
     - [x] "Close" decision functionality (prevent new votes).
     - [x] Export results as image.
 
-
 ## v1.2: Take decision
     - [x] Users should be able to vote for the final decision (yes / no)
     - [x] The final decision should be displayed, not only the Net Score
@@ -62,9 +61,9 @@
     - [ ] Create a list of participants for private decisions
     - [ ] Restrict the closing of decisions to the owner
 
-## v1.6 Production Readiness
+## v1.6 Production Readiness and Compliance
     - [ ] Add a productive domain address
-    - [ ] Add and impress for legal requirements
+    - [ ] Add impress for legal requirements
     - [ ] Add data privacy statement
     - [ ] Add terms of service
     - [ ] Add privacy policy
