@@ -10,21 +10,21 @@ runConfig:
 
 env:
   - variable: NODE_ENV
-    value: production
+    value: ${NODE_ENV}
   - variable: PORT
-    value: "8080"
+    value: "${PORT}"
   - variable: VITE_FIREBASE_API_KEY
-    value: "AIzaSyC9mNXI73UugDyGiIzWoDg_5e8vKdFfosM"
+    value: "${VITE_FIREBASE_API_KEY}"
   - variable: VITE_FIREBASE_AUTH_DOMAIN
-    value: "decide-o-mat.firebaseapp.com"
+    value: "${VITE_FIREBASE_AUTH_DOMAIN}"
   - variable: VITE_FIREBASE_PROJECT_ID
-    value: "decide-o-mat"
+    value: "${VITE_FIREBASE_PROJECT_ID}"
   - variable: VITE_FIREBASE_STORAGE_BUCKET
-    value: "decide-o-mat.firebasestorage.app"
+    value: "${VITE_FIREBASE_STORAGE_BUCKET}"
   - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
-    value: "392455957988"
+    value: "${VITE_FIREBASE_MESSAGING_SENDER_ID}"
   - variable: VITE_FIREBASE_APP_ID
-    value: "1:392455957988:web:eb89fe86cee30aef5b6bf1"
+    value: "${VITE_FIREBASE_APP_ID}"
   - variable: VITE_FIREBASE_MEASUREMENT_ID
-    value: "G-6BKMBG3HJ5"
+    value: "${VITE_FIREBASE_MEASUREMENT_ID}"
 
