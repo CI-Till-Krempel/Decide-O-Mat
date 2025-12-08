@@ -21,6 +21,68 @@ Navigate the project documentation:
 - **[Changelog](CHANGELOG.md)**  
   History of all notable changes, features, and bug fixes for each released version.
 
+## Development Workflow
+
+### Environments
+
+We use a multi-stage environment setup to ensure stability:
+
+1.  **Local Development**:
+    *   **Frontend**: Runs locally via Vite (`npm run dev`). Connects to Firebase Emulators for data.
+    *   **Backend**: Runs locally via Firebase Emulators (`firebase emulators:start`).
+    *   **Config**: Uses `.env.local` for initialization credentials (safe to use Staging credentials here).
+
+2.  **Staging (`staging`)**:
+    *   **Trigger**: Automatically deployed on every push to the `main` branch.
+    *   **Purpose**: Integration testing and verification in a live environment.
+    *   **URL**: `https://decide-o-mat-staging.web.app`
+
+3.  **Production (`prod`)**:
+    *   **Trigger**: Automatically deployed when a version tag (e.g., `v1.2.0`) is pushed.
+    *   **Purpose**: Live application for end users.
+    *   **URL**: `https://decide-o-mat.web.app`
+
+### Setup for New Developers
+
+1.  **Prerequisites**:
+    *   Node.js (v20+)
+    *   Firebase CLI (`npm install -g firebase-tools`)
+    *   Java (for Firebase Emulators)
+
+2.  **Clone & Install**:
+    ```bash
+    git clone <repository-url>
+    cd decide-o-mat
+    cd frontend && npm install
+    cd ../functions && npm install
+    ```
+
+3.  **Configure Environment**:
+    *   Create `frontend/.env.local`.
+    *   Populate it with **Staging** project credentials (ask a team member or get them from the Firebase Console > Project Settings).
+    *   *Note: These are only used to initialize the SDK. Local development connects to emulators.*
+
+    ```env
+    VITE_FIREBASE_API_KEY=...
+    VITE_FIREBASE_AUTH_DOMAIN=...
+    VITE_FIREBASE_PROJECT_ID=...
+    VITE_FIREBASE_STORAGE_BUCKET=...
+    VITE_FIREBASE_MESSAGING_SENDER_ID=...
+    VITE_FIREBASE_APP_ID=...
+    VITE_FIREBASE_MEASUREMENT_ID=...
+    ```
+
+4.  **Start Development Server**:
+    *   **Terminal 1 (Emulators)**:
+        ```bash
+        firebase emulators:start
+        ```
+    *   **Terminal 2 (Frontend)**:
+        ```bash
+        cd frontend
+        npm run dev
+        ```
+
 ## Development Resources
 
 Directories containing detailed development artifacts:
