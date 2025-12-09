@@ -145,6 +145,9 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
+      - name: Debug Output Service Account
+        run: gcloud auth list
+
       - name: Trigger App Hosting Rollout (Production)
         run: |
           npm install -g firebase-tools
