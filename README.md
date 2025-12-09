@@ -48,6 +48,7 @@ We use a multi-stage environment setup to ensure stability:
 
 The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOUNT`) requires the following Google Cloud IAM roles:
 
+*   **Firebase App Hosting Admin** (`roles/firebaseapphosting.admin`): To manage App Hosting backends and rollouts.
 *   **Cloud Functions Admin** (`roles/cloudfunctions.admin`): To deploy functions.
 *   **Cloud Run Admin** (`roles/run.admin`): Required for Cloud Functions 2nd Gen (which uses Cloud Run).
 *   **Artifact Registry Admin** (`roles/artifactregistry.admin`): To store function container images.
