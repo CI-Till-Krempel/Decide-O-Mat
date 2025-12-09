@@ -36,7 +36,7 @@ To prevent unauthorized or accidental deployments to production, we use **GitHub
     - Check the box.
     - Add trusted team members (or yourself) as reviewers.
 5.  (Optional) Enable **Deployment Branches**:
-    - Restrict deployment to the `main` branch or `v*` tags.
+    - Restrict deployment to the `main` branch or tags matching `v*` (e.g., `v1.0.0`).
 
 **Effect:** When the `deploy-prod` job is triggered, it will pause and wait for manual approval from a reviewer before proceeding.
 
