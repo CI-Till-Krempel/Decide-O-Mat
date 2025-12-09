@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2025-12-09
+
+### Added
+- **Footer**: Added a footer component to display version and environment information (in non-prod environments).
+- **Deployment Documentation**: Added comprehensive deployment guide in `README.md` and `RELEASE.md`.
+
+### Changed
+- **Deployment Security**: Switched to using Google Cloud Service Accounts for GitHub Actions deployments instead of long-lived tokens.
+- **CI/CD**: Updated deployment workflow to inject environment variables at build time.
+
 ## [1.3.0] - 2025-12-02
 
 ### Added
