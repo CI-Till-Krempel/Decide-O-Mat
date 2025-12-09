@@ -59,9 +59,9 @@ The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOU
 *   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
 
 > **Advanced: Minimal Billing Permissions (Read-Only)**
-> To allow the deployment to check billing status *without* granting write access (`Project Billing Manager`), add these two predefined roles:
-> 1.  **Billing Account Viewer** (`roles/billing.viewer`): Allows checking the billing account link (Read-Only).
-> 2.  **Service Usage Consumer** (`roles/serviceusage.serviceUsageConsumer`): Allows checking if the Cloud Billing API is enabled.
+> To allow the deployment to check billing status *without* granting write access, add these two roles:
+> 1.  **Browser** (`roles/browser`): Allows reading project metadata (like billing enabled status).
+> 2.  **Service Usage Consumer** (`roles/serviceusage.serviceUsageConsumer`): Allows checking api usage.
 
 ### Setup for New Developers
 
