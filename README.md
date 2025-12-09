@@ -58,10 +58,10 @@ The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOU
 *   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
 *   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
 
-> **Advanced: Minimal Billing Permissions (Custom Role)**
-> If you prefer not to grant `Project Billing Manager`, you can create a [Custom Role](https://console.cloud.google.com/iam-admin/roles) with just these specific permissions required for the check:
-> *   `billing.resourceAssociations.list` (To see the project is linked to a billing account)
-> *   `serviceusage.services.use` (To check if the Billing API is enabled)
+> **Advanced: Minimal Billing Permissions (Read-Only)**
+> To allow the deployment to check billing status *without* granting write access (`Project Billing Manager`), add these two predefined roles:
+> 1.  **Billing Account Viewer** (`roles/billing.viewer`): Allows checking the billing account link (Read-Only).
+> 2.  **Service Usage Consumer** (`roles/serviceusage.serviceUsageConsumer`): Allows checking if the Cloud Billing API is enabled.
 
 ### Setup for New Developers
 
