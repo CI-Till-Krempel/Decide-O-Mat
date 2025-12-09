@@ -120,6 +120,9 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Generate Version JSON
+        run: |
+          echo "{\"commitHash\": \"${{ github.sha }}\"}" > frontend/version.json
       - name: Deploy to Staging
         if: steps.check_label.outputs.skip_deploy != 'true'
         run: |
@@ -177,6 +180,9 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Generate Version JSON
+        run: |
+          echo "{\"commitHash\": \"${{ github.sha }}\"}" > frontend/version.json
       - name: Deploy to Production
         run: |
           npm install -g firebase-tools

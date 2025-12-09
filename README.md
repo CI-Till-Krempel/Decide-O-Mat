@@ -43,14 +43,25 @@ We use a multi-stage environment setup to ensure stability:
     *   **URL**: `https://decide-o-mat.web.app`
 45: 
 46: ### Service Account Permissions
-47: 
-48: The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOUNT`) requires the following Google Cloud IAM roles:
-49: 
-50: *   **Cloud Functions Admin** (`roles/cloudfunctions.admin`): To deploy functions.
-51: *   **Firebase Hosting Admin** (`roles/firebasehosting.admin`): To deploy hosting sites.
-52: *   **Firebase Rules Admin** (`roles/firebaserules.admin`): To deploy/test security rules.
-53: *   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
-54: *   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
+
+### Service Account Permissions
+
+The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOUNT`) requires the following Google Cloud IAM roles:
+
+*   **Cloud Functions Admin** (`roles/cloudfunctions.admin`): To deploy functions.
+*   **Cloud Run Admin** (`roles/run.admin`): Required for Cloud Functions 2nd Gen (which uses Cloud Run).
+*   **Artifact Registry Admin** (`roles/artifactregistry.admin`): To store function container images.
+*   **Firebase Hosting Admin** (`roles/firebasehosting.admin`): To deploy hosting sites.
+*   **Firebase Rules Admin** (`roles/firebaserules.admin`): To deploy/test security rules.
+*   **Cloud Datastore Index Admin** (`roles/datastore.indexAdmin`): To manage Firestore indexes.
+*   **Firebase Extensions Viewer** (`roles/firebaseextensions.viewer`): To list installed extensions during deploy.
+*   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
+*   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
+
+> **Advanced: Minimal Billing Permissions (Read-Only)**
+> To allow the deployment to check billing status *without* granting write access, add these two roles:
+> 1.  **Browser** (`roles/browser`): Allows reading project metadata (like billing enabled status).
+> 2.  **Service Usage Consumer** (`roles/serviceusage.serviceUsageConsumer`): Allows checking api usage.
 
 ### Setup for New Developers
 

@@ -5,7 +5,30 @@ import fs from 'fs'
 
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 // Use env var if present (CI), otherwise git (local)
-const commitHash = process.env.VITE_COMMIT_HASH || execSync('git rev-parse --short HEAD').toString().trim()
+// Try to get commit hash from multiple sources
+let commitHash = process.env.VITE_COMMIT_HASH
+
+// 1. Try version.json (generated in CI for Cloud Build)
+if (!commitHash) {
+  try {
+    const versionJson = JSON.parse(fs.readFileSync('./version.json', 'utf-8'))
+    if (versionJson.commitHash) {
+      commitHash = versionJson.commitHash
+    }
+  } catch {
+    // version.json optional
+  }
+}
+
+// 2. Try git (local dev)
+if (!commitHash) {
+  try {
+    commitHash = execSync('git rev-parse --short HEAD').toString().trim()
+  } catch {
+    console.warn('Could not determine commit hash (git failed and VITE_COMMIT_HASH not set)')
+    commitHash = 'unknown'
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
