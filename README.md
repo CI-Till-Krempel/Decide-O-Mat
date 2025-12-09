@@ -80,17 +80,18 @@ The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOU
 
 3.  **Configure Environment**:
     *   Create `frontend/.env.local`.
-    *   Populate it with **Staging** project credentials (ask a team member or get them from the Firebase Console > Project Settings).
-    *   *Note: These are only used to initialize the SDK. Local development connects to emulators.*
-
+    *   Create `frontend/.env.local`.
+    *   Populate it with dummy credentials. Since we use Emulators, these values don't need to be real (except `VITE_FIREBASE_PROJECT_ID` which should match the emulator default).
+    
     ```env
-    VITE_FIREBASE_API_KEY=...
-    VITE_FIREBASE_AUTH_DOMAIN=...
-    VITE_FIREBASE_PROJECT_ID=...
-    VITE_FIREBASE_STORAGE_BUCKET=...
-    VITE_FIREBASE_MESSAGING_SENDER_ID=...
-    VITE_FIREBASE_APP_ID=...
-    VITE_FIREBASE_MEASUREMENT_ID=...
+    VITE_FIREBASE_API_KEY=fake-api-key
+    VITE_FIREBASE_AUTH_DOMAIN=decide-o-mat.firebaseapp.com
+    VITE_FIREBASE_PROJECT_ID=decide-o-mat
+    VITE_FIREBASE_STORAGE_BUCKET=decide-o-mat.appspot.com
+    VITE_FIREBASE_MESSAGING_SENDER_ID=fake-sender-id
+    VITE_FIREBASE_APP_ID=fake-app-id
+    VITE_FIREBASE_MEASUREMENT_ID=fake-measurement-id
+    VITE_APP_ENV=Local
     ```
 
 4.  **Start Development Server**:
