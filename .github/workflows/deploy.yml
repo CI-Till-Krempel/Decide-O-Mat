@@ -67,6 +67,21 @@ jobs:
     environment: STAGING
     steps:
       - uses: actions/checkout@v4
+      - name: Check for NO_DEPLOY label
+        id: check_label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch PRs associated with this commit
+          # We search for merged PRs containing this commit SHA
+          PR_LABELS=$(gh pr list --search "${{ github.sha }}" --state merged --json labels --jq '.[0].labels[].name')
+          
+          if echo "$PR_LABELS" | grep -q "NO_DEPLOY"; then
+            echo "skip_deploy=true" >> $GITHUB_OUTPUT
+            echo "::notice::Found NO_DEPLOY label. Deployment to staging will be skipped."
+          else
+            echo "skip_deploy=false" >> $GITHUB_OUTPUT
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
