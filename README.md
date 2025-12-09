@@ -53,6 +53,7 @@ The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOU
 *   **Artifact Registry Admin** (`roles/artifactregistry.admin`): To store function container images.
 *   **Firebase Hosting Admin** (`roles/firebasehosting.admin`): To deploy hosting sites.
 *   **Firebase Rules Admin** (`roles/firebaserules.admin`): To deploy/test security rules.
+*   **Cloud Datastore Index Admin** (`roles/datastore.indexAdmin`): To manage Firestore indexes.
 *   **Firebase Extensions Viewer** (`roles/firebaseextensions.viewer`): To list installed extensions during deploy.
 *   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
 *   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
