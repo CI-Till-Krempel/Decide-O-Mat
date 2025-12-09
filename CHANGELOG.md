@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.2] - 2025-12-09
+
+### Fixed
+- **Linting**: Fixed linter error in `vite.config.js` regarding undefined `process`.
+
 ## [1.3.1] - 2025-12-09
 
 ### Added
