@@ -54,10 +54,14 @@ The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOU
 *   **Firebase Hosting Admin** (`roles/firebasehosting.admin`): To deploy hosting sites.
 *   **Firebase Rules Admin** (`roles/firebaserules.admin`): To deploy/test security rules.
 *   **Cloud Datastore Index Admin** (`roles/datastore.indexAdmin`): To manage Firestore indexes.
-*   **Project Billing Manager** (`roles/billing.projectManager`): To verify the project's billing status (required for Cloud Functions).
 *   **Firebase Extensions Viewer** (`roles/firebaseextensions.viewer`): To list installed extensions during deploy.
 *   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
 *   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
+
+> **Advanced: Minimal Billing Permissions (Custom Role)**
+> If you prefer not to grant `Project Billing Manager`, you can create a [Custom Role](https://console.cloud.google.com/iam-admin/roles) with just these specific permissions required for the check:
+> *   `billing.resourceAssociations.list` (To see the project is linked to a billing account)
+> *   `serviceusage.services.use` (To check if the Billing API is enabled)
 
 ### Setup for New Developers
 
