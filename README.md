@@ -43,14 +43,17 @@ We use a multi-stage environment setup to ensure stability:
     *   **URL**: `https://decide-o-mat.web.app`
 45: 
 46: ### Service Account Permissions
-47: 
-48: The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOUNT`) requires the following Google Cloud IAM roles:
-49: 
-50: *   **Cloud Functions Admin** (`roles/cloudfunctions.admin`): To deploy functions.
-51: *   **Firebase Hosting Admin** (`roles/firebasehosting.admin`): To deploy hosting sites.
-52: *   **Firebase Rules Admin** (`roles/firebaserules.admin`): To deploy/test security rules.
-53: *   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
-54: *   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
+
+### Service Account Permissions
+
+The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOUNT`) requires the following Google Cloud IAM roles:
+
+*   **Cloud Functions Admin** (`roles/cloudfunctions.admin`): To deploy functions.
+*   **Firebase Hosting Admin** (`roles/firebasehosting.admin`): To deploy hosting sites.
+*   **Firebase Rules Admin** (`roles/firebaserules.admin`): To deploy/test security rules.
+*   **Firebase Extensions Viewer** (`roles/firebaseextensions.viewer`): To list installed extensions during deploy.
+*   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
+*   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
 
 ### Setup for New Developers
 
