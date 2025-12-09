@@ -6,7 +6,7 @@ import fs from 'fs'
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 // Use env var if present (CI), otherwise git (local)
 // Try to get commit hash from multiple sources
-let commitHash = process.env.VITE_COMMIT_HASH
+const commitHash = process.env.VITE_COMMIT_HASH || process.env.COMMIT_SHA || process.env.GITHUB_SHA
 
 // 1. Try version.json (generated in CI for Cloud Build)
 if (!commitHash) {
