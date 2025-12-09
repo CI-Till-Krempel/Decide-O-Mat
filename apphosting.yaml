@@ -27,4 +27,8 @@ env:
     value: "${VITE_FIREBASE_APP_ID}"
   - variable: VITE_FIREBASE_MEASUREMENT_ID
     value: "${VITE_FIREBASE_MEASUREMENT_ID}"
+  - variable: VITE_APP_ENV
+    value: "${VITE_APP_ENV}"
+  - variable: VITE_COMMIT_HASH
+    value: "${VITE_COMMIT_HASH}"
 
