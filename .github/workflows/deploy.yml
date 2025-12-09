@@ -20,6 +20,10 @@ jobs:
         run: |
           cd frontend
           npm ci
+      - name: Audit Frontend
+        run: |
+          cd frontend
+          npm audit
       - name: Lint Frontend
         run: |
           cd frontend
@@ -55,6 +59,10 @@ jobs:
         run: |
           cd functions
           npm ci
+      - name: Audit Functions
+        run: |
+          cd functions
+          npm audit
       - name: Lint Functions
         run: |
           cd functions
