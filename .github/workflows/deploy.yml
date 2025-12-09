@@ -69,4 +69,87 @@ jobs:
           cd functions
           npm run lint
 
+  deploy-staging:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: STAGING
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for NO_DEPLOY label
+        id: check_label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_LABELS=$(gh pr list --search "${{ github.sha }}" --state merged --json labels --jq '.[0].labels[].name')
+          if echo "$PR_LABELS" | grep -q "NO_DEPLOY"; then
+            echo "skip_deploy=true" >> $GITHUB_OUTPUT
+            echo "::notice::Found NO_DEPLOY label. Deployment to staging will be skipped."
+          else
+            echo "skip_deploy=false" >> $GITHUB_OUTPUT
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm ci
+      # Build is handled by App Hosting, but we run it here to verify it builds
+      - name: Verify Build
+        run: |
+          cd frontend
+          npm run build
+        env:
+          VITE_APP_ENV: Staging
+          VITE_COMMIT_HASH: ${{ github.sha }}
+          # Mock values for verification build
+          VITE_FIREBASE_API_KEY: "mock"
+          VITE_FIREBASE_AUTH_DOMAIN: "mock"
+          VITE_FIREBASE_PROJECT_ID: "mock"
+          VITE_FIREBASE_STORAGE_BUCKET: "mock"
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "mock"
+          VITE_FIREBASE_APP_ID: "mock"
+          VITE_FIREBASE_MEASUREMENT_ID: "mock"
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Trigger App Hosting Rollout (Staging)
+        if: steps.check_label.outputs.skip_deploy != 'true'
+        run: |
+          npm install -g firebase-tools
+          # Trigger rollout. Requires 'decide-o-mat-staging' backend to exist.
+          # We force the rollout from the current commit.
+          firebase apphosting:rollouts:create decide-o-mat-staging --project decide-o-mat-staging --git-branch main --force
+
+  deploy-prod:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: PRODUCTION
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Trigger App Hosting Rollout (Production)
+        run: |
+          npm install -g firebase-tools
+          # Trigger rollout. Requires 'decide-o-mat-prod' backend to exist.
+          firebase apphosting:rollouts:create decide-o-mat-prod --project decide-o-mat --git-commit ${{ github.sha }} --force
+
+
 
