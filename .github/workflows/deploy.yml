@@ -33,6 +33,8 @@ jobs:
           cd frontend
           npm run build
         env:
+          VITE_APP_ENV: CI
+          VITE_COMMIT_HASH: ${{ github.sha }}
           # We use a generic build here, but ideally environment specific vars should be injected at build time.
           # For now, we assume these secrets are available at repo level or we might need to move build into deploy jobs if vars differ.
           # Let's assume for now the build is generic or uses dev vars by default.
@@ -48,6 +50,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+
       - name: Install Functions Dependencies
         run: |
           cd functions
@@ -76,6 +79,8 @@ jobs:
           cd frontend
           npm run build
         env:
+          VITE_APP_ENV: Staging
+          VITE_COMMIT_HASH: ${{ github.sha }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -83,6 +88,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+
       - name: Install Functions Dependencies
         run: |
           cd functions
@@ -126,6 +132,8 @@ jobs:
           cd frontend
           npm run build
         env:
+          VITE_APP_ENV: Production
+          VITE_COMMIT_HASH: ${{ github.sha }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -133,6 +141,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+
       - name: Install Functions Dependencies
         run: |
           cd functions
