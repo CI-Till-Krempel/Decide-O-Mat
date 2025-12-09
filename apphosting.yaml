@@ -10,25 +10,25 @@ runConfig:
 
 env:
   - variable: NODE_ENV
-    value: ${NODE_ENV}
+    value: production
   - variable: PORT
-    value: "${PORT}"
+    value: "8080"
   - variable: VITE_FIREBASE_API_KEY
-    value: "${VITE_FIREBASE_API_KEY}"
+    secret: VITE_FIREBASE_API_KEY
   - variable: VITE_FIREBASE_AUTH_DOMAIN
-    value: "${VITE_FIREBASE_AUTH_DOMAIN}"
+    secret: VITE_FIREBASE_AUTH_DOMAIN
   - variable: VITE_FIREBASE_PROJECT_ID
-    value: "${VITE_FIREBASE_PROJECT_ID}"
+    secret: VITE_FIREBASE_PROJECT_ID
   - variable: VITE_FIREBASE_STORAGE_BUCKET
-    value: "${VITE_FIREBASE_STORAGE_BUCKET}"
+    secret: VITE_FIREBASE_STORAGE_BUCKET
   - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
-    value: "${VITE_FIREBASE_MESSAGING_SENDER_ID}"
+    secret: VITE_FIREBASE_MESSAGING_SENDER_ID
   - variable: VITE_FIREBASE_APP_ID
-    value: "${VITE_FIREBASE_APP_ID}"
+    secret: VITE_FIREBASE_APP_ID
   - variable: VITE_FIREBASE_MEASUREMENT_ID
-    value: "${VITE_FIREBASE_MEASUREMENT_ID}"
-  - variable: VITE_APP_ENV
-    value: "${VITE_APP_ENV}"
-  - variable: VITE_COMMIT_HASH
-    value: "${VITE_COMMIT_HASH}"
+    secret: VITE_FIREBASE_MEASUREMENT_ID
+  # Staging/Production values should be set in the App Hosting Console config
+  # or validated via defaults if not secret.
+  # VITE_APP_ENV and VITE_COMMIT_HASH must be passed via App Hosting environment config
+  # as they change per environment/deployment.
 
