@@ -33,26 +33,47 @@ if (!commitHash) {
 // 3. Fallback Environment Detection
 // App Hosting doesn't always inject VITE_APP_ENV from apphosting.staging.yaml if the env mapping is ambiguous.
 // We fallback to inferring from the Project ID which IS available.
-const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT;
-let appEnv = process.env.VITE_APP_ENV;
-
-if (!appEnv && projectId) {
-  if (projectId.includes('staging')) {
-    appEnv = 'Staging';
-  } else if (projectId.includes('prod') || projectId === 'decide-o-mat') {
-    appEnv = 'Production';
-  }
-}
-
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  define: {
-    __APP_VERSION__: JSON.stringify(packageJson.version),
-    __COMMIT_HASH__: JSON.stringify(commitHash),
-    __APP_ENV__: JSON.stringify(appEnv || 'Local'),
-  },
-  preview: {
-    allowedHosts: true,
-  },
+export default defineConfig(({ command }) => {
+  // 1. Local Development Override
+  // If running via `vite` (dev server), explicitly set to Development
+  if (command === 'serve') {
+    return {
+      plugins: [react()],
+      define: {
+        __APP_VERSION__: JSON.stringify(packageJson.version),
+        __COMMIT_HASH__: JSON.stringify(commitHash),
+        __APP_ENV__: JSON.stringify('Development'),
+      },
+      preview: { allowedHosts: true },
+    }
+  }
+
+  // 2. Build / Production Logic
+  // Fallback Environment Detection for App Hosting
+  const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT;
+  let appEnv = process.env.VITE_APP_ENV;
+
+  if (!appEnv && projectId) {
+    if (projectId.includes('staging')) {
+      appEnv = 'Staging';
+    } else if (projectId.includes('prod') || projectId === 'decide-o-mat') {
+      appEnv = 'Production';
+    }
+  }
+
+  return {
+    plugins: [react()],
+    test: {
+      environment: 'jsdom',
+      globals: true,
+      setupFiles: './src/setupTests.js',
+    },
+    define: {
+      __APP_VERSION__: JSON.stringify(packageJson.version),
+      __COMMIT_HASH__: JSON.stringify(commitHash),
+      __APP_ENV__: JSON.stringify(appEnv || 'Local'),
+    },
+    preview: { allowedHosts: true },
+  }
 })

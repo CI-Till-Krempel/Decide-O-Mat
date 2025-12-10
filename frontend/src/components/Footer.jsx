@@ -1,8 +1,14 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import EncryptionService from '../services/EncryptionService';
+import LockIcon from './LockIcon';
 
 const Footer = () => {
+    const location = useLocation();
     const isEncrypted = EncryptionService.isEnabled();
+    const hasKey = location.hash && location.hash.includes('key=');
+    // Safe access to global __APP_ENV__ which might be replaced by Vite or undefined in tests
+    const appEnv = typeof __APP_ENV__ !== 'undefined' ? __APP_ENV__ : 'Local';
 
     return (
         <footer style={{
@@ -20,15 +26,15 @@ const Footer = () => {
             {isEncrypted ? (
                 <>
                     <span style={{ color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        🔒 End-to-End Encrypted
+                        <LockIcon isOpen={!!hasKey} size={14} /> End-to-End Encrypted
                     </span>
                     <span>|</span>
                     <span>v1.4</span>
                 </>
             ) : (
                 <>
-                    <span style={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        🔓 Unencrypted (Staging)
+                    <span style={{ color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <LockIcon isOpen={true} size={14} color="var(--color-danger)" /> Unencrypted ({appEnv})
                     </span>
                     <span>|</span>
                     <span>v1.4</span>
