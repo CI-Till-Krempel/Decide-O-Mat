@@ -1,32 +1,39 @@
 import React from 'react';
+import EncryptionService from '../services/EncryptionService';
 
 const Footer = () => {
-    const version = __APP_VERSION__;
-    const commitHash = __COMMIT_HASH__;
-    const envName = __APP_ENV__;
-
-    const isProduction = envName === 'Production';
+    const isEncrypted = EncryptionService.isEnabled();
 
     return (
         <footer style={{
-            textAlign: 'center',
             padding: '1rem',
-            fontSize: '0.8rem',
-            color: '#666',
-            borderTop: '1px solid #eee',
-            marginTop: '2rem'
+            textAlign: 'center',
+            marginTop: 'auto',
+            borderTop: '1px solid var(--color-border)',
+            fontSize: '0.875rem',
+            color: 'var(--color-text-muted)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '0.5rem'
         }}>
-            <p>
-                v{version}
-                {!isProduction && (
-                    <>
-                        {' • '}
-                        {envName || 'Local'}
-                        {' • '}
-                        {commitHash}
-                    </>
-                )}
-            </p>
+            {isEncrypted ? (
+                <>
+                    <span style={{ color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        🔒 End-to-End Encrypted
+                    </span>
+                    <span>|</span>
+                    <span>v1.4</span>
+                </>
+            ) : (
+                <>
+                    <span style={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        🔓 Unencrypted (Staging)
+                    </span>
+                    <span>|</span>
+                    <span>v1.4</span>
+                </>
+            )}
         </footer>
     );
 };

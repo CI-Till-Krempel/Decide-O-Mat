@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { addArgument } from '../services/firebase';
 import { useUser } from '../contexts/UserContext';
+import EncryptionService from '../services/EncryptionService';
 import NamePrompt from './NamePrompt';
 
-function AddArgumentForm({ decisionId, type, readOnly }) {
+function AddArgumentForm({ decisionId, type, readOnly, encryptionKey }) {
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [showNamePrompt, setShowNamePrompt] = useState(false);
@@ -25,7 +26,15 @@ function AddArgumentForm({ decisionId, type, readOnly }) {
     const submitArgument = async () => {
         setLoading(true);
         try {
-            await addArgument(decisionId, type, text, user.displayName, user.userId);
+            let textToSubmit = text;
+            let nameToSubmit = user.displayName;
+
+            if (encryptionKey) {
+                textToSubmit = await EncryptionService.encrypt(text, encryptionKey);
+                nameToSubmit = await EncryptionService.encrypt(nameToSubmit, encryptionKey);
+            }
+
+            await addArgument(decisionId, type, textToSubmit, nameToSubmit, user.userId);
             setText('');
         } catch (error) {
             console.error("Error adding argument:", error);

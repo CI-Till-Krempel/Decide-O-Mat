@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { subscribeToDecision, subscribeToArguments, toggleDecisionStatus, voteDecision, subscribeToFinalVotes } from '../services/firebase';
 import ArgumentList from '../components/ArgumentList';
 import AddArgumentForm from '../components/AddArgumentForm';
@@ -7,9 +7,11 @@ import UserSettings from '../components/UserSettings';
 import NamePrompt from '../components/NamePrompt';
 import { useUser } from '../contexts/UserContext';
 import { toPng } from 'html-to-image';
+import EncryptionService from '../services/EncryptionService';
 
 function Decision() {
     const { id } = useParams();
+    const location = useLocation();
     const { user, setDisplayName } = useUser();
     const [decision, setDecision] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -22,22 +24,87 @@ function Decision() {
     const [finalVotesList, setFinalVotesList] = useState([]);
     const [showNamePrompt, setShowNamePrompt] = useState(false);
     const [pendingVoteType, setPendingVoteType] = useState(null);
+    const [encryptionKey, setEncryptionKey] = useState(null);
     const decisionRef = useRef(null);
 
+    // Parse key from URL hash
     useEffect(() => {
-        const unsubscribeDecision = subscribeToDecision(id, (data) => {
-            setDecision(data);
-            setLoading(false);
-        });
+        const hash = location.hash;
+        if (hash && hash.includes('key=')) {
+            const keyString = hash.split('key=')[1];
+            if (keyString) {
+                EncryptionService.importKey(keyString)
+                    .then(key => setEncryptionKey(key))
+                    .catch(err => console.error("Failed to import key", err));
+            }
+        }
+    }, [location]);
 
-        const unsubscribeArguments = subscribeToArguments(id, (args) => {
-            setPros(args.filter(arg => arg.type === 'pro'));
-            setCons(args.filter(arg => arg.type === 'con'));
-        });
+    useEffect(() => {
+        let unsubscribeDecision = () => { };
+        let unsubscribeArguments = () => { };
+        let unsubscribeFinalVotes = () => { };
 
-        const unsubscribeFinalVotes = subscribeToFinalVotes(id, (votes) => {
-            setFinalVotesList(votes);
-        });
+        // We need to wait for key parsing (or determination that there is no key)
+        // Checks if we processed the hash logic. 
+        // encryptionKey is null initially. If URL has no key, it stays null.
+        // If URL has key, it sets key.
+        // We can run subscriptions immediately, and decrypt inside callback if key exists.
+        // However, key state might change async.
+        // To avoid complex dependency chains, we use the key in the callbacks via refs or just rebuild subs when key changes.
+        // Rebuilding subs when key changes is cleaner.
+
+        const setupSubscriptions = async () => {
+            const currentKey = encryptionKey; // Closure capture
+
+            unsubscribeDecision = subscribeToDecision(id, async (data) => {
+                if (data && currentKey && data.question) {
+                    try {
+                        data.question = await EncryptionService.decrypt(data.question, currentKey);
+                    } catch (e) {
+                        console.error("Failed to decrypt question", e);
+                        data.question = "[Decryption Failed]";
+                    }
+                }
+                setDecision(data);
+                setLoading(false);
+            });
+
+            unsubscribeArguments = subscribeToArguments(id, async (args) => {
+                const decryptedArgs = await Promise.all(args.map(async (arg) => {
+                    if (currentKey) {
+                        try {
+                            if (arg.text) arg.text = await EncryptionService.decrypt(arg.text, currentKey);
+                            if (arg.authorName) arg.authorName = await EncryptionService.decrypt(arg.authorName, currentKey);
+                        } catch (e) {
+                            console.error("Failed to decrypt argument", e);
+                            arg.text = "[Decryption Failed]";
+                        }
+                    }
+                    return arg;
+                }));
+
+                setPros(decryptedArgs.filter(arg => arg.type === 'pro'));
+                setCons(decryptedArgs.filter(arg => arg.type === 'con'));
+            });
+
+            unsubscribeFinalVotes = subscribeToFinalVotes(id, async (votes) => {
+                const decryptedVotes = await Promise.all(votes.map(async (v) => {
+                    if (currentKey && v.displayName) {
+                        try {
+                            v.displayName = await EncryptionService.decrypt(v.displayName, currentKey);
+                        } catch (e) {
+                            console.error("Failed to decrypt vote name", e);
+                            v.displayName = "???";
+                        }
+                    }
+                    return v;
+                }));
+                setFinalVotesList(decryptedVotes);
+            });
+        };
+
+        setupSubscriptions();
 
         // Load local vote state
         const storedVote = localStorage.getItem(`decision_vote_${id}`);
@@ -50,7 +117,7 @@ function Decision() {
             unsubscribeArguments();
             unsubscribeFinalVotes();
         };
-    }, [id]);
+    }, [id, encryptionKey]);
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -63,7 +130,6 @@ function Decision() {
         const newStatus = decision.status === 'closed' ? 'open' : 'closed';
         try {
             await toggleDecisionStatus(id, newStatus);
-            // Optimistic update not needed as we are subscribed
         } catch (error) {
             console.error("Error toggling status:", error);
             alert("Failed to update decision status.");
@@ -87,7 +153,12 @@ function Decision() {
         setIsVoting(true);
 
         try {
-            await voteDecision(id, voteType, user.userId, displayName || user.displayName);
+            let nameToSubmit = displayName || "Anonymous";
+            if (encryptionKey) {
+                nameToSubmit = await EncryptionService.encrypt(nameToSubmit, encryptionKey);
+            }
+
+            await voteDecision(id, voteType, user.userId, nameToSubmit);
 
             // Update local state
             setFinalVote(voteType);
@@ -283,11 +354,11 @@ function Decision() {
                 <div className="arguments-container" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
                     <div className="pros-column" style={{ flex: 1 }}>
                         <ArgumentList arguments={pros} type="pro" decisionId={id} readOnly={isClosed || exporting} />
-                        {!exporting && <AddArgumentForm decisionId={id} type="pro" readOnly={isClosed} />}
+                        {!exporting && <AddArgumentForm decisionId={id} type="pro" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>
                     <div className="cons-column" style={{ flex: 1 }}>
                         <ArgumentList arguments={cons} type="con" decisionId={id} readOnly={isClosed || exporting} />
-                        {!exporting && <AddArgumentForm decisionId={id} type="con" readOnly={isClosed} />}
+                        {!exporting && <AddArgumentForm decisionId={id} type="con" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>
                 </div>
             </div>
