@@ -73,6 +73,8 @@ export default defineConfig(({ command }) => {
       __APP_VERSION__: JSON.stringify(packageJson.version),
       __COMMIT_HASH__: JSON.stringify(commitHash),
       __APP_ENV__: JSON.stringify(appEnv || 'Local'),
+      // Enable encryption ONLY in Production
+      'import.meta.env.VITE_ENABLE_ENCRYPTION': JSON.stringify(appEnv === 'Production' ? 'true' : 'false'),
     },
     preview: { allowedHosts: true },
   }
