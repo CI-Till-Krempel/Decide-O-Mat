@@ -81,7 +81,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_LABELS=$(gh pr list --search "${{ github.sha }}" --state merged --json labels --jq '.[0].labels[].name')
+          PR_LABELS=$(gh pr list --search "${{ github.sha }}" --state merged --json labels --jq '.[0].labels[].name // empty')
           if echo "$PR_LABELS" | grep -q "NO_DEPLOY"; then
             echo "skip_deploy=true" >> $GITHUB_OUTPUT
             echo "::notice::Found NO_DEPLOY label. Deployment to staging will be skipped."
