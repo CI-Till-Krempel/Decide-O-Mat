@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2025-12-10
+
+### Fixed
+- **Deployment Metadata**: Fixed "Local" environment display by strictly inferring environment name from Project ID and removing unreliable git hash dependence in remote builds.
+- **Permissions**: Resolved App Hosting deployment permissions by escalating Service Account roles (`developerconnect.admin`).
+- **Setup**: Added reproducible setup scripts for secrets and IAM configuration.
+
 ## [1.3.2] - 2025-12-09
 
 ### Fixed
