@@ -117,13 +117,8 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Debug Output Service Account
-        run: gcloud auth list
-
       - name: Trigger App Hosting Rollout (Staging)
+
         if: steps.check_label.outputs.skip_deploy != 'true'
         run: |
           npm install -g firebase-tools
@@ -150,12 +145,6 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Debug Output Service Account
-        run: gcloud auth list
 
       - name: Trigger App Hosting Rollout (Production)
         run: |
