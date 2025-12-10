@@ -5,10 +5,18 @@ import fs from 'fs'
 
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 // Use env var if present (CI), otherwise git (local)
-// Try to get commit hash from multiple sources
-let commitHash = process.env.VITE_COMMIT_HASH || process.env.COMMIT_SHA || process.env.GITHUB_SHA
+// Try to get commit hash from multiple sources including Cloud Build default vars
+let commitHash = process.env.VITE_COMMIT_HASH || process.env.COMMIT_SHA || process.env.SHORT_SHA || process.env.GITHUB_SHA
 
-// 1. Try version.json (generated in CI for Cloud Build)
+// DEBUG: Log for troubleshooting App Hosting build environment
+console.log('--- VITE BUILD DEBUG ---');
+console.log('VITE_APP_ENV:', process.env.VITE_APP_ENV);
+console.log('COMMIT_SHA:', process.env.COMMIT_SHA);
+console.log('SHORT_SHA:', process.env.SHORT_SHA);
+console.log('Detected commitHash:', commitHash);
+console.log('------------------------');
+
+// 1. Try version.json (generated in CI for Cloud Build - deprecated but kept for compat)
 if (!commitHash) {
   try {
     const versionJson = JSON.parse(fs.readFileSync('./version.json', 'utf-8'))
