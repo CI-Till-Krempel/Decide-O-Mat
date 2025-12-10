@@ -23,15 +23,7 @@ const base64ToArrayBuffer = (base64) => {
     return bytes.buffer;
 };
 
-// Helper to convert base64url to base64
-const base64UrlToBase64 = (base64Url) => {
-    return base64Url.replace(/-/g, '+').replace(/_/g, '/');
-};
 
-// Helper to convert base64 to base64url
-const base64ToBase64Url = (base64) => {
-    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-};
 
 const EncryptionService = {
     isEnabled: () => {
