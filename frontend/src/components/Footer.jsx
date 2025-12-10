@@ -9,6 +9,7 @@ const Footer = () => {
     const hasKey = location.hash && location.hash.includes('key=');
     // Safe access to global __APP_ENV__ which might be replaced by Vite or undefined in tests
     const appEnv = typeof __APP_ENV__ !== 'undefined' ? __APP_ENV__ : 'Local';
+    const appVersion = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
 
     return (
         <footer style={{
@@ -29,7 +30,7 @@ const Footer = () => {
                         <LockIcon isOpen={!!hasKey} size={14} /> End-to-End Encrypted
                     </span>
                     <span>|</span>
-                    <span>v1.4</span>
+                    <span>v{appVersion}</span>
                 </>
             ) : (
                 <>
@@ -37,7 +38,7 @@ const Footer = () => {
                         <LockIcon isOpen={true} size={14} color="var(--color-danger)" /> Unencrypted ({appEnv})
                     </span>
                     <span>|</span>
-                    <span>v1.4</span>
+                    <span>v{appVersion}</span>
                 </>
             )}
         </footer>
