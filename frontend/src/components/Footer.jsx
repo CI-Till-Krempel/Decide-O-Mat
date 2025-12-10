@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import EncryptionService from '../services/EncryptionService';
+import LockIcon from './LockIcon';
 
 const Footer = () => {
     const location = useLocation();
@@ -23,14 +24,14 @@ const Footer = () => {
             {isEncrypted ? (
                 <>
                     <span style={{ color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        {hasKey ? '🔓' : '🔒'} End-to-End Encrypted
+                        <LockIcon isOpen={!!hasKey} size={14} /> End-to-End Encrypted
                     </span>
                     <span>|</span>
                     <span>v1.4</span>
                 </>
             ) : (
                 <>
-                    <span style={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         🔓 Unencrypted (Staging)
                     </span>
                     <span>|</span>
