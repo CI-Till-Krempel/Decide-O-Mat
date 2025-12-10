@@ -50,7 +50,7 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __COMMIT_HASH__: JSON.stringify(commitHash),
-    'process.env.VITE_APP_ENV': JSON.stringify(appEnv || 'Local'), // Inject detected env
+    __APP_ENV__: JSON.stringify(appEnv || 'Local'),
   },
   preview: {
     allowedHosts: true,

@@ -3,7 +3,7 @@ import React from 'react';
 const Footer = () => {
     const version = __APP_VERSION__;
     const commitHash = __COMMIT_HASH__;
-    const envName = import.meta.env.VITE_APP_ENV;
+    const envName = __APP_ENV__;
 
     const isProduction = envName === 'Production';
 
