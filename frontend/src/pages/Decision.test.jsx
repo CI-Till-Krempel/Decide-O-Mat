@@ -120,8 +120,8 @@ describe('Decision Component', () => {
 
         // Default encryption mocks
         EncryptionService.importKey.mockResolvedValue('mock-key');
-        EncryptionService.decrypt.mockImplementation((text, _) => Promise.resolve(text.replace('encrypted-', '')));
-        EncryptionService.encrypt.mockImplementation((text, _) => Promise.resolve('encrypted-' + text));
+        EncryptionService.decrypt.mockImplementation((text) => Promise.resolve(text.replace('encrypted-', '')));
+        EncryptionService.encrypt.mockImplementation((text) => Promise.resolve('encrypted-' + text));
     });
 
     // US-005: View Results
