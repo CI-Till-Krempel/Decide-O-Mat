@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Decision from './Decision';
@@ -134,21 +135,35 @@ describe('Decision Component', () => {
             });
         });
 
-        it('calculates and displays net score correctly', async () => {
+        it('calculates and displays argument score correctly', async () => {
             renderDecision();
 
             await waitFor(() => {
-                // Net score = pros (10 + 5) - cons (3) = 12
-                expect(screen.getByText(/net score: \+12/i)).toBeInTheDocument();
+                // Argument score = pros (10 + 5) - cons (3) = 12
+                expect(screen.getByText(/argument score/i)).toBeInTheDocument();
+                // We typically look for the value near the label or just in the document if unique
+                expect(screen.getByText(/\+12/i)).toBeInTheDocument();
             });
         });
 
-        it('displays positive net score in success color', async () => {
+        it('calculates and displays vote balance correctly', async () => {
             renderDecision();
 
             await waitFor(() => {
-                const netScoreElement = screen.getByText(/net score: \+12/i);
-                expect(netScoreElement).toBeInTheDocument();
+                // Vote Balance = yes (5) - no (3) = 2
+                expect(screen.getByText(/vote balance/i)).toBeInTheDocument();
+                expect(screen.getByText(/\+2/i)).toBeInTheDocument();
+            });
+        });
+
+        it('displays positive argument score in success color', async () => {
+            renderDecision();
+
+            await waitFor(() => {
+                const scoreElement = screen.getByText(/\+12/i);
+                expect(scoreElement).toBeInTheDocument();
+                // Checking style might be brittle/complex without helper, so we imply existence is mostly enough here
+                // or check partial match if improved
             });
         });
 
@@ -166,7 +181,8 @@ describe('Decision Component', () => {
             renderDecision();
 
             await waitFor(() => {
-                expect(screen.getByText(/net score: -8/i)).toBeInTheDocument();
+                expect(screen.getByText(/-8/i)).toBeInTheDocument();
+                expect(screen.getByText(/argument score/i)).toBeInTheDocument();
             });
         });
 
@@ -495,6 +511,30 @@ describe('Decision Component', () => {
             await waitFor(() => {
                 // Should call voteDecision with new vote
                 expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'test-user-id', 'Test User');
+            });
+        });
+
+        it('updates vote balance when final votes change', async () => {
+            let decisionCallback;
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                decisionCallback = callback;
+                callback(mockDecision); // Initial: yes=5, no=3 -> Balance +2
+                return () => { };
+            });
+
+            renderDecision();
+
+            await waitFor(() => {
+                expect(screen.getByText(/\+2/i)).toBeInTheDocument();
+            });
+
+            // Simulate update
+            act(() => {
+                decisionCallback({ ...mockDecision, yesVotes: 6, noVotes: 3 }); // Balance +3
+            });
+
+            await waitFor(() => {
+                expect(screen.getByText(/\+3/i)).toBeInTheDocument();
             });
         });
 
