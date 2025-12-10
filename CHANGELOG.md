@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-12-10
+
+### Added
+- **End-to-End Encryption**: Decisions are now encrypted client-side using a key in the URL hash, ensuring only those with the link can decrypt the content.
+- **Loading Spinner**: Added a loading spinner to indicate progress during decision loading and voting actions.
+
 ## [1.3.3] - 2025-12-10
 
 ### Fixed
