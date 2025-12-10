@@ -216,7 +216,7 @@ function Decision() {
     if (!decision) return <div className="container">Decision not found</div>;
 
     const isClosed = decision.status === 'closed';
-    const netScore = pros.reduce((sum, arg) => sum + (arg.votes || 0), 0) - cons.reduce((sum, arg) => sum + (arg.votes || 0), 0);
+    const argumentScore = pros.reduce((sum, arg) => sum + (arg.votes || 0), 0) - cons.reduce((sum, arg) => sum + (arg.votes || 0), 0);
 
     const yesVotes = decision.yesVotes || 0;
     const noVotes = decision.noVotes || 0;
@@ -259,18 +259,39 @@ function Decision() {
                         </div>
                     )}
 
-                    {/* Net Score Display */}
-                    <div style={{
-                        fontSize: '1.5rem',
-                        fontWeight: 'bold',
-                        margin: '1rem 0',
-                        color: netScore > 0
-                            ? 'var(--color-success)'
-                            : netScore < 0
-                                ? 'var(--color-danger)'
-                                : 'var(--color-text-muted)'
-                    }}>
-                        Net Score: {netScore > 0 ? '+' : ''}{netScore}
+                    {/* Metrics Display */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', margin: '1rem 0' }}>
+                        {/* Vote Balance */}
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Vote Balance</div>
+                            <div style={{
+                                fontSize: '1.5rem',
+                                fontWeight: 'bold',
+                                color: (yesVotes - noVotes) > 0
+                                    ? 'var(--color-success)'
+                                    : (yesVotes - noVotes) < 0
+                                        ? 'var(--color-danger)'
+                                        : 'var(--color-text-muted)'
+                            }}>
+                                {(yesVotes - noVotes) > 0 ? '+' : ''}{yesVotes - noVotes}
+                            </div>
+                        </div>
+
+                        {/* Argument Score */}
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Argument Score</div>
+                            <div style={{
+                                fontSize: '1.5rem',
+                                fontWeight: 'bold',
+                                color: argumentScore > 0
+                                    ? 'var(--color-success)'
+                                    : argumentScore < 0
+                                        ? 'var(--color-danger)'
+                                        : 'var(--color-text-muted)'
+                            }}>
+                                {argumentScore > 0 ? '+' : ''}{argumentScore}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Final Voting Section */}
