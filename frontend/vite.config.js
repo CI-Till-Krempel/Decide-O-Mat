@@ -8,14 +8,6 @@ const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 // Try to get commit hash from multiple sources including Cloud Build default vars
 let commitHash = process.env.VITE_COMMIT_HASH || process.env.COMMIT_SHA || process.env.SHORT_SHA || process.env.GITHUB_SHA
 
-// DEBUG: Log for troubleshooting App Hosting build environment
-console.log('--- VITE BUILD DEBUG ---');
-console.log('VITE_APP_ENV:', process.env.VITE_APP_ENV);
-console.log('COMMIT_SHA:', process.env.COMMIT_SHA);
-console.log('SHORT_SHA:', process.env.SHORT_SHA);
-console.log('Detected commitHash:', commitHash);
-console.log('------------------------');
-
 // 1. Try version.json (generated in CI for Cloud Build - deprecated but kept for compat)
 if (!commitHash) {
   try {
@@ -37,6 +29,15 @@ if (!commitHash) {
     commitHash = 'unknown'
   }
 }
+
+// DEBUG: Log for troubleshooting App Hosting build environment
+console.log('--- VITE BUILD DEBUG ---');
+console.log('Available Env Keys:', Object.keys(process.env).sort().join(', '));
+console.log('VITE_APP_ENV:', process.env.VITE_APP_ENV);
+console.log('GCLOUD_PROJECT:', process.env.GCLOUD_PROJECT);
+console.log('GOOGLE_CLOUD_PROJECT:', process.env.GOOGLE_CLOUD_PROJECT);
+console.log('Final commitHash:', commitHash);
+console.log('------------------------');
 
 // https://vite.dev/config/
 export default defineConfig({
