@@ -5,6 +5,7 @@ import ArgumentList from '../components/ArgumentList';
 import AddArgumentForm from '../components/AddArgumentForm';
 import UserSettings from '../components/UserSettings';
 import NamePrompt from '../components/NamePrompt';
+import Spinner from '../components/Spinner';
 import { useUser } from '../contexts/UserContext';
 import { toPng } from 'html-to-image';
 import EncryptionService from '../services/EncryptionService';
@@ -19,7 +20,7 @@ function Decision() {
     const [cons, setCons] = useState([]);
     const [copied, setCopied] = useState(false);
     const [finalVote, setFinalVote] = useState(null);
-    const [isVoting, setIsVoting] = useState(false);
+    const [votingTarget, setVotingTarget] = useState(null);
     const [exporting, setExporting] = useState(false);
     const [finalVotesList, setFinalVotesList] = useState([]);
     const [showNamePrompt, setShowNamePrompt] = useState(false);
@@ -137,7 +138,7 @@ function Decision() {
     };
 
     const handleFinalVote = async (voteType) => {
-        if (isVoting || decision.status === 'closed') return;
+        if (votingTarget || decision.status === 'closed') return;
 
         // Check if user has a display name
         if (!user.displayName) {
@@ -150,7 +151,7 @@ function Decision() {
     };
 
     const performFinalVote = async (voteType, displayName) => {
-        setIsVoting(true);
+        setVotingTarget(voteType);
 
         try {
             let nameToSubmit = displayName || "Anonymous";
@@ -167,7 +168,7 @@ function Decision() {
             console.error("Error voting:", error);
             alert("Failed to cast vote.");
         } finally {
-            setIsVoting(false);
+            setVotingTarget(null);
         }
     };
 
@@ -212,7 +213,11 @@ function Decision() {
         }
     }, [id]);
 
-    if (loading) return <div className="container">Loading...</div>;
+    if (loading) return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+            <Spinner size="lg" color="var(--color-primary)" />
+        </div>
+    );
     if (!decision) return <div className="container">Decision not found</div>;
 
     const isClosed = decision.status === 'closed';
@@ -301,7 +306,7 @@ function Decision() {
                             <div style={{ textAlign: 'center', flex: 1 }}>
                                 <button
                                     onClick={() => handleFinalVote('yes')}
-                                    disabled={isClosed || isVoting}
+                                    disabled={isClosed || !!votingTarget}
                                     style={{
                                         background: finalVote === 'yes' ? 'var(--color-success)' : 'white',
                                         color: finalVote === 'yes' ? 'white' : 'var(--color-success)',
@@ -309,11 +314,14 @@ function Decision() {
                                         padding: '0.5rem 1.5rem',
                                         borderRadius: '20px',
                                         fontSize: '1.2rem',
-                                        cursor: (isClosed || isVoting) ? 'not-allowed' : 'pointer',
-                                        opacity: (isClosed && finalVote !== 'yes') ? 0.5 : 1
+                                        cursor: (isClosed || !!votingTarget) ? 'not-allowed' : 'pointer',
+                                        opacity: (isClosed && finalVote !== 'yes') ? 0.5 : 1,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
                                     }}
                                 >
-                                    Yes
+                                    {votingTarget === 'yes' ? <Spinner size="sm" color={finalVote === 'yes' ? 'white' : 'var(--color-success)'} /> : 'Yes'}
                                 </button>
                                 <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{yesVotes}</div>
                                 {finalVotesList.filter(v => v.vote === 'yes').length > 0 && (
@@ -336,7 +344,7 @@ function Decision() {
                             <div style={{ textAlign: 'center', flex: 1 }}>
                                 <button
                                     onClick={() => handleFinalVote('no')}
-                                    disabled={isClosed || isVoting}
+                                    disabled={isClosed || !!votingTarget}
                                     style={{
                                         background: finalVote === 'no' ? 'var(--color-danger)' : 'white',
                                         color: finalVote === 'no' ? 'white' : 'var(--color-danger)',
@@ -344,11 +352,14 @@ function Decision() {
                                         padding: '0.5rem 1.5rem',
                                         borderRadius: '20px',
                                         fontSize: '1.2rem',
-                                        cursor: (isClosed || isVoting) ? 'not-allowed' : 'pointer',
-                                        opacity: (isClosed && finalVote !== 'no') ? 0.5 : 1
+                                        cursor: (isClosed || !!votingTarget) ? 'not-allowed' : 'pointer',
+                                        opacity: (isClosed && finalVote !== 'no') ? 0.5 : 1,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
                                     }}
                                 >
-                                    No
+                                    {votingTarget === 'no' ? <Spinner size="sm" color={finalVote === 'no' ? 'white' : 'var(--color-danger)'} /> : 'No'}
                                 </button>
                                 <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{noVotes}</div>
                                 {finalVotesList.filter(v => v.vote === 'no').length > 0 && (
@@ -421,7 +432,7 @@ function Decision() {
                         cursor: exporting ? 'wait' : 'pointer'
                     }}
                 >
-                    {exporting ? 'Exporting...' : 'Export as Image'}
+                    {exporting ? <Spinner size="sm" color="white" /> : 'Export as Image'}
                 </button>
             </div>
         </div>

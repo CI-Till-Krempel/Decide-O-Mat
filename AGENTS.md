@@ -43,6 +43,15 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Human Review**: The human user acts as the reviewer. The agent must address all feedback before merging.
 - **Branch Protection**: NEVER push directly to `main`. ALL changes must be merged via Pull Requests, without exception.
 
+### 5.1 Issue Resolution Process
+For work triggered by a GitHub Issue:
+1.  **Fresh Branch**: Always create a fresh branch from `main` for the specific issue.
+2.  **Implementation**: Follow the standard Implementation Cycle.
+3.  **Pull Request**: Create a PR as usual.
+4.  **Issue Comment**: After creating the PR, comment on the original Issue.
+    - Mention the PR (e.g., "Fixed in PR #123").
+    - Close the issue if applicable (or let the PR merge close it, but the comment is mandatory).
+
 ### 6. Release Preparation
 - **Announcement Post**: For every major and minor release, generate a short blog post announcing the new version.
     - **Location**: `announcements/v[VERSION].md`

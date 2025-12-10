@@ -3,6 +3,7 @@ import { addArgument } from '../services/firebase';
 import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
 import NamePrompt from './NamePrompt';
+import Spinner from '../components/Spinner';
 
 function AddArgumentForm({ decisionId, type, readOnly, encryptionKey }) {
     const [text, setText] = useState('');
@@ -87,7 +88,7 @@ function AddArgumentForm({ decisionId, type, readOnly, encryptionKey }) {
                         cursor: (loading || !text.trim() || readOnly) ? 'not-allowed' : 'pointer'
                     }}
                 >
-                    {loading ? 'Adding...' : 'Add'}
+                    {loading ? <Spinner size="sm" color="white" /> : 'Add'}
                 </button>
             </form>
         </>

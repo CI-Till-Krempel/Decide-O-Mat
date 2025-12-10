@@ -190,7 +190,7 @@ describe('Decision Component', () => {
             mockSubscribeToDecision.mockImplementation(() => () => { });
             renderDecision();
 
-            expect(screen.getByText(/loading/i)).toBeInTheDocument();
+            expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
         });
 
         it('shows not found state when decision does not exist', async () => {
@@ -619,7 +619,7 @@ describe('Decision Component', () => {
             const exportButton = screen.getByRole('button', { name: /export as image/i });
             await user.click(exportButton);
 
-            expect(screen.getByText(/exporting/i)).toBeInTheDocument();
+            expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
         });
     });
 
