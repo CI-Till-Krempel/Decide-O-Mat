@@ -117,6 +117,9 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
+      - name: Debug Output Service Account
+        run: gcloud auth list
+
       - name: Trigger App Hosting Rollout (Staging)
         if: steps.check_label.outputs.skip_deploy != 'true'
         run: |
