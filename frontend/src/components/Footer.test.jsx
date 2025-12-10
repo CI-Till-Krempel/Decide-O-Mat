@@ -30,21 +30,23 @@ describe('Footer Component', () => {
 
     it('renders closed lock when encrypted and no key present', () => {
         render(<Footer />);
-        expect(screen.getByText(/🔒 End-to-End Encrypted/i)).toBeInTheDocument();
+        expect(screen.getByText(/End-to-End Encrypted/i)).toBeInTheDocument();
+        expect(screen.getByTestId('lock-closed')).toBeInTheDocument();
     });
 
     it('renders open lock when encrypted and key IS present', () => {
         useLocation.mockReturnValue({ hash: '#key=some-key' });
         render(<Footer />);
-        // Expect open lock emoji
-        expect(screen.getByText(/🔓 End-to-End Encrypted/i)).toBeInTheDocument();
-        // Should NOT show closed lock
-        expect(screen.queryByText(/🔒/)).not.toBeInTheDocument();
+        expect(screen.getByText(/End-to-End Encrypted/i)).toBeInTheDocument();
+        expect(screen.getByTestId('lock-open')).toBeInTheDocument();
+        expect(screen.queryByTestId('lock-closed')).not.toBeInTheDocument();
     });
 
     it('renders unencrypted status when encryption is disabled', () => {
         EncryptionService.isEnabled.mockReturnValue(false);
         render(<Footer />);
-        expect(screen.getByText(/🔓 Unencrypted/i)).toBeInTheDocument();
+        // Assuming default in test environment might need setup, but checking for "Unencrypted" is safe
+        expect(screen.getByText(/Unencrypted/i)).toBeInTheDocument();
+        expect(screen.getByTestId('lock-open')).toBeInTheDocument();
     });
 });
