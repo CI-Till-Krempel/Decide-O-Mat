@@ -1,8 +1,11 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import EncryptionService from '../services/EncryptionService';
 
 const Footer = () => {
+    const location = useLocation();
     const isEncrypted = EncryptionService.isEnabled();
+    const hasKey = location.hash && location.hash.includes('key=');
 
     return (
         <footer style={{
@@ -20,7 +23,7 @@ const Footer = () => {
             {isEncrypted ? (
                 <>
                     <span style={{ color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        🔒 End-to-End Encrypted
+                        {hasKey ? '🔓' : '🔒'} End-to-End Encrypted
                     </span>
                     <span>|</span>
                     <span>v1.4</span>
