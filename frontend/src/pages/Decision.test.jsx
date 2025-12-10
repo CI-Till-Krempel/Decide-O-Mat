@@ -40,11 +40,23 @@ vi.mock('../contexts/UserContext', async () => {
     };
 });
 
+// Mock EncryptionService
+vi.mock('../services/EncryptionService', () => ({
+    default: {
+        importKey: vi.fn(),
+        decrypt: vi.fn(),
+        encrypt: vi.fn(),
+        isEnabled: vi.fn(),
+    }
+}));
+import EncryptionService from '../services/EncryptionService';
+
 // Mock components
 vi.mock('../components/ArgumentList', () => ({
     default: ({ arguments: args, type, readOnly }) => (
         <div data-testid={`argument-list-${type}`}>
             ArgumentList: {type} ({args.length} args) {readOnly && '(read-only)'}
+            {args.map(arg => <div key={arg.id}>{arg.text}</div>)}
         </div>
     ),
 }));
@@ -61,9 +73,9 @@ vi.mock('../components/UserSettings', () => ({
     default: () => <div data-testid="user-settings">UserSettings</div>
 }));
 
-const renderDecision = (decisionId = 'test-decision-123') => {
+const renderDecision = (initialUrl = '/d/test-decision-123') => {
     return render(
-        <MemoryRouter initialEntries={[`/d/${decisionId}`]}>
+        <MemoryRouter initialEntries={[initialUrl]}>
             <Routes>
                 <Route path="/d/:id" element={<Decision />} />
             </Routes>
@@ -105,6 +117,11 @@ describe('Decision Component', () => {
             return vi.fn();
         });
         mockToggleDecisionStatus.mockResolvedValue({ success: true });
+
+        // Default encryption mocks
+        EncryptionService.importKey.mockResolvedValue('mock-key');
+        EncryptionService.decrypt.mockImplementation((text, _) => Promise.resolve(text.replace('encrypted-', '')));
+        EncryptionService.encrypt.mockImplementation((text, _) => Promise.resolve('encrypted-' + text));
     });
 
     // US-005: View Results
@@ -170,6 +187,60 @@ describe('Decision Component', () => {
 
             await waitFor(() => {
                 expect(screen.getByText(/decision not found/i)).toBeInTheDocument();
+            });
+        });
+    });
+
+    // Encrypted View Tests
+    describe('Encrypted View', () => {
+        it('decrypts decision data when key is present', async () => {
+            const encryptedDecision = {
+                ...mockDecision,
+                question: 'encrypted-Secret Question'
+            };
+            const encryptedArgs = [
+                { id: 'arg-1', text: 'encrypted-Secret Arg', type: 'pro', votes: 1 }
+            ];
+
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(encryptedDecision);
+                return () => { };
+            });
+            mockSubscribeToArguments.mockImplementation((id, callback) => {
+                callback(encryptedArgs);
+                return () => { };
+            });
+
+            renderDecision('/d/test-id#key=mock-key-string');
+
+            await waitFor(() => {
+                expect(EncryptionService.importKey).toHaveBeenCalledWith('mock-key-string');
+                expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Secret Question', 'mock-key');
+                expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Secret Arg', 'mock-key');
+
+                // Check if decrypted content is rendered
+                expect(screen.getByText('Secret Question')).toBeInTheDocument();
+                expect(screen.getByText('Secret Arg')).toBeInTheDocument();
+            });
+        });
+
+        it('handles decryption failure gracefully', async () => {
+            const encryptedDecision = {
+                ...mockDecision,
+                question: 'encrypted-Bad Data'
+            };
+
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(encryptedDecision);
+                return () => { };
+            });
+
+            EncryptionService.decrypt.mockRejectedValue(new Error("Decryption failed"));
+
+            renderDecision('/d/test-id#key=mock-key-string');
+
+            await waitFor(() => {
+                expect(screen.getAllByText('[Decryption Failed]')).toHaveLength(4); // Header + 3 args
             });
         });
     });
@@ -539,9 +610,11 @@ describe('Decision Component', () => {
         it('unsubscribes on unmount', async () => {
             const unsubscribeDecision = vi.fn();
             const unsubscribeArguments = vi.fn();
+            const unsubscribeFinalVotes = vi.fn(); // Mock this too
 
             mockSubscribeToDecision.mockReturnValue(unsubscribeDecision);
             mockSubscribeToArguments.mockReturnValue(unsubscribeArguments);
+            mockSubscribeToFinalVotes.mockReturnValue(unsubscribeFinalVotes);
 
             const { unmount } = renderDecision();
 
@@ -553,6 +626,7 @@ describe('Decision Component', () => {
 
             expect(unsubscribeDecision).toHaveBeenCalled();
             expect(unsubscribeArguments).toHaveBeenCalled();
+            expect(unsubscribeFinalVotes).toHaveBeenCalled();
         });
     });
 });

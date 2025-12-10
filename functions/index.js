@@ -1,6 +1,6 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const {FieldValue} = require("firebase-admin/firestore");
+const { FieldValue } = require("firebase-admin/firestore");
 
 // setGlobalOptions({region: "europe-west1"});
 
@@ -13,16 +13,15 @@ const db = admin.firestore();
  * @param {string} request.data.question - The question to decide on.
  * @return {Promise<Object>} The created decision ID.
  */
-exports.createDecision = onCall({cors: true}, async (request) => {
-  console.log("createDecision called with data:", request.data);
+exports.createDecision = onCall({ cors: true }, async (request) => {
   const question = request.data.question;
 
   if (!question || typeof question !== "string" || question.trim().length === 0) {
     throw new HttpsError("invalid-argument", "The function must be called with a valid 'question' argument.");
   }
 
-  if (question.length > 200) {
-    throw new HttpsError("invalid-argument", "Question must be under 200 characters.");
+  if (question.length > 1000) {
+    throw new HttpsError("invalid-argument", "Question must be under 1000 characters.");
   }
 
   const decisionRef = db.collection("decisions").doc();
@@ -32,7 +31,7 @@ exports.createDecision = onCall({cors: true}, async (request) => {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return {id: decisionRef.id};
+  return { id: decisionRef.id };
 });
 
 /**
@@ -45,8 +44,8 @@ exports.createDecision = onCall({cors: true}, async (request) => {
  * @param {string} [request.data.authorId] - Optional unique ID of the author.
  * @return {Promise<Object>} The created argument ID.
  */
-exports.addArgument = onCall({cors: true}, async (request) => {
-  const {decisionId, type, text, authorName, authorId} = request.data;
+exports.addArgument = onCall({ cors: true }, async (request) => {
+  const { decisionId, type, text, authorName, authorId } = request.data;
 
   if (!decisionId || !type || !text) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
@@ -56,8 +55,8 @@ exports.addArgument = onCall({cors: true}, async (request) => {
     throw new HttpsError("invalid-argument", "Type must be 'pro' or 'con'.");
   }
 
-  if (text.trim().length === 0 || text.length > 500) {
-    throw new HttpsError("invalid-argument", "Text must be between 1 and 500 characters.");
+  if (text.trim().length === 0 || text.length > 2000) {
+    throw new HttpsError("invalid-argument", "Text must be between 1 and 2000 characters.");
   }
 
   const decisionRef = db.collection("decisions").doc(decisionId);
@@ -86,7 +85,7 @@ exports.addArgument = onCall({cors: true}, async (request) => {
 
   await argumentRef.set(argumentData);
 
-  return {id: argumentRef.id};
+  return { id: argumentRef.id };
 });
 
 /**
@@ -97,10 +96,9 @@ exports.addArgument = onCall({cors: true}, async (request) => {
  * @param {number} request.data.change - Vote change (1 to vote, -1 to unvote).
  * @return {Promise<Object>} Success status.
  */
-exports.voteArgument = onCall({cors: true}, async (request) => {
-  console.log("voteArgument called with data:", request.data);
+exports.voteArgument = onCall({ cors: true }, async (request) => {
 
-  const {decisionId, argumentId, userId, displayName} = request.data;
+  const { decisionId, argumentId, userId, displayName } = request.data;
 
   if (!decisionId || !argumentId || !userId) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId, userId.");
@@ -150,11 +148,11 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
     }
   });
 
-  return {success: true};
+  return { success: true };
 });
 
-exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
-  const {decisionId, status} = request.data;
+exports.toggleDecisionStatus = onCall({ cors: true }, async (request) => {
+  const { decisionId, status } = request.data;
 
   if (!decisionId || !status) {
     throw new HttpsError("invalid-argument", "Missing decisionId or status");
@@ -171,13 +169,13 @@ exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
     throw new HttpsError("not-found", "Decision not found");
   }
 
-  await decisionRef.update({status: status});
+  await decisionRef.update({ status: status });
 
-  return {success: true, status: status};
+  return { success: true, status: status };
 });
 
-exports.voteDecision = onCall({cors: true}, async (request) => {
-  const {decisionId, vote, userId, displayName} = request.data;
+exports.voteDecision = onCall({ cors: true }, async (request) => {
+  const { decisionId, vote, userId, displayName } = request.data;
 
   if (!decisionId || !vote || !userId) {
     throw new HttpsError("invalid-argument", "Missing decisionId, vote, or userId");
@@ -254,5 +252,5 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
     });
   });
 
-  return {success: true};
+  return { success: true };
 });
