@@ -25,19 +25,24 @@ if (!commitHash) {
   try {
     commitHash = execSync('git rev-parse --short HEAD').toString().trim()
   } catch {
-    console.warn('Could not determine commit hash (git failed and VITE_COMMIT_HASH not set)')
+    // Git failed and no env var set. This happens in App Hosting remote builds.
     commitHash = 'unknown'
   }
 }
 
-// DEBUG: Log for troubleshooting App Hosting build environment
-console.log('--- VITE BUILD DEBUG ---');
-console.log('Available Env Keys:', Object.keys(process.env).sort().join(', '));
-console.log('VITE_APP_ENV:', process.env.VITE_APP_ENV);
-console.log('GCLOUD_PROJECT:', process.env.GCLOUD_PROJECT);
-console.log('GOOGLE_CLOUD_PROJECT:', process.env.GOOGLE_CLOUD_PROJECT);
-console.log('Final commitHash:', commitHash);
-console.log('------------------------');
+// 3. Fallback Environment Detection
+// App Hosting doesn't always inject VITE_APP_ENV from apphosting.staging.yaml if the env mapping is ambiguous.
+// We fallback to inferring from the Project ID which IS available.
+const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT;
+let appEnv = process.env.VITE_APP_ENV;
+
+if (!appEnv && projectId) {
+  if (projectId.includes('staging')) {
+    appEnv = 'Staging';
+  } else if (projectId.includes('prod') || projectId === 'decide-o-mat') {
+    appEnv = 'Production';
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -45,6 +50,7 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __COMMIT_HASH__: JSON.stringify(commitHash),
+    'process.env.VITE_APP_ENV': JSON.stringify(appEnv || 'Local'), // Inject detected env
   },
   preview: {
     allowedHosts: true,
