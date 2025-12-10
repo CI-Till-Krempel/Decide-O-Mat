@@ -23,8 +23,11 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Verify**: Run builds, tests, and linting immediately after changes.
     - `npm run build`
     - `npm test`
-    - `npm run lint` (Run in both `frontend` and `functions` directories)
-- **Fix**: If verification fails, fix the issue immediately.
+    - **LINTING IS MANDATORY**: You must run the linter in **BOTH** `frontend` and `functions` directories.
+        - Run `cd frontend && npm run lint`
+        - Run `cd functions && npm run lint`
+    - **Pre-Commit Check**: Ensure ALL linters pass *before* adding or committing any code.
+    - **Iterate**: If linting fails, fix the errors and run the linter again. Repeat until it passes completely. Do not assume one fix resolves all issues.
 
 ### 3. Version Control
 - **Commit Frequently**: Commit code as soon as a small unit of work is stable and verified.
