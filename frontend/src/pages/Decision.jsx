@@ -245,7 +245,7 @@ function Decision() {
                     }}
                 />
             )}
-            <UserSettings />
+            <UserSettings decisionId={id} />
             <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                     <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>

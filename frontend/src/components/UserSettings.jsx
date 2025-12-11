@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
 import { useUser } from '../contexts/UserContext';
+import { updateUserDisplayName } from '../services/firebase';
 
-function UserSettings() {
-    const { user, setDisplayName } = useUser();
+function UserSettings({ decisionId }) {
+    const { user, setDisplayName, logout, login } = useUser();
     const [isEditing, setIsEditing] = useState(false);
     const [newName, setNewName] = useState(user.displayName || '');
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (newName.trim()) {
-            setDisplayName(newName.trim());
+            const trimmedName = newName.trim();
+            setDisplayName(trimmedName);
             setIsEditing(false);
+
+            if (decisionId && user.userId) {
+                try {
+                    await updateUserDisplayName(decisionId, user.userId, trimmedName);
+                } catch (error) {
+                    console.error("Failed to update display name on votes:", error);
+                }
+            }
         }
     };
 
@@ -17,6 +27,59 @@ function UserSettings() {
         setNewName(user.displayName || '');
         setIsEditing(false);
     };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
+
+    const handleLogin = async () => {
+        try {
+            await login();
+        } catch (error) {
+            console.error("Login failed", error);
+        }
+    };
+
+    if (!user.isAnonymous) {
+        return (
+            <div style={{
+                position: 'fixed',
+                top: '1rem',
+                right: '1rem',
+                padding: '0.5rem 1rem',
+                backgroundColor: 'white',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                zIndex: 100
+            }}>
+                <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                    {user.displayName}
+                </span>
+                <button
+                    onClick={handleLogout}
+                    style={{
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        border: '1px solid var(--color-danger)',
+                        borderRadius: '4px',
+                        backgroundColor: 'white',
+                        color: 'var(--color-danger)',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Logout
+                </button>
+            </div>
+        );
+    }
 
     if (!isEditing) {
         return (
@@ -35,7 +98,7 @@ function UserSettings() {
                 zIndex: 100
             }}>
                 <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                    {user.displayName ? `Signed in as ${user.displayName}` : 'No name set'}
+                    {user.displayName ? `Guest: ${user.displayName}` : 'Guest (No name)'}
                 </span>
                 <button
                     onClick={() => setIsEditing(true)}
@@ -50,6 +113,20 @@ function UserSettings() {
                     }}
                 >
                     Edit
+                </button>
+                <button
+                    onClick={handleLogin}
+                    style={{
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        border: '1px solid var(--color-success)',
+                        borderRadius: '4px',
+                        backgroundColor: 'white',
+                        color: 'var(--color-success)',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Login
                 </button>
             </div>
         );
