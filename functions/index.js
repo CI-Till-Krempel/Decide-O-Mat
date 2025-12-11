@@ -97,10 +97,16 @@ exports.addArgument = onCall({ cors: true }, async (request) => {
  * @return {Promise<Object>} Success status.
  */
 exports.voteArgument = onCall({ cors: true }, async (request) => {
-  const { decisionId, argumentId, userId, displayName } = request.data;
+  // Authentication required
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
 
-  if (!decisionId || !argumentId || !userId) {
-    throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId, userId.");
+  const { decisionId, argumentId, displayName } = request.data;
+  const userId = request.auth.uid;
+
+  if (!decisionId || !argumentId) {
+    throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, argumentId.");
   }
 
   const decisionRef = db.collection("decisions").doc(decisionId);
@@ -174,10 +180,16 @@ exports.toggleDecisionStatus = onCall({ cors: true }, async (request) => {
 });
 
 exports.voteDecision = onCall({ cors: true }, async (request) => {
-  const { decisionId, vote, userId, displayName } = request.data;
+  // Authentication required
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
 
-  if (!decisionId || !vote || !userId) {
-    throw new HttpsError("invalid-argument", "Missing decisionId, vote, or userId");
+  const { decisionId, vote, displayName } = request.data;
+  const userId = request.auth.uid;
+
+  if (!decisionId || !vote) {
+    throw new HttpsError("invalid-argument", "Missing decisionId or vote");
   }
 
   if (vote !== "yes" && vote !== "no") {
@@ -263,10 +275,16 @@ exports.voteDecision = onCall({ cors: true }, async (request) => {
  * @return {Promise<Object>} Success status.
  */
 exports.updateUserDisplayName = onCall({ cors: true }, async (request) => {
-  const { decisionId, userId, displayName } = request.data;
+  // Authentication required
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
 
-  if (!decisionId || !userId || !displayName) {
-    throw new HttpsError("invalid-argument", "Missing required arguments.");
+  const { decisionId, displayName } = request.data;
+  const userId = request.auth.uid;
+
+  if (!decisionId || !displayName) {
+    throw new HttpsError("invalid-argument", "Missing valid arguments.");
   }
 
   const db = admin.firestore();

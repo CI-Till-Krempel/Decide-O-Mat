@@ -62,7 +62,7 @@ describe('ArgumentItem Component', () => {
         const voteButton = screen.getByRole('button', { name: /Vote/i });
         await user.click(voteButton);
 
-        expect(mockVoteArgument).toHaveBeenCalledWith(mockDecisionId, mockArgument.id, 'test-user-id', 'Test User');
+        expect(mockVoteArgument).toHaveBeenCalledWith(mockDecisionId, mockArgument.id, 'Test User');
     });
 
     it('displays voter chips', () => {

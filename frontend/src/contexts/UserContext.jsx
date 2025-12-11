@@ -1,40 +1,43 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { generateUUID } from '../utils/uuid';
+// import { generateUUID } from '../utils/uuid'; // Removed
 import { auth } from '../services/firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
     // Persistent anonymous identity
-    const [anonymousUser, setAnonymousUser] = useState(() => {
-        const stored = localStorage.getItem('decide-o-mat-user');
-        if (stored) {
-            try {
-                return JSON.parse(stored);
-            } catch (e) {
-                console.error('Failed to parse stored user data:', e);
-            }
-        }
-        return {
-            userId: generateUUID(),
-            displayName: null
-        };
+    // Persistent display name for anonymous users
+    const [localDisplayName, setLocalDisplayName] = useState(() => {
+        return localStorage.getItem('dom_display_name') || null;
     });
 
     const [firebaseUser, setFirebaseUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Persist anonymous user to localStorage whenever it changes
+    // Persist display name
     useEffect(() => {
-        localStorage.setItem('decide-o-mat-user', JSON.stringify(anonymousUser));
-    }, [anonymousUser]);
+        if (localDisplayName) {
+            localStorage.setItem('dom_display_name', localDisplayName);
+        } else {
+            localStorage.removeItem('dom_display_name');
+        }
+    }, [localDisplayName]);
 
+    // Listen to Firebase Auth state
     // Listen to Firebase Auth state
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setFirebaseUser(user);
-            setLoading(false);
+            if (user) {
+                setFirebaseUser(user);
+                setLoading(false);
+            } else {
+                // If no user, sign in anonymously
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Anonymous auth failed", error);
+                    setLoading(false);
+                });
+            }
         });
         return () => unsubscribe();
     }, []);
@@ -59,29 +62,23 @@ export function UserProvider({ children }) {
     };
 
     // Determine the effective user
+    // Determine the effective user
+    // Now we rely on firebaseUser for everything (even anonymous)
+    // We mix in localDisplayName if the firebase user doesn't have one (anonymous usually doesn't)
     const user = firebaseUser ? {
         userId: firebaseUser.uid,
-        displayName: firebaseUser.displayName,
+        displayName: firebaseUser.displayName || localDisplayName,
         photoURL: firebaseUser.photoURL,
-        isAnonymous: false
-    } : {
-        ...anonymousUser,
-        isAnonymous: true
-    };
+        isAnonymous: firebaseUser.isAnonymous
+    } : null; // Should not happen after loading, but safe fallback
 
     const setDisplayName = (name) => {
-        if (firebaseUser) {
-            // For now, we don't update Firebase profile, or we could?
-            // The story says "Users can update their profile".
-            // For now, let's just update the local anonymous user if not logged in.
-            // If logged in, we might want to allow updating the display name too, but that requires updateProfile.
-            // Let's stick to updating anonymous user for now, or warn.
-            console.warn("Updating display name for authenticated user not yet fully implemented");
-        } else {
-            setAnonymousUser(prev => ({
-                ...prev,
-                displayName: name
-            }));
+        // Always update local display name for now, as it's used for anonymous contexts
+        setLocalDisplayName(name);
+
+        if (firebaseUser && !firebaseUser.isAnonymous) {
+            // Future: Update profile for real users
+            console.warn("Updating display name for authenticated user only updates local state for now");
         }
     };
 

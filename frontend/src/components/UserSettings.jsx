@@ -15,7 +15,7 @@ function UserSettings({ decisionId }) {
 
             if (decisionId && user.userId) {
                 try {
-                    await updateUserDisplayName(decisionId, user.userId, trimmedName);
+                    await updateUserDisplayName(decisionId, trimmedName);
                 } catch (error) {
                     console.error("Failed to update display name on votes:", error);
                 }

@@ -159,7 +159,7 @@ function Decision() {
                 nameToSubmit = await EncryptionService.encrypt(nameToSubmit, encryptionKey);
             }
 
-            await voteDecision(id, voteType, user.userId, nameToSubmit);
+            await voteDecision(id, voteType, nameToSubmit);
 
             // Update local state
             setFinalVote(voteType);
