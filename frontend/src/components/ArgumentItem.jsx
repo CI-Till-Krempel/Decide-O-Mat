@@ -39,7 +39,7 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote })
     const performVote = async () => {
         setVoting(true);
         try {
-            await voteArgument(decisionId, argument.id, user.userId, user.displayName);
+            await voteArgument(decisionId, argument.id, user.displayName);
         } catch (error) {
             console.error("Error voting:", error);
             alert("Failed to vote. Please try again.");

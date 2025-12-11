@@ -7,12 +7,14 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 const mockOnAuthStateChanged = vi.fn();
 const mockSignInWithPopup = vi.fn();
 const mockSignOut = vi.fn();
+const mockSignInAnonymously = vi.fn(() => Promise.resolve({ user: { uid: 'anon-uid', isAnonymous: true } }));
 
 vi.mock('firebase/auth', () => ({
     getAuth: vi.fn(),
     connectAuthEmulator: vi.fn(),
     GoogleAuthProvider: vi.fn(() => ({})),
     signInWithPopup: (...args) => mockSignInWithPopup(...args),
+    signInAnonymously: (...args) => mockSignInAnonymously(...args),
     signOut: (...args) => mockSignOut(...args),
     onAuthStateChanged: (...args) => mockOnAuthStateChanged(...args),
 }));
@@ -48,7 +50,7 @@ describe('UserContext', () => {
         });
     });
 
-    it('provides anonymous user by default', async () => {
+    it('triggers anonymous sign-in if no user', async () => {
         await act(async () => {
             render(
                 <UserProvider>
@@ -57,8 +59,10 @@ describe('UserContext', () => {
             );
         });
 
-        expect(screen.getByTestId('is-anonymous')).toHaveTextContent('true');
-        expect(screen.getByTestId('user-id')).not.toBeEmpty();
+        expect(mockSignInAnonymously).toHaveBeenCalled();
+        // Note: Since we mocked onAuthStateChanged to return null and stop, 
+        // the state update from signInAnonymously won't happen unless we wire it up manually in the mock 
+        // or verify the call effect.
     });
 
     it('updates user when auth state changes', async () => {

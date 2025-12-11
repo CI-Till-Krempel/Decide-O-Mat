@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, doc, query, orderBy, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -50,10 +50,10 @@ export const addArgument = async (decisionId, type, text, authorName, authorId) 
     return result.data.id;
 };
 
-export const voteArgument = async (decisionId, argumentId, userId, displayName) => {
+export const voteArgument = async (decisionId, argumentId, displayName) => {
     const voteArgumentFunction = httpsCallable(functions, 'voteArgument');
-    console.log("Calling voteArgument with:", { decisionId, argumentId, userId, displayName });
-    return await voteArgumentFunction({ decisionId, argumentId, userId, displayName });
+    console.log("Calling voteArgument with:", { decisionId, argumentId, displayName });
+    return await voteArgumentFunction({ decisionId, argumentId, displayName });
 };
 
 export const toggleDecisionStatus = async (decisionId, status) => {
@@ -61,14 +61,14 @@ export const toggleDecisionStatus = async (decisionId, status) => {
     return await toggleFunction({ decisionId, status });
 };
 
-export const voteDecision = async (decisionId, vote, userId, displayName) => {
+export const voteDecision = async (decisionId, vote, displayName) => {
     const voteDecisionFunction = httpsCallable(functions, 'voteDecision');
-    return await voteDecisionFunction({ decisionId, vote, userId, displayName });
+    return await voteDecisionFunction({ decisionId, vote, displayName });
 };
 
-export const updateUserDisplayName = async (decisionId, userId, displayName) => {
+export const updateUserDisplayName = async (decisionId, displayName) => {
     const updateUserDisplayNameFn = httpsCallable(functions, 'updateUserDisplayName');
-    return await updateUserDisplayNameFn({ decisionId, userId, displayName });
+    return await updateUserDisplayNameFn({ decisionId, displayName });
 };
 
 export const subscribeToDecision = (decisionId, callback) => {
@@ -131,4 +131,4 @@ export const subscribeToArguments = (decisionId, callback) => {
     });
 };
 
-export { db, functions, auth };
+export { db, functions, auth, signInAnonymously };
