@@ -41,6 +41,7 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 ### 5. Review Process
 - **Pull Requests**: All changes should be submitted via Pull Requests (PRs) on GitHub.
 - **Human Review**: The human user acts as the reviewer. The agent must address all feedback before merging.
+- **Update Roadmap**: When creating a PR, check off the completed story or task list item in `ROADMAP.md` and mark it as done.
 - **Branch Protection**: NEVER push directly to `main`. ALL changes must be merged via Pull Requests, without exception.
 
 ### 5.1 Issue Resolution Process
