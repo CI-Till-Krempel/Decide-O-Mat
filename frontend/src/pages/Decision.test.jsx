@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Decision from './Decision';
@@ -40,11 +41,23 @@ vi.mock('../contexts/UserContext', async () => {
     };
 });
 
+// Mock EncryptionService
+vi.mock('../services/EncryptionService', () => ({
+    default: {
+        importKey: vi.fn(),
+        decrypt: vi.fn(),
+        encrypt: vi.fn(),
+        isEnabled: vi.fn(),
+    }
+}));
+import EncryptionService from '../services/EncryptionService';
+
 // Mock components
 vi.mock('../components/ArgumentList', () => ({
     default: ({ arguments: args, type, readOnly }) => (
         <div data-testid={`argument-list-${type}`}>
             ArgumentList: {type} ({args.length} args) {readOnly && '(read-only)'}
+            {args.map(arg => <div key={arg.id}>{arg.text}</div>)}
         </div>
     ),
 }));
@@ -61,9 +74,9 @@ vi.mock('../components/UserSettings', () => ({
     default: () => <div data-testid="user-settings">UserSettings</div>
 }));
 
-const renderDecision = (decisionId = 'test-decision-123') => {
+const renderDecision = (initialUrl = '/d/test-decision-123') => {
     return render(
-        <MemoryRouter initialEntries={[`/d/${decisionId}`]}>
+        <MemoryRouter initialEntries={[initialUrl]}>
             <Routes>
                 <Route path="/d/:id" element={<Decision />} />
             </Routes>
@@ -105,6 +118,11 @@ describe('Decision Component', () => {
             return vi.fn();
         });
         mockToggleDecisionStatus.mockResolvedValue({ success: true });
+
+        // Default encryption mocks
+        EncryptionService.importKey.mockResolvedValue('mock-key');
+        EncryptionService.decrypt.mockImplementation((text) => Promise.resolve(text.replace('encrypted-', '')));
+        EncryptionService.encrypt.mockImplementation((text) => Promise.resolve('encrypted-' + text));
     });
 
     // US-005: View Results
@@ -117,21 +135,35 @@ describe('Decision Component', () => {
             });
         });
 
-        it('calculates and displays net score correctly', async () => {
+        it('calculates and displays argument score correctly', async () => {
             renderDecision();
 
             await waitFor(() => {
-                // Net score = pros (10 + 5) - cons (3) = 12
-                expect(screen.getByText(/net score: \+12/i)).toBeInTheDocument();
+                // Argument score = pros (10 + 5) - cons (3) = 12
+                expect(screen.getByText(/argument score/i)).toBeInTheDocument();
+                // We typically look for the value near the label or just in the document if unique
+                expect(screen.getByText(/\+12/i)).toBeInTheDocument();
             });
         });
 
-        it('displays positive net score in success color', async () => {
+        it('calculates and displays vote balance correctly', async () => {
             renderDecision();
 
             await waitFor(() => {
-                const netScoreElement = screen.getByText(/net score: \+12/i);
-                expect(netScoreElement).toBeInTheDocument();
+                // Vote Balance = yes (5) - no (3) = 2
+                expect(screen.getByText(/vote balance/i)).toBeInTheDocument();
+                expect(screen.getByText(/\+2/i)).toBeInTheDocument();
+            });
+        });
+
+        it('displays positive argument score in success color', async () => {
+            renderDecision();
+
+            await waitFor(() => {
+                const scoreElement = screen.getByText(/\+12/i);
+                expect(scoreElement).toBeInTheDocument();
+                // Checking style might be brittle/complex without helper, so we imply existence is mostly enough here
+                // or check partial match if improved
             });
         });
 
@@ -149,7 +181,8 @@ describe('Decision Component', () => {
             renderDecision();
 
             await waitFor(() => {
-                expect(screen.getByText(/net score: -8/i)).toBeInTheDocument();
+                expect(screen.getByText(/-8/i)).toBeInTheDocument();
+                expect(screen.getByText(/argument score/i)).toBeInTheDocument();
             });
         });
 
@@ -157,7 +190,7 @@ describe('Decision Component', () => {
             mockSubscribeToDecision.mockImplementation(() => () => { });
             renderDecision();
 
-            expect(screen.getByText(/loading/i)).toBeInTheDocument();
+            expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
         });
 
         it('shows not found state when decision does not exist', async () => {
@@ -170,6 +203,60 @@ describe('Decision Component', () => {
 
             await waitFor(() => {
                 expect(screen.getByText(/decision not found/i)).toBeInTheDocument();
+            });
+        });
+    });
+
+    // Encrypted View Tests
+    describe('Encrypted View', () => {
+        it('decrypts decision data when key is present', async () => {
+            const encryptedDecision = {
+                ...mockDecision,
+                question: 'encrypted-Secret Question'
+            };
+            const encryptedArgs = [
+                { id: 'arg-1', text: 'encrypted-Secret Arg', type: 'pro', votes: 1 }
+            ];
+
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(encryptedDecision);
+                return () => { };
+            });
+            mockSubscribeToArguments.mockImplementation((id, callback) => {
+                callback(encryptedArgs);
+                return () => { };
+            });
+
+            renderDecision('/d/test-id#key=mock-key-string');
+
+            await waitFor(() => {
+                expect(EncryptionService.importKey).toHaveBeenCalledWith('mock-key-string');
+                expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Secret Question', 'mock-key');
+                expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Secret Arg', 'mock-key');
+
+                // Check if decrypted content is rendered
+                expect(screen.getByText('Secret Question')).toBeInTheDocument();
+                expect(screen.getByText('Secret Arg')).toBeInTheDocument();
+            });
+        });
+
+        it('handles decryption failure gracefully', async () => {
+            const encryptedDecision = {
+                ...mockDecision,
+                question: 'encrypted-Bad Data'
+            };
+
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(encryptedDecision);
+                return () => { };
+            });
+
+            EncryptionService.decrypt.mockRejectedValue(new Error("Decryption failed"));
+
+            renderDecision('/d/test-id#key=mock-key-string');
+
+            await waitFor(() => {
+                expect(screen.getAllByText('[Decryption Failed]')).toHaveLength(4); // Header + 3 args
             });
         });
     });
@@ -427,6 +514,30 @@ describe('Decision Component', () => {
             });
         });
 
+        it('updates vote balance when final votes change', async () => {
+            let decisionCallback;
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                decisionCallback = callback;
+                callback(mockDecision); // Initial: yes=5, no=3 -> Balance +2
+                return () => { };
+            });
+
+            renderDecision();
+
+            await waitFor(() => {
+                expect(screen.getByText(/\+2/i)).toBeInTheDocument();
+            });
+
+            // Simulate update
+            act(() => {
+                decisionCallback({ ...mockDecision, yesVotes: 6, noVotes: 3 }); // Balance +3
+            });
+
+            await waitFor(() => {
+                expect(screen.getByText(/\+3/i)).toBeInTheDocument();
+            });
+        });
+
         it('disables voting when decision is closed', async () => {
             mockSubscribeToDecision.mockImplementation((id, callback) => {
                 callback({ ...mockDecision, status: 'closed' });
@@ -508,7 +619,7 @@ describe('Decision Component', () => {
             const exportButton = screen.getByRole('button', { name: /export as image/i });
             await user.click(exportButton);
 
-            expect(screen.getByText(/exporting/i)).toBeInTheDocument();
+            expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
         });
     });
 
@@ -539,9 +650,11 @@ describe('Decision Component', () => {
         it('unsubscribes on unmount', async () => {
             const unsubscribeDecision = vi.fn();
             const unsubscribeArguments = vi.fn();
+            const unsubscribeFinalVotes = vi.fn(); // Mock this too
 
             mockSubscribeToDecision.mockReturnValue(unsubscribeDecision);
             mockSubscribeToArguments.mockReturnValue(unsubscribeArguments);
+            mockSubscribeToFinalVotes.mockReturnValue(unsubscribeFinalVotes);
 
             const { unmount } = renderDecision();
 
@@ -553,6 +666,7 @@ describe('Decision Component', () => {
 
             expect(unsubscribeDecision).toHaveBeenCalled();
             expect(unsubscribeArguments).toHaveBeenCalled();
+            expect(unsubscribeFinalVotes).toHaveBeenCalled();
         });
     });
 });

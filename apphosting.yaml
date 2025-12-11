@@ -14,17 +14,21 @@ env:
   - variable: PORT
     value: "8080"
   - variable: VITE_FIREBASE_API_KEY
-    value: "AIzaSyC9mNXI73UugDyGiIzWoDg_5e8vKdFfosM"
+    secret: VITE_FIREBASE_API_KEY
   - variable: VITE_FIREBASE_AUTH_DOMAIN
-    value: "decide-o-mat.firebaseapp.com"
+    secret: VITE_FIREBASE_AUTH_DOMAIN
   - variable: VITE_FIREBASE_PROJECT_ID
-    value: "decide-o-mat"
+    secret: VITE_FIREBASE_PROJECT_ID
   - variable: VITE_FIREBASE_STORAGE_BUCKET
-    value: "decide-o-mat.firebasestorage.app"
+    secret: VITE_FIREBASE_STORAGE_BUCKET
   - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
-    value: "392455957988"
+    secret: VITE_FIREBASE_MESSAGING_SENDER_ID
   - variable: VITE_FIREBASE_APP_ID
-    value: "1:392455957988:web:eb89fe86cee30aef5b6bf1"
+    secret: VITE_FIREBASE_APP_ID
   - variable: VITE_FIREBASE_MEASUREMENT_ID
-    value: "G-6BKMBG3HJ5"
+    secret: VITE_FIREBASE_MEASUREMENT_ID
+  # Staging/Production values should be set in the App Hosting Console config
+  # or validated via defaults if not secret.
+  # VITE_APP_ENV and VITE_COMMIT_HASH must be passed via App Hosting environment config
+  # as they change per environment/deployment.
 

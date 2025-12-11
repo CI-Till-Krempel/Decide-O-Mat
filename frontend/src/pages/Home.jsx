@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../services/firebase';
+import EncryptionService from '../services/EncryptionService';
 
 export default function Home() {
     const [question, setQuestion] = useState('');
@@ -16,9 +17,24 @@ export default function Home() {
         setError('');
 
         try {
+            let questionToSubmit = question;
+            let keyString = '';
+
+            if (EncryptionService.isEnabled()) {
+                const key = await EncryptionService.generateKey();
+                keyString = await EncryptionService.exportKey(key);
+                questionToSubmit = await EncryptionService.encrypt(question, key);
+            }
+
             const createDecision = httpsCallable(functions, 'createDecision');
-            const result = await createDecision({ question });
-            navigate(`/d/${result.data.id}`);
+            const result = await createDecision({ question: questionToSubmit });
+
+            let targetUrl = `/d/${result.data.id}`;
+            if (keyString) {
+                targetUrl += `#key=${keyString}`;
+            }
+
+            navigate(targetUrl);
         } catch (err) {
             console.error(err);
             setError('Failed to create decision. Please try again.');

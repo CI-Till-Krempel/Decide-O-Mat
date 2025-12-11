@@ -32,7 +32,6 @@
     - [x] "Close" decision functionality (prevent new votes).
     - [x] Export results as image.
 
-
 ## v1.2: Take decision
     - [x] Users should be able to vote for the final decision (yes / no)
     - [x] The final decision should be displayed, not only the Net Score
@@ -44,7 +43,10 @@
     - [x] Visualize the user votes for arguments with chips
     - [x] Visualize the user votes for final decision with chips 
 
-## v1.4 User Authentication
+## v1.4 End-to-End Encryption
+    - [x] End-to-End Encryption (US-020)
+
+## v1.5 User Authentication
     - [ ] Integrate Firebase Authentication to enable User Authentication
     - [ ] Add minimal user registration
     - [ ] Add login via OAuth
@@ -53,10 +55,30 @@
     - [ ] Add a simple user self service
     - [ ] Add a list of my decisions (both open and private)
 
-## v1.5 Private Decisions
+## v1.5.1 Deployment
+    - [ ] Create a separate development deployment
+    - [ ] Create a separate staging deployment
+    
+## v1.6 Private Decisions
     - [ ] When creating a decision, let the user choose wether it is open or private
     - [ ] Create a list of participants for private decisions
     - [ ] Restrict the closing of decisions to the owner
+
+## v1.7 Production Readiness and Compliance
+    - [ ] Add a productive domain address
+    - [ ] Add impress for legal requirements
+    - [ ] Add data privacy statement
+    - [ ] Add terms of service
+    - [ ] Add privacy policy
+    - [ ] GDPR Compliant use of cookies
+    - [ ] GDPR Compliant use of google services
+
+## v1.8 Security
+    - [ ] Do a security audit
+    - [ ] Audit user data access
+    - [ ] Audit data access for private decisions
+    - [ ] Audit data access for open decisions
+    - [ ] Check development setup
 
 ## v2.0: Multi-Option Decisions (Future)
 - **Goal**: Support complex decisions with multiple choices (not just Yes/No).

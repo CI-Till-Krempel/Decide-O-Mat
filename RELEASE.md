@@ -24,6 +24,22 @@ Each version should have a section with the version number and date:
 - Bug fix description
 ```
 
+## Environment Protection
+
+To prevent unauthorized or accidental deployments to production, we use **GitHub Environment Protection Rules**.
+
+### Configuration (One-Time Setup)
+1.  Go to the GitHub Repository **Settings**.
+2.  Navigate to **Environments** in the sidebar.
+3.  Click on **PRODUCTION** (this environment is created automatically by the workflow).
+4.  Enable **Required Reviewers**:
+    - Check the box.
+    - Add trusted team members (or yourself) as reviewers.
+5.  (Optional) Enable **Deployment Branches**:
+    - Restrict deployment to the `main` branch or tags matching `v*` (e.g., `v1.0.0`).
+
+**Effect:** When the `deploy-prod` job is triggered, it will pause and wait for manual approval from a reviewer before proceeding.
+
 ## How to Create a Release
 
 The release process is automated using GitHub Actions. To trigger a release, follow these steps:

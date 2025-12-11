@@ -84,7 +84,7 @@ describe('AddArgumentForm Component', () => {
         await user.type(input, 'Test argument');
         await user.click(button);
 
-        expect(screen.getByText('Adding...')).toBeInTheDocument();
+        expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
         expect(button).toBeDisabled();
 
         await waitFor(() => {

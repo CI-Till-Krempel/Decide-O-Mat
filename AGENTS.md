@@ -23,8 +23,11 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Verify**: Run builds, tests, and linting immediately after changes.
     - `npm run build`
     - `npm test`
-    - `npm run lint` (Run in both `frontend` and `functions` directories)
-- **Fix**: If verification fails, fix the issue immediately.
+    - **LINTING IS MANDATORY**: You must run the linter in **BOTH** `frontend` and `functions` directories.
+        - Run `cd frontend && npm run lint`
+        - Run `cd functions && npm run lint`
+    - **Pre-Commit Check**: Ensure ALL linters pass *before* adding or committing any code.
+    - **Iterate**: If linting fails, fix the errors and run the linter again. Repeat until it passes completely. Do not assume one fix resolves all issues.
 
 ### 3. Version Control
 - **Commit Frequently**: Commit code as soon as a small unit of work is stable and verified.
@@ -38,7 +41,16 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 ### 5. Review Process
 - **Pull Requests**: All changes should be submitted via Pull Requests (PRs) on GitHub.
 - **Human Review**: The human user acts as the reviewer. The agent must address all feedback before merging.
-- **No Direct Merges**: Avoid pushing directly to the `main` branch for non-trivial changes.
+- **Branch Protection**: NEVER push directly to `main`. ALL changes must be merged via Pull Requests, without exception.
+
+### 5.1 Issue Resolution Process
+For work triggered by a GitHub Issue:
+1.  **Fresh Branch**: Always create a fresh branch from `main` for the specific issue.
+2.  **Implementation**: Follow the standard Implementation Cycle.
+3.  **Pull Request**: Create a PR as usual.
+4.  **Issue Comment**: After creating the PR, comment on the original Issue.
+    - Mention the PR (e.g., "Fixed in PR #123").
+    - Close the issue if applicable (or let the PR merge close it, but the comment is mandatory).
 
 ### 6. Release Preparation
 - **Announcement Post**: For every major and minor release, generate a short blog post announcing the new version.

@@ -14,15 +14,14 @@ const db = admin.firestore();
  * @return {Promise<Object>} The created decision ID.
  */
 exports.createDecision = onCall({cors: true}, async (request) => {
-  console.log("createDecision called with data:", request.data);
   const question = request.data.question;
 
   if (!question || typeof question !== "string" || question.trim().length === 0) {
     throw new HttpsError("invalid-argument", "The function must be called with a valid 'question' argument.");
   }
 
-  if (question.length > 200) {
-    throw new HttpsError("invalid-argument", "Question must be under 200 characters.");
+  if (question.length > 1000) {
+    throw new HttpsError("invalid-argument", "Question must be under 1000 characters.");
   }
 
   const decisionRef = db.collection("decisions").doc();
@@ -56,8 +55,8 @@ exports.addArgument = onCall({cors: true}, async (request) => {
     throw new HttpsError("invalid-argument", "Type must be 'pro' or 'con'.");
   }
 
-  if (text.trim().length === 0 || text.length > 500) {
-    throw new HttpsError("invalid-argument", "Text must be between 1 and 500 characters.");
+  if (text.trim().length === 0 || text.length > 2000) {
+    throw new HttpsError("invalid-argument", "Text must be between 1 and 2000 characters.");
   }
 
   const decisionRef = db.collection("decisions").doc(decisionId);
@@ -98,8 +97,6 @@ exports.addArgument = onCall({cors: true}, async (request) => {
  * @return {Promise<Object>} Success status.
  */
 exports.voteArgument = onCall({cors: true}, async (request) => {
-  console.log("voteArgument called with data:", request.data);
-
   const {decisionId, argumentId, userId, displayName} = request.data;
 
   if (!decisionId || !argumentId || !userId) {

@@ -21,6 +21,91 @@ Navigate the project documentation:
 - **[Changelog](CHANGELOG.md)**  
   History of all notable changes, features, and bug fixes for each released version.
 
+## Development Workflow
+
+### Environments
+
+We use a multi-stage environment setup to ensure stability:
+
+1.  **Local Development**:
+    *   **Frontend**: Runs locally via Vite (`npm run dev`). Connects to Firebase Emulators for data.
+    *   **Backend**: Runs locally via Firebase Emulators (`firebase emulators:start`).
+    *   **Config**: Uses `.env.local` for initialization credentials (safe to use Staging credentials here).
+
+2.  **Staging (`staging`)**:
+    *   **Trigger**: Automatically deployed on every push to the `main` branch.
+    *   **Purpose**: Integration testing and verification in a live environment.
+    *   **URL**: `https://decide-o-mat-staging.web.app`
+
+3.  **Production (`prod`)**:
+    *   **Trigger**: Automatically deployed when a version tag (e.g., `v1.2.0`) is pushed.
+    *   **Purpose**: Live application for end users.
+    *   **URL**: `https://decide-o-mat.web.app`
+45: 
+46: ### Service Account Permissions
+
+### Service Account Permissions
+
+The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOUNT`) requires the following Google Cloud IAM roles:
+
+*   **Firebase App Hosting Admin** (`roles/firebaseapphosting.admin`): To manage App Hosting backends and rollouts.
+*   **Developer Connect Admin** (`roles/developerconnect.admin`): To verify full access to Git repository connections.
+*   **Cloud Functions Admin** (`roles/cloudfunctions.admin`): To deploy functions.
+*   **Cloud Run Admin** (`roles/run.admin`): Required for Cloud Functions 2nd Gen (which uses Cloud Run).
+*   **Artifact Registry Admin** (`roles/artifactregistry.admin`): To store function container images.
+*   **Firebase Hosting Admin** (`roles/firebasehosting.admin`): To deploy hosting sites.
+*   **Firebase Rules Admin** (`roles/firebaserules.admin`): To deploy/test security rules.
+*   **Cloud Datastore Index Admin** (`roles/datastore.indexAdmin`): To manage Firestore indexes.
+*   **Firebase Extensions Viewer** (`roles/firebaseextensions.viewer`): To list installed extensions during deploy.
+*   **Service Account User** (`roles/iam.serviceAccountUser`): To act as the runtime service account.
+*   **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`): (Optional) To view API keys during deploy.
+
+> **Advanced: Minimal Billing Permissions (Read-Only)**
+> To allow the deployment to check billing status *without* granting write access, add these two roles:
+> 1.  **Browser** (`roles/browser`): Allows reading project metadata (like billing enabled status).
+> 2.  **Service Usage Consumer** (`roles/serviceusage.serviceUsageConsumer`): Allows checking api usage.
+
+### Setup for New Developers
+
+1.  **Prerequisites**:
+    *   Node.js (v20+)
+    *   Firebase CLI (`npm install -g firebase-tools`)
+    *   Java (for Firebase Emulators)
+
+2.  **Clone & Install**:
+    ```bash
+    git clone <repository-url>
+    cd decide-o-mat
+    cd frontend && npm install
+    cd ../functions && npm install
+    ```
+
+3.  **Configure Environment**:
+    *   Create `frontend/.env.local`.
+    *   Populate it with **Staging** project credentials (ask a team member or get them from the Firebase Console > Project Settings).
+    *   *Note: These are only used to initialize the SDK. Local development connects to emulators.*
+
+    ```env
+    VITE_FIREBASE_API_KEY=...
+    VITE_FIREBASE_AUTH_DOMAIN=...
+    VITE_FIREBASE_PROJECT_ID=...
+    VITE_FIREBASE_STORAGE_BUCKET=...
+    VITE_FIREBASE_MESSAGING_SENDER_ID=...
+    VITE_FIREBASE_APP_ID=...
+    VITE_FIREBASE_MEASUREMENT_ID=...
+    ```
+
+4.  **Start Development Server**:
+    *   **Terminal 1 (Emulators)**:
+        ```bash
+        firebase emulators:start
+        ```
+    *   **Terminal 2 (Frontend)**:
+        ```bash
+        cd frontend
+        npm run dev
+        ```
+
 ## Development Resources
 
 Directories containing detailed development artifacts:

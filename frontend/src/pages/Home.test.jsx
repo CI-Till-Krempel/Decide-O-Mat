@@ -15,6 +15,17 @@ vi.mock('firebase/functions', () => ({
     httpsCallable: vi.fn(() => mockCreateDecision),
 }));
 
+// Mock EncryptionService
+vi.mock('../services/EncryptionService', () => ({
+    default: {
+        isEnabled: vi.fn(),
+        generateKey: vi.fn(),
+        exportKey: vi.fn(),
+        encrypt: vi.fn(),
+    }
+}));
+import EncryptionService from '../services/EncryptionService';
+
 // Mock useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -28,6 +39,8 @@ vi.mock('react-router-dom', async () => {
 describe('Home Component', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Default: encryption disabled
+        EncryptionService.isEnabled.mockReturnValue(false);
     });
 
     it('renders the home page with title and input', () => {
@@ -56,7 +69,7 @@ describe('Home Component', () => {
         expect(input).toHaveValue('Should we have pizza for lunch?');
     });
 
-    it('creates decision and navigates on form submission', async () => {
+    it('creates decision and navigates on form submission (unencrypted)', async () => {
         const user = userEvent.setup();
         const mockDecisionId = 'test-decision-123';
         mockCreateDecision.mockResolvedValue({ data: { id: mockDecisionId } });
@@ -76,6 +89,47 @@ describe('Home Component', () => {
         await waitFor(() => {
             expect(mockCreateDecision).toHaveBeenCalledWith({ question: 'Should we have pizza?' });
             expect(mockNavigate).toHaveBeenCalledWith(`/d/${mockDecisionId}`);
+        });
+    });
+
+    it('encrypts question and includes key in URL when enabled', async () => {
+        const user = userEvent.setup();
+        const mockDecisionId = 'test-decision-123';
+        const mockKey = 'mock-key-object';
+        const mockExportedKey = 'mock-exported-key';
+        const mockEncryptedQuestion = 'encrypted-question-string';
+
+        // Setup encryption mocks
+        EncryptionService.isEnabled.mockReturnValue(true);
+        EncryptionService.generateKey.mockResolvedValue(mockKey);
+        EncryptionService.exportKey.mockResolvedValue(mockExportedKey);
+        EncryptionService.encrypt.mockResolvedValue(mockEncryptedQuestion);
+
+        mockCreateDecision.mockResolvedValue({ data: { id: mockDecisionId } });
+
+        render(
+            <BrowserRouter>
+                <Home />
+            </BrowserRouter>
+        );
+
+        const input = screen.getByPlaceholderText('What do you need to decide?');
+        const button = screen.getByRole('button', { name: /start deciding/i });
+
+        await user.type(input, 'Secret Decision');
+        await user.click(button);
+
+        await waitFor(() => {
+            // Verify encryption flow
+            expect(EncryptionService.generateKey).toHaveBeenCalled();
+            expect(EncryptionService.exportKey).toHaveBeenCalledWith(mockKey);
+            expect(EncryptionService.encrypt).toHaveBeenCalledWith('Secret Decision', mockKey);
+
+            // Verify backend call with encrypted data
+            expect(mockCreateDecision).toHaveBeenCalledWith({ question: mockEncryptedQuestion });
+
+            // Verify navigation with key in hash
+            expect(mockNavigate).toHaveBeenCalledWith(`/d/${mockDecisionId}#key=${mockExportedKey}`);
         });
     });
 
