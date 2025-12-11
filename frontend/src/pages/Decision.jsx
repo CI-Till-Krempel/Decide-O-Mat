@@ -3,7 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { subscribeToDecision, subscribeToArguments, toggleDecisionStatus, voteDecision, subscribeToFinalVotes } from '../services/firebase';
 import ArgumentList from '../components/ArgumentList';
 import AddArgumentForm from '../components/AddArgumentForm';
-import UserSettings from '../components/UserSettings';
+
 import NamePrompt from '../components/NamePrompt';
 import Spinner from '../components/Spinner';
 import { useUser } from '../contexts/UserContext';
@@ -245,7 +245,7 @@ function Decision() {
                     }}
                 />
             )}
-            <UserSettings decisionId={id} />
+
             <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                     <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>

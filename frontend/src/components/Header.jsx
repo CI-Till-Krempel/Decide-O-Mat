@@ -1,10 +1,18 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
+import UserSettings from './UserSettings';
 
 export default function Header() {
-    const { user, logout } = useUser();
+    // Actually UserSettings handles it. So we can remove useUser from Header entirely if imports allow.
+    // But let's just remove the destructuring for now or remove the line if possible.
+
     const navigate = useNavigate();
+    // Attempt to get decisionId from params if we are on a decision page
+    // Note: This might not work if Header is outside the Routes that define :id
+    // But commonly it is. We can parse location.pathname manually if needed.
+    // For now let's just render UserSettings. If it needs decisionId to update votes, we might need a context or verify if useParams works.
+    const { id: decisionId } = useParams();
 
     const handleLogout = async () => {
         await logout();
@@ -25,34 +33,8 @@ export default function Header() {
                 Decide-O-Mat
             </Link>
             <div>
-                {user && !user.isAnonymous ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        {user.photoURL && (
-                            <img
-                                src={user.photoURL}
-                                alt={user.displayName}
-                                style={{ width: '32px', height: '32px', borderRadius: '50%' }}
-                            />
-                        )}
-                        <span style={{ fontWeight: '500' }}>{user.displayName}</span>
-                        <button
-                            onClick={handleLogout}
-                            className="btn"
-                            style={{
-                                fontSize: '0.875rem',
-                                padding: '0.5rem 1rem',
-                                background: 'var(--color-bg-secondary)',
-                                color: 'var(--color-text)'
-                            }}
-                        >
-                            Logout
-                        </button>
-                    </div>
-                ) : (
-                    <Link to="/login" className="btn btn-primary" style={{ textDecoration: 'none', fontSize: '0.9rem' }}>
-                        Login
-                    </Link>
-                )}
+                {/* Unified User Settings / Login / Logout */}
+                <UserSettings decisionId={decisionId} />
             </div>
         </header>
     );
