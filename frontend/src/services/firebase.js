@@ -66,6 +66,11 @@ export const voteDecision = async (decisionId, vote, userId, displayName) => {
     return await voteDecisionFunction({ decisionId, vote, userId, displayName });
 };
 
+export const updateUserDisplayName = async (decisionId, userId, displayName) => {
+    const updateUserDisplayNameFn = httpsCallable(functions, 'updateUserDisplayName');
+    return await updateUserDisplayNameFn({ decisionId, userId, displayName });
+};
+
 export const subscribeToDecision = (decisionId, callback) => {
     const docRef = doc(db, "decisions", decisionId);
     return onSnapshot(docRef, (doc) => {
