@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import UserSettings from './UserSettings';
 
@@ -7,17 +7,14 @@ export default function Header() {
     // Actually UserSettings handles it. So we can remove useUser from Header entirely if imports allow.
     // But let's just remove the destructuring for now or remove the line if possible.
 
-    const navigate = useNavigate();
+
     // Attempt to get decisionId from params if we are on a decision page
     // Note: This might not work if Header is outside the Routes that define :id
     // But commonly it is. We can parse location.pathname manually if needed.
     // For now let's just render UserSettings. If it needs decisionId to update votes, we might need a context or verify if useParams works.
     const { id: decisionId } = useParams();
 
-    const handleLogout = async () => {
-        await logout();
-        navigate('/');
-    };
+
 
     return (
         <header style={{
