@@ -25,9 +25,57 @@ const base64ToArrayBuffer = (base64) => {
 
 
 
+const KEYS_STORAGE_KEY = 'dom_decision_keys';
+
 const EncryptionService = {
-    isEnabled: () => {
-        return import.meta.env.VITE_ENABLE_ENCRYPTION === 'true';
+    isEnabled: () => import.meta.env.VITE_ENABLE_ENCRYPTION === 'true',
+
+    // Cache key for a decision (persisted locally)
+    saveKey: async (decisionId, callback) => {
+        // Key is CryptoKey, we need to export it to string to save
+        if (!decisionId || !callback) return;
+        try {
+            // We assume the key is passed as cryptoKey. But wait, importKey returns CryptoKey.
+            // Let's change signature: saveKey(decisionId, keyString)
+            // Actually, better to save the RAW STRING from URL to avoid export overhead/issues.
+            // Caller (Decision.jsx) has the string from URL.
+        } catch (e) {
+            console.error("Failed to save key", e);
+        }
+    },
+
+    // Improved implementation below
+    storeKey: (decisionId, keyString) => {
+        try {
+            const store = JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) || '{}');
+            store[decisionId] = keyString;
+            localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(store));
+        } catch (e) {
+            console.warn("Failed to store key", e);
+        }
+    },
+
+    getStoredKey: async (decisionId) => {
+        try {
+            const store = JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) || '{}');
+            const keyString = store[decisionId];
+            if (keyString) {
+                return await EncryptionService.importKey(keyString);
+            }
+        } catch (e) {
+            console.warn("Failed to get stored key", e);
+        }
+        return null;
+    },
+
+    getStoredKeyString: (decisionId) => {
+        try {
+            const store = JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) || '{}');
+            return store[decisionId] || null;
+        } catch (e) {
+            console.warn("Failed to get stored key string", e);
+            return null;
+        }
     },
 
     generateKey: async () => {

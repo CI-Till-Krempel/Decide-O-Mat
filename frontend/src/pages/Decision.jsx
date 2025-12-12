@@ -36,12 +36,13 @@ function Decision() {
         if (hash && hash.includes('key=')) {
             const keyString = hash.split('key=')[1];
             if (keyString) {
+                EncryptionService.storeKey(id, keyString);
                 EncryptionService.importKey(keyString)
                     .then(key => setEncryptionKey(key))
                     .catch(err => console.error("Failed to import key", err));
             }
         }
-    }, [location]);
+    }, [location, id]);
 
     useEffect(() => {
         let unsubscribeDecision = () => { };

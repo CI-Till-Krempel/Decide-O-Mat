@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useLocation } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
 
 import UserSettings from './UserSettings';
 
 export default function Header() {
+    const { user } = useUser();
     const { id: routeParamsId } = useParams();
     const location = useLocation();
     const [encryptionKey, setEncryptionKey] = useState(null);
@@ -57,9 +59,16 @@ export default function Header() {
             backgroundColor: 'white',
             marginBottom: '2rem'
         }}>
-            <Link to="/" style={{ textDecoration: 'none', color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '1.5rem' }}>
-                Decide-O-Mat
-            </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                <Link to="/" style={{ textDecoration: 'none', color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '1.5rem' }}>
+                    Decide-O-Mat
+                </Link>
+                {user && (
+                    <Link to="/my-decisions" style={{ textDecoration: 'none', color: 'var(--text-color)', fontWeight: '500' }}>
+                        My Decisions
+                    </Link>
+                )}
+            </div>
             <div>
                 {/* Unified User Settings / Login / Logout */}
                 <UserSettings decisionId={decisionId} encryptionKey={encryptionKey} />

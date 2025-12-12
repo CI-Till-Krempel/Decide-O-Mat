@@ -13,7 +13,10 @@ Decide-O-Mat v1.4 introduces End-to-End Encryption (E2EE) to ensure that decisio
 -   **Generation**: Keys are generated client-side upon decision creation.
 -   **Distribution**: The key is encoded as a JWK (JSON Web Key) and appended to the decision URL as a **hash fragment** (e.g., `.../d/123#key=...`).
     -   *Why Hash Fragment?* Browsers do not send the hash fragment to the server in HTTP requests. This ensures the key never leaves the user's device via standard navigation or API calls.
--   **Storage**: The key is not stored in any persistent database. It exists only in the URL and transient client-side memory.
+-   **Storage**: Keys are transiently stored in:
+    1.  **URL Hash**: For sharing and initial access.
+    2.  **Local Storage** (`dom_decision_keys`): For cached access in the "My Decisions" list. This allows the user to see decrypted titles of decisions they have visited on that device.
+    -   *Security Note*: Local Storage is accessible to JavaScript running on the same origin (XSS risk), but this is equivalent to the risk of the key being in the URL hash or memory in the context of an active session. Keys are never sent to the server.
 
 ### Data Flow
 1.  **Creation**:
