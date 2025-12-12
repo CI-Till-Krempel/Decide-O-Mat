@@ -48,6 +48,9 @@ vi.mock('../services/EncryptionService', () => ({
         decrypt: vi.fn(),
         encrypt: vi.fn(),
         isEnabled: vi.fn(),
+        storeKey: vi.fn(),
+        getStoredKey: vi.fn(),
+        getStoredKeyString: vi.fn(),
     }
 }));
 import EncryptionService from '../services/EncryptionService';
