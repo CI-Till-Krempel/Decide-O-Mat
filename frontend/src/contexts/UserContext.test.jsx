@@ -13,10 +13,17 @@ vi.mock('firebase/auth', () => ({
     getAuth: vi.fn(),
     connectAuthEmulator: vi.fn(),
     GoogleAuthProvider: vi.fn(() => ({})),
+    EmailAuthProvider: { credential: vi.fn() },
     signInWithPopup: (...args) => mockSignInWithPopup(...args),
     signInAnonymously: (...args) => mockSignInAnonymously(...args),
     signOut: (...args) => mockSignOut(...args),
     onAuthStateChanged: (...args) => mockOnAuthStateChanged(...args),
+    createUserWithEmailAndPassword: vi.fn(),
+    signInWithEmailAndPassword: vi.fn(),
+    sendPasswordResetEmail: vi.fn(),
+    linkWithPopup: vi.fn(),
+    linkWithCredential: vi.fn(),
+    updateProfile: vi.fn(),
 }));
 
 // Mock services/firebase
@@ -26,13 +33,13 @@ vi.mock('../services/firebase', () => ({
 
 // Test component to consume context
 const TestComponent = () => {
-    const { user, login, logout } = useUser();
+    const { user, loginWithGoogle, logout } = useUser();
     return (
         <div>
             <div data-testid="user-id">{user.userId}</div>
             <div data-testid="user-name">{user.displayName || 'null'}</div>
             <div data-testid="is-anonymous">{user.isAnonymous ? 'true' : 'false'}</div>
-            <button onClick={login}>Login</button>
+            <button onClick={loginWithGoogle}>Login</button>
             <button onClick={logout}>Logout</button>
         </div>
     );

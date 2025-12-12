@@ -1,50 +1,208 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
-export default function Login() {
-    const { login } = useUser();
+function Login() {
+    const { loginWithGoogle, loginEmail, registerEmail, resetPassword, user } = useUser();
     const navigate = useNavigate();
+    const [mode, setMode] = useState('login'); // 'login', 'register', 'reset'
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    // If already logged in (and not anonymous), redirect to home
+    React.useEffect(() => {
+        if (user && !user.isAnonymous) {
+            navigate('/');
+        }
+    }, [user, navigate]);
 
     const handleGoogleLogin = async () => {
+        setError('');
+        setLoading(true);
         try {
-            await login();
-            navigate('/');
+            await loginWithGoogle();
+            navigate(-1); // Go back to where they came from
+        } catch {
+            setError('Failed to sign in with Google');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setMessage('');
+        setLoading(true);
+
+        try {
+            if (mode === 'login') {
+                await loginEmail(email, password);
+                navigate(-1);
+            } else if (mode === 'register') {
+                await registerEmail(email, password);
+                navigate(-1);
+            } else if (mode === 'reset') {
+                await resetPassword(email);
+                setMessage('Check your email for instructions.');
+            }
         } catch (err) {
-            setError('Failed to sign in with Google. Please try again.');
             console.error(err);
+            let msg = 'Failed to perform action.';
+            if (err.code === 'auth/wrong-password') msg = 'Incorrect password.';
+            if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+            if (err.code === 'auth/email-already-in-use') msg = 'Email already in use.';
+            if (err.code === 'auth/weak-password') msg = 'Password is too weak.';
+            if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
+            setError(msg);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="container" style={{ maxWidth: '400px', marginTop: '4rem' }}>
-            <div className="card" style={{ padding: '2rem' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--color-primary)' }}>Welcome Back</h2>
-                {error && <div style={{ color: 'var(--color-danger)', marginBottom: '1rem', textAlign: 'center', padding: '0.5rem', background: '#fee2e2', borderRadius: '4px' }}>{error}</div>}
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+            <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+                <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                    {mode === 'login' && 'Welcome Back'}
+                    {mode === 'register' && 'Create Account'}
+                    {mode === 'reset' && 'Reset Password'}
+                </h2>
 
-                <button
-                    onClick={handleGoogleLogin}
-                    className="btn btn-primary"
-                    style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem',
-                        fontSize: '1rem'
-                    }}
-                >
-                    <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fillRule="evenodd" fillOpacity="1" fill="#fff" stroke="none"></path>
-                        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.715H.957v2.332A8.997 8.997 0 0 0 9 18z" fillRule="evenodd" fillOpacity="1" fill="#fff" stroke="none"></path>
-                        <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fillRule="evenodd" fillOpacity="1" fill="#fff" stroke="none"></path>
-                        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fillRule="evenodd" fillOpacity="1" fill="#fff" stroke="none"></path>
-                    </svg>
-                    Sign in with Google
-                </button>
+                {error && <div style={{ color: 'var(--color-danger)', marginBottom: '1rem', background: '#fee2e2', padding: '0.5rem', borderRadius: '4px' }}>{error}</div>}
+                {message && <div style={{ color: 'var(--color-success)', marginBottom: '1rem', background: '#dcfce7', padding: '0.5rem', borderRadius: '4px' }}>{message}</div>}
+
+                {/* Tabs */}
+                <div style={{ display: 'flex', marginBottom: '1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+                    <button
+                        type="button"
+                        onClick={() => { setMode('login'); setError(''); setMessage(''); }}
+                        style={{
+                            flex: 1,
+                            padding: '0.5rem',
+                            background: 'none',
+                            border: 'none',
+                            borderBottom: mode === 'login' ? '2px solid var(--color-primary)' : '2px solid transparent',
+                            color: mode === 'login' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                            fontWeight: mode === 'login' ? '600' : '400'
+                        }}
+                    >
+                        Sign In
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => { setMode('register'); setError(''); setMessage(''); }}
+                        style={{
+                            flex: 1,
+                            padding: '0.5rem',
+                            background: 'none',
+                            border: 'none',
+                            borderBottom: mode === 'register' ? '2px solid var(--color-primary)' : '2px solid transparent',
+                            color: mode === 'register' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                            fontWeight: mode === 'register' ? '600' : '400'
+                        }}
+                    >
+                        Register
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>Email</label>
+                        <input
+                            type="email"
+                            className="input"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            placeholder="you@example.com"
+                        />
+                    </div>
+
+                    {mode !== 'reset' && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>Password</label>
+                            <input
+                                type="password"
+                                className="input"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                placeholder="••••••••"
+                                minLength={6}
+                            />
+                        </div>
+                    )}
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="btn btn-primary"
+                        style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem' }}
+                    >
+                        {loading ? 'Processing...' : (
+                            <>
+                                {mode === 'login' && 'Sign In'}
+                                {mode === 'register' && 'Create Account'}
+                                {mode === 'reset' && 'Send Reset Link'}
+                            </>
+                        )}
+                    </button>
+                </form>
+
+                {mode === 'login' && (
+                    <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                        <button
+                            onClick={() => setMode('reset')}
+                            style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline' }}
+                        >
+                            Forgot Password?
+                        </button>
+                    </div>
+                )}
+
+                {(mode === 'login' || mode === 'register') && (
+                    <>
+                        <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0' }}>
+                            <div style={{ flex: 1, height: '1px', background: 'var(--color-border)' }}></div>
+                            <span style={{ padding: '0 0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>OR</span>
+                            <div style={{ flex: 1, height: '1px', background: 'var(--color-border)' }}></div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={handleGoogleLogin}
+                            disabled={loading}
+                            className="btn"
+                            style={{
+                                width: '100%',
+                                background: 'white',
+                                border: '1px solid var(--color-border)',
+                                color: 'var(--color-text-main)'
+                            }}
+                        >
+                            <span style={{ marginRight: '0.5rem' }}>G</span>
+                            {mode === 'register' ? 'Sign up with Google' : 'Sign in with Google'}
+                        </button>
+                    </>
+                )}
+
+                {mode === 'reset' && (
+                    <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem' }}>
+                        <button
+                            onClick={() => setMode('login')}
+                            style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline' }}
+                        >
+                            Back to Login
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
+
+export default Login;

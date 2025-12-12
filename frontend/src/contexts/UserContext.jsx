@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 // import { generateUUID } from '../utils/uuid'; // Removed
 import NameGenerator from '../utils/NameGenerator';
 import { auth } from '../services/firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, updateProfile } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, updateProfile, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, linkWithPopup, linkWithCredential, EmailAuthProvider } from 'firebase/auth';
 
 const UserContext = createContext();
 
@@ -93,12 +93,66 @@ export function UserProvider({ children }) {
         }
     }, [localDisplayName]);
 
-    const login = async () => {
+    const loginWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
         try {
+            if (auth.currentUser && auth.currentUser.isAnonymous) {
+                // Try to upgrade the anonymous account
+                try {
+                    await linkWithPopup(auth.currentUser, provider);
+                    return; // Success
+                    // eslint-disable-next-line no-unused-vars
+                } catch (linkError) {
+                    // console.log("Link failed, falling back to sign in", linkError);
+                    // If link fails (e.g. email already in use), fall back to normal sign in
+                    // This will switch the user, effectively "logging out" the anonymous session
+                }
+            }
             await signInWithPopup(auth, provider);
         } catch (error) {
-            console.error("Login failed:", error);
+            console.error("Google Login failed:", error);
+            throw error;
+        }
+    };
+
+    const registerEmail = async (email, password) => {
+        try {
+            if (auth.currentUser && auth.currentUser.isAnonymous) {
+                // Try to link first -> "Upgrade"
+                const credential = EmailAuthProvider.credential(email, password);
+                /* 
+                   Note: linkWithCredential works for ID/Pass. 
+                   But if we want to create a NEW account with this email/pass and link it, 
+                   it's effectively linkWithCredential.
+                   However, createUserWithEmailAndPassword creates a user and signs in. 
+                   To upgrade, we use linkWithCredential.
+                */
+                // Actually, linking requires the user to NOT exist yet with that credential.
+                // If we want to "Register" a new email on this anonymous user:
+                await linkWithCredential(auth.currentUser, credential);
+            } else {
+                await createUserWithEmailAndPassword(auth, email, password);
+            }
+        } catch (error) {
+            console.error("Registration failed:", error);
+            throw error;
+        }
+    };
+
+    const loginEmail = async (email, password) => {
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            console.error("Email Login failed:", error);
+            throw error;
+        }
+    };
+
+    const resetPassword = async (email) => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+        } catch (error) {
+            console.error("Reset Password failed:", error);
             throw error;
         }
     };
@@ -154,7 +208,7 @@ export function UserProvider({ children }) {
     };
 
     return (
-        <UserContext.Provider value={{ user, login, logout, setDisplayName, resetToInitialName, getInitialName, loading }}>
+        <UserContext.Provider value={{ user, loginWithGoogle, loginEmail, registerEmail, resetPassword, logout, setDisplayName, resetToInitialName, getInitialName, loading }}>
             {!loading && children}
         </UserContext.Provider>
     );

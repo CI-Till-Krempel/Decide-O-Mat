@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { updateUserDisplayName } from '../services/firebase';
 import ParticipantService from '../services/ParticipantService';
@@ -6,7 +7,8 @@ import MagicLinkData from './MagicLinkData';
 import NameGenerator from '../utils/NameGenerator';
 
 function UserSettings({ decisionId, encryptionKey }) {
-    const { user, login, logout, setDisplayName, resetToInitialName, getInitialName } = useUser();
+    const { user, logout, setDisplayName, resetToInitialName, getInitialName } = useUser();
+    const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [showTransfer, setShowTransfer] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
@@ -71,12 +73,8 @@ function UserSettings({ decisionId, encryptionKey }) {
         }
     };
 
-    const handleLogin = async () => {
-        try {
-            await login();
-        } catch (error) {
-            console.error("Login failed", error);
-        }
+    const handleLogin = () => {
+        navigate('/login');
     };
 
     if (!user.isAnonymous) {
@@ -95,6 +93,13 @@ function UserSettings({ decisionId, encryptionKey }) {
                 gap: '0.5rem',
                 zIndex: 100
             }}>
+                {user.photoURL && (
+                    <img
+                        src={user.photoURL}
+                        alt="Avatar"
+                        style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+                    />
+                )}
                 <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
                     {user.displayName}
                 </span>
