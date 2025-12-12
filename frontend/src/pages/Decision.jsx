@@ -121,10 +121,16 @@ function Decision() {
         };
     }, [id, encryptionKey]);
 
+    useEffect(() => {
+        if (copied) {
+            const timer = setTimeout(() => setCopied(false), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [copied]);
+
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
     };
 
     const handleToggleStatus = async () => {
