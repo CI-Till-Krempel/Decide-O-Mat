@@ -16,8 +16,11 @@ function UserSettings({ decisionId, encryptionKey }) {
     const [editedName, setEditedName] = useState(user.displayName || '');
 
     useEffect(() => {
-        setEditedName(user.displayName || '');
-    }, [user.displayName]);
+        if (user.displayName && user.displayName !== editedName) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setEditedName(user.displayName);
+        }
+    }, [user.displayName]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSave = async () => {
         if (editedName.trim()) {
