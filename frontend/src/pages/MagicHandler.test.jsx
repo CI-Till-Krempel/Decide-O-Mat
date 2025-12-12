@@ -37,7 +37,9 @@ describe('MagicHandler', () => {
         vi.clearAllMocks();
     });
 
-    it('shows loading state initially', () => {
+    it('shows loading state initially', async () => {
+        // Return a pending promise so state doesn't update during test
+        signInWithCustomToken.mockReturnValue(new Promise(() => { }));
         renderWithRouter('/magic?token=test-token');
         expect(screen.getByText(/Processing/i)).toBeInTheDocument();
     });
