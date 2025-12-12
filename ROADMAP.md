@@ -52,12 +52,11 @@
 
 ## v1.5 User Authentication
     - [x] Integrate Firebase Authentication to enable User Authentication
-    - [ ] Add minimal user registration
-    - [ ] Add login via OAuth
-    - [ ] Add logout
-    - [ ] Add possibility to inform users on updates on decisions
-    - [ ] Add a simple user self service
-    - [ ] Add a list of my decisions (both open and private)
+    - [ ] [US-023](stories/US-023-User-Login.md): User Login & Registration (OAuth + Email/Pass)
+    - [ ] [US-024](stories/US-024-User-Profile.md): User Profile & Self Service (Delete Account)
+    - [ ] [US-025](stories/US-025-My-Decisions.md): My Decisions List
+    - [ ] [US-026](stories/US-026-Participant-List.md): Participant List Sidebar
+    - [ ] [US-027](stories/US-027-Notifications.md): Decision Notifications (Push)
 
 ## v1.6 Private Decisions
     - [ ] When creating a decision, let the user choose wether it is open or private
