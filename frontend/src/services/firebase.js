@@ -82,6 +82,11 @@ export const registerParticipant = async (decisionId, encryptedDisplayName, plai
     return await registerParticipantFn({ decisionId, encryptedDisplayName, plainDisplayName });
 };
 
+export const deleteUser = async () => {
+    const deleteUserFn = httpsCallable(functions, 'deleteUser');
+    return await deleteUserFn();
+};
+
 export const subscribeToDecision = (decisionId, callback) => {
     const docRef = doc(db, "decisions", decisionId);
     return onSnapshot(docRef, (doc) => {
