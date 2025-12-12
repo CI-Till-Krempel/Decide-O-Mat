@@ -1,6 +1,6 @@
-const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const { FieldValue } = require("firebase-admin/firestore");
+const {FieldValue} = require("firebase-admin/firestore");
 
 // setGlobalOptions({region: "europe-west1"});
 
@@ -13,7 +13,7 @@ const db = admin.firestore();
  * @param {string} request.data.question - The question to decide on.
  * @return {Promise<Object>} The created decision ID.
  */
-exports.createDecision = onCall({ cors: true }, async (request) => {
+exports.createDecision = onCall({cors: true}, async (request) => {
   const question = request.data.question;
 
   if (!question || typeof question !== "string" || question.trim().length === 0) {
@@ -31,7 +31,7 @@ exports.createDecision = onCall({ cors: true }, async (request) => {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return { id: decisionRef.id };
+  return {id: decisionRef.id};
 });
 
 /**
@@ -44,8 +44,8 @@ exports.createDecision = onCall({ cors: true }, async (request) => {
  * @param {string} [request.data.authorId] - Optional unique ID of the author.
  * @return {Promise<Object>} The created argument ID.
  */
-exports.addArgument = onCall({ cors: true }, async (request) => {
-  const { decisionId, type, text, authorName, authorId } = request.data;
+exports.addArgument = onCall({cors: true}, async (request) => {
+  const {decisionId, type, text, authorName, authorId} = request.data;
 
   if (!decisionId || !type || !text) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
@@ -85,7 +85,7 @@ exports.addArgument = onCall({ cors: true }, async (request) => {
 
   await argumentRef.set(argumentData);
 
-  return { id: argumentRef.id };
+  return {id: argumentRef.id};
 });
 
 /**
@@ -96,13 +96,13 @@ exports.addArgument = onCall({ cors: true }, async (request) => {
  * @param {number} request.data.change - Vote change (1 to vote, -1 to unvote).
  * @return {Promise<Object>} Success status.
  */
-exports.voteArgument = onCall({ cors: true }, async (request) => {
+exports.voteArgument = onCall({cors: true}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const { decisionId, argumentId } = request.data;
+  const {decisionId, argumentId} = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !argumentId) {
@@ -153,11 +153,11 @@ exports.voteArgument = onCall({ cors: true }, async (request) => {
     }
   });
 
-  return { success: true };
+  return {success: true};
 });
 
-exports.toggleDecisionStatus = onCall({ cors: true }, async (request) => {
-  const { decisionId, status } = request.data;
+exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
+  const {decisionId, status} = request.data;
 
   if (!decisionId || !status) {
     throw new HttpsError("invalid-argument", "Missing decisionId or status");
@@ -174,18 +174,18 @@ exports.toggleDecisionStatus = onCall({ cors: true }, async (request) => {
     throw new HttpsError("not-found", "Decision not found");
   }
 
-  await decisionRef.update({ status: status });
+  await decisionRef.update({status: status});
 
-  return { success: true, status: status };
+  return {success: true, status: status};
 });
 
-exports.voteDecision = onCall({ cors: true }, async (request) => {
+exports.voteDecision = onCall({cors: true}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const { decisionId, vote } = request.data;
+  const {decisionId, vote} = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !vote) {
@@ -263,7 +263,7 @@ exports.voteDecision = onCall({ cors: true }, async (request) => {
     });
   });
 
-  return { success: true };
+  return {success: true};
 });
 
 /**
@@ -274,13 +274,13 @@ exports.voteDecision = onCall({ cors: true }, async (request) => {
  * @param {string} request.data.displayName - The new display name.
  * @return {Promise<Object>} Success status.
  */
-exports.updateUserDisplayName = onCall({ cors: true }, async (request) => {
+exports.updateUserDisplayName = onCall({cors: true}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const { decisionId, displayName } = request.data;
+  const {decisionId, displayName} = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !displayName) {
@@ -302,7 +302,7 @@ exports.updateUserDisplayName = onCall({ cors: true }, async (request) => {
   const finalVoteRef = decisionRef.collection("finalVotes").doc(userId);
   const finalVoteDoc = await finalVoteRef.get();
   if (finalVoteDoc.exists) {
-    batch.update(finalVoteRef, { displayName: displayName });
+    batch.update(finalVoteRef, {displayName: displayName});
     operationCount++;
   }
 
@@ -313,14 +313,14 @@ exports.updateUserDisplayName = onCall({ cors: true }, async (request) => {
   const voteReadPromises = argumentsSnapshot.docs.map(async (argDoc) => {
     const voteRef = argDoc.ref.collection("votes").doc(userId);
     const voteDoc = await voteRef.get();
-    return { ref: voteRef, exists: voteDoc.exists };
+    return {ref: voteRef, exists: voteDoc.exists};
   });
 
   const voteResults = await Promise.all(voteReadPromises);
 
   voteResults.forEach((result) => {
     if (result.exists) {
-      batch.update(result.ref, { displayName: displayName });
+      batch.update(result.ref, {displayName: displayName});
       operationCount++;
     }
   });
@@ -329,7 +329,7 @@ exports.updateUserDisplayName = onCall({ cors: true }, async (request) => {
     await batch.commit();
   }
 
-  return { success: true, updated: operationCount };
+  return {success: true, updated: operationCount};
 });
 
 /**
@@ -340,13 +340,13 @@ exports.updateUserDisplayName = onCall({ cors: true }, async (request) => {
  * @param {string} request.data.encryptedDisplayName - The encrypted display name.
  * @return {Promise<Object>} Success status.
  */
-exports.registerParticipant = onCall({ cors: true }, async (request) => {
+exports.registerParticipant = onCall({cors: true}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const { decisionId, encryptedDisplayName, plainDisplayName } = request.data;
+  const {decisionId, encryptedDisplayName, plainDisplayName} = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || (!encryptedDisplayName && !plainDisplayName)) {
@@ -374,9 +374,9 @@ exports.registerParticipant = onCall({ cors: true }, async (request) => {
     data.plainDisplayName = plainDisplayName;
   }
 
-  await participantRef.set(data, { merge: true });
+  await participantRef.set(data, {merge: true});
 
-  return { success: true };
+  return {success: true};
 });
 
 /**
@@ -384,7 +384,7 @@ exports.registerParticipant = onCall({ cors: true }, async (request) => {
  * @param {Object} request - The request object.
  * @return {Promise<Object>} The magic link token.
  */
-exports.generateMagicLink = onCall({ cors: true }, async (request) => {
+exports.generateMagicLink = onCall({cors: true}, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
@@ -393,7 +393,7 @@ exports.generateMagicLink = onCall({ cors: true }, async (request) => {
 
   try {
     const customToken = await admin.auth().createCustomToken(userId);
-    return { token: customToken };
+    return {token: customToken};
   } catch (error) {
     console.error("Error creating custom token:", error);
     throw new HttpsError("internal", "Unable to create magic link token.");
