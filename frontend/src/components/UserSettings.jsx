@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { updateUserDisplayName } from '../services/firebase';
 import ParticipantService from '../services/ParticipantService';
@@ -11,6 +11,10 @@ function UserSettings({ decisionId, encryptionKey }) {
     const [showTransfer, setShowTransfer] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
     const [editedName, setEditedName] = useState(user.displayName || '');
+
+    useEffect(() => {
+        setEditedName(user.displayName || '');
+    }, [user.displayName]);
 
     const handleSave = async () => {
         if (editedName.trim()) {

@@ -38,6 +38,7 @@ export function UserProvider({ children }) {
                             const newName = NameGenerator.generate();
                             setLocalDisplayName(newName);
                             localStorage.setItem('dom_display_name', newName);
+                            localStorage.setItem('dom_initial_name', newName);
                             localStorage.setItem('dom_display_name_uid', user.uid);
                             // Persist new name to profile immediately
                             try { await updateProfile(user, { displayName: newName }) } catch { /* ignore */ }
@@ -54,6 +55,7 @@ export function UserProvider({ children }) {
                                 const newName = NameGenerator.generate();
                                 setLocalDisplayName(newName);
                                 localStorage.setItem('dom_display_name', newName);
+                                localStorage.setItem('dom_initial_name', newName);
                                 localStorage.setItem('dom_display_name_uid', user.uid);
                                 // Persist new name to profile immediately
                                 try { await updateProfile(user, { displayName: newName }) } catch { /* ignore */ }
