@@ -70,11 +70,25 @@ describe('EncryptionService', () => {
         await expect(EncryptionService.decrypt(encrypted, key2)).rejects.toThrow();
     });
 
-    it('fails to decrypt garbage data', async () => {
+    it('returns garbage data as-is if too short', async () => {
+        const key = await EncryptionService.generateKey();
+        const garbage = "Short"; // Too short for IV+Tag
+        const result = await EncryptionService.decrypt(garbage, key);
+        expect(result).toBe(garbage);
+    });
+
+    it('returns invalid base64 data as-is', async () => {
         const key = await EncryptionService.generateKey();
         const garbage = "NotBase64EncodedLikely";
+        const result = await EncryptionService.decrypt(garbage, key);
+        expect(result).toBe(garbage);
+    });
 
-        await expect(EncryptionService.decrypt(garbage, key)).rejects.toThrow();
+    it('returns "Deleted [Name]" strings as-is', async () => {
+        const key = await EncryptionService.generateKey();
+        const deletedName = "Deleted Panda";
+        const result = await EncryptionService.decrypt(deletedName, key);
+        expect(result).toBe(deletedName);
     });
 
     it('checks enabled status correctly', () => {

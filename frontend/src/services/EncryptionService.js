@@ -121,8 +121,25 @@ const EncryptionService = {
         try {
             if (!encryptedBase64) return encryptedBase64;
 
-            const fullBuffer = base64ToArrayBuffer(encryptedBase64);
+            // Check for unencrypted "Deleted" names from backend
+            if (typeof encryptedBase64 === 'string' && encryptedBase64.startsWith('Deleted ')) {
+                return encryptedBase64;
+            }
+
+            let fullBuffer;
+            try {
+                fullBuffer = base64ToArrayBuffer(encryptedBase64);
+            } catch {
+                // Not valid base64, likely plaintext
+                return encryptedBase64;
+            }
+
             const fullArray = new Uint8Array(fullBuffer);
+
+            // Sanity check: IV (12) + Tag (16) = 28 bytes minimum
+            if (fullArray.byteLength < 28) {
+                return encryptedBase64; // Return as-is, likely plaintext
+            }
 
             // Extract IV (first 12 bytes)
             const iv = fullArray.slice(0, 12);
@@ -142,9 +159,10 @@ const EncryptionService = {
             return decoder.decode(decryptedBuffer);
         } catch (error) {
             console.error('Error decrypting data:', error);
-            // Fail safe: return null or throw?
-            // If we can't decrypt, showing garbage is bad.
-            // Throwing allows UI to handle "Decryption Failed"
+            // If actual decryption (crypto.subtle) fails, it might be due to wrong key.
+            // In that case, we probably SHOULD throw or return a fallback, 
+            // but returning raw encrypted data is useless/ugly.
+            // However, sticking to the requested behavior of not crashing:
             throw new Error("Decryption failed");
         }
     }

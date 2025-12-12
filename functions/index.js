@@ -399,3 +399,6 @@ exports.generateMagicLink = onCall({cors: true}, async (request) => {
     throw new HttpsError("internal", "Unable to create magic link token.");
   }
 });
+
+const {deleteUser} = require("./deleteUser");
+exports.deleteUser = deleteUser;

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // import { generateUUID } from '../utils/uuid'; // Removed
 import NameGenerator from '../utils/NameGenerator';
-import { auth } from '../services/firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, updateProfile, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, linkWithPopup, linkWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { auth, deleteUser } from '../services/firebase';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, updateProfile, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, linkWithPopup, linkWithCredential, EmailAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup } from 'firebase/auth';
 
 const UserContext = createContext();
 
@@ -174,13 +174,42 @@ export function UserProvider({ children }) {
         }
     };
 
+    const deleteAccount = async (password) => {
+        if (!firebaseUser) return;
+        try {
+            // 1. Re-authenticate (Security Requirement)
+            if (firebaseUser.providerData.some(p => p.providerId === 'google.com')) {
+                const provider = new GoogleAuthProvider();
+                await reauthenticateWithPopup(firebaseUser, provider);
+            } else if (firebaseUser.providerData.some(p => p.providerId === 'password')) {
+                if (!password) throw new Error("Password required for deletion");
+                const credential = EmailAuthProvider.credential(firebaseUser.email, password);
+                await reauthenticateWithCredential(firebaseUser, credential);
+            }
+            // Anonymous users don't need re-auth
+
+            // 2. Call Backend Anonymization
+            await deleteUser();
+
+            // 3. Cleanup Local Session
+            await signOut(auth);
+            setFirebaseUser(null);
+            localStorage.removeItem('dom_display_name_uid');
+            setLocalDisplayName(null);
+        } catch (error) {
+            console.error("Delete Account failed:", error);
+            throw error;
+        }
+    };
+
     // Determine the effective user
     const user = firebaseUser ? {
         userId: firebaseUser.uid,
         displayName: localDisplayName || firebaseUser.displayName,
         photoURL: firebaseUser.photoURL,
         // Treat as anonymous if explicit flag OR if no providers
-        isAnonymous: firebaseUser.isAnonymous || firebaseUser.providerData.length === 0
+        isAnonymous: firebaseUser.isAnonymous || firebaseUser.providerData.length === 0,
+        providers: firebaseUser.providerData.map(p => p.providerId)
     } : null;
 
     const setDisplayName = async (name) => {
@@ -216,7 +245,7 @@ export function UserProvider({ children }) {
     };
 
     return (
-        <UserContext.Provider value={{ user, loginWithGoogle, loginEmail, registerEmail, resetPassword, logout, setDisplayName, resetToInitialName, getInitialName, loading }}>
+        <UserContext.Provider value={{ user, loginWithGoogle, loginEmail, registerEmail, resetPassword, logout, deleteAccount, setDisplayName, resetToInitialName, getInitialName, loading }}>
             {!loading && children}
         </UserContext.Provider>
     );

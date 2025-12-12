@@ -4,23 +4,26 @@ import { useUser } from '../contexts/UserContext';
 import { updateUserDisplayName } from '../services/firebase';
 import ParticipantService from '../services/ParticipantService';
 import MagicLinkData from './MagicLinkData';
-import NameGenerator from '../utils/NameGenerator';
+// import NameGenerator from '../utils/NameGenerator'; // Unused
 
 function UserSettings({ decisionId, encryptionKey }) {
-    const { user, logout, setDisplayName, resetToInitialName, getInitialName } = useUser();
+    const { user, logout, deleteAccount, setDisplayName, resetToInitialName, getInitialName } = useUser();
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [showTransfer, setShowTransfer] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
-    const [editedName, setEditedName] = useState(user.displayName || '');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deletePassword, setDeletePassword] = useState('');
+    const [deleteError, setDeleteError] = useState('');
+    const [editedName, setEditedName] = useState(user?.displayName || '');
 
     useEffect(() => {
-        if (user.displayName && user.displayName !== editedName) {
+        if (user?.displayName && user.displayName !== editedName) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setEditedName(user.displayName);
         }
-    }, [user.displayName]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [user?.displayName]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSave = async () => {
         if (editedName.trim()) {
@@ -47,6 +50,9 @@ function UserSettings({ decisionId, encryptionKey }) {
         setShowTransfer(false);
         setShowHelp(false);
         setShowResetConfirm(false);
+        setShowDeleteConfirm(false);
+        setDeletePassword('');
+        setDeleteError('');
     };
 
     const handleResetClick = () => {
@@ -76,9 +82,62 @@ function UserSettings({ decisionId, encryptionKey }) {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        setDeleteError('');
+        try {
+            await deleteAccount(deletePassword);
+            setShowDeleteConfirm(false);
+        } catch (error) {
+            setDeleteError("Failed to delete account. Check password.");
+            console.error(error);
+        }
+    };
+
     const handleLogin = () => {
         navigate('/login');
     };
+
+    if (!user) return null;
+
+    if (showDeleteConfirm) {
+        const needsPassword = user.providers && user.providers.includes('password');
+
+        return (
+            <div style={{
+                position: 'fixed', top: '1rem', right: '1rem', padding: '1rem',
+                backgroundColor: 'white', border: '1px solid #ddd', borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)', zIndex: 110,
+                minWidth: '280px', maxWidth: '300px'
+            }}>
+                <h4 style={{ marginTop: 0, color: 'var(--color-danger)' }}>Delete Account?</h4>
+                <p style={{ fontSize: '0.85rem' }}>
+                    This action is <strong>irreversible</strong>. Not even we can undo this.
+                </p>
+                <p style={{ fontSize: '0.85rem', color: '#666' }}>
+                    Your votes will be anonymized to "Deleted [Animal]" to preserve decision integrity.
+                </p>
+
+                {needsPassword && (
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.25rem' }}>Confim Password:</label>
+                        <input
+                            type="password"
+                            value={deletePassword}
+                            onChange={(e) => setDeletePassword(e.target.value)}
+                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                        />
+                    </div>
+                )}
+
+                {deleteError && <div style={{ color: 'red', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{deleteError}</div>}
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button onClick={handleCancel} style={{ flex: 1, padding: '0.5rem', cursor: 'pointer', background: 'white', border: '1px solid #ccc', borderRadius: '4px' }}>Cancel</button>
+                    <button onClick={handleDeleteAccount} style={{ flex: 1, padding: '0.5rem', cursor: 'pointer', background: 'var(--color-danger)', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>Delete</button>
+                </div>
+            </div>
+        );
+    }
 
     if (!user.isAnonymous) {
         return (
@@ -120,11 +179,23 @@ function UserSettings({ decisionId, encryptionKey }) {
                 >
                     Logout
                 </button>
+                <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    style={{
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        border: 'none',
+                        borderRadius: '4px',
+                        backgroundColor: 'var(--color-danger)',
+                        color: 'white',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Delete
+                </button>
             </div>
         );
     }
-
-
 
     if (showTransfer) {
         return (
