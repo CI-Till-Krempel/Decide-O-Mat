@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, connectFirestoreEmulator, collection, getDoc, doc, query, orderBy, onSnapshot } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator, collection, getDoc, getDocs, doc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
 
@@ -129,6 +129,50 @@ export const subscribeToFinalVotes = (decisionId, callback) => {
         });
         callback(votes);
     });
+};
+
+export const getUserDecisions = async (userId) => {
+    // 1. Decisions created by user
+    const qOwner = query(
+        collection(db, "decisions"),
+        orderBy("createdAt", "desc"),
+        where("ownerId", "==", userId)
+    );
+
+    // 2. Decisions participated in by user
+    const qParticipant = query(
+        collection(db, "decisions"),
+        orderBy("createdAt", "desc"),
+        where("participantIds", "array-contains", userId)
+    );
+
+    const [ownerSnap, participantSnap] = await Promise.all([
+        getDocs(qOwner),
+        getDocs(qParticipant)
+    ]);
+
+    const decisionsMap = new Map();
+
+    ownerSnap.forEach((doc) => {
+        decisionsMap.set(doc.id, { id: doc.id, ...doc.data(), role: 'owner' });
+    });
+
+    participantSnap.forEach((doc) => {
+        if (!decisionsMap.has(doc.id)) {
+            decisionsMap.set(doc.id, { id: doc.id, ...doc.data(), role: 'participant' });
+        } else {
+            // Already there as owner, which takes precedence, but good to know
+        }
+    });
+
+    // Convert to array and sort by createdAt desc
+    const sortedDecisions = Array.from(decisionsMap.values()).sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+        return dateB - dateA;
+    });
+
+    return sortedDecisions;
 };
 
 export const subscribeToArguments = (decisionId, callback) => {

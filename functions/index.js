@@ -29,6 +29,8 @@ exports.createDecision = onCall({cors: true}, async (request) => {
   await decisionRef.set({
     question: question.trim(),
     createdAt: FieldValue.serverTimestamp(),
+    ownerId: request.auth ? request.auth.uid : null,
+    participantIds: request.auth ? [request.auth.uid] : [],
   });
 
   return {id: decisionRef.id};
@@ -140,6 +142,7 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
       transaction.update(argumentRef, {
         votes: FieldValue.increment(-1),
       });
+      // We don't remove from participantIds on unvote to preserve history of "participation"
     } else {
       // New vote
       transaction.set(voteRef, {
@@ -149,6 +152,10 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
       });
       transaction.update(argumentRef, {
         votes: FieldValue.increment(1),
+      });
+      // Ensure user is marked as participant on the main decision document
+      transaction.update(decisionRef, {
+        participantIds: FieldValue.arrayUnion(userId),
       });
     }
   });
@@ -260,6 +267,7 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
     transaction.update(decisionRef, {
       yesVotes: FieldValue.increment(yesChange),
       noVotes: FieldValue.increment(noChange),
+      participantIds: FieldValue.arrayUnion(userId),
     });
   });
 
@@ -375,6 +383,11 @@ exports.registerParticipant = onCall({cors: true}, async (request) => {
   }
 
   await participantRef.set(data, {merge: true});
+
+  // Also ensuring they are in the participantIds array for easy querying
+  await decisionRef.update({
+    participantIds: FieldValue.arrayUnion(userId),
+  });
 
   return {success: true};
 });

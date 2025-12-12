@@ -54,16 +54,18 @@
     - [x] Integrate Firebase Authentication to enable User Authentication
     - [x] [US-023](stories/US-023-User-Login.md): User Login & Registration (OAuth + Email/Pass)
     - [x] [US-024](stories/US-024-User-Profile.md): User Profile & Self Service (Delete Account)
-    - [ ] [US-025](stories/US-025-My-Decisions.md): My Decisions List
+    - [x] [US-025](stories/US-025-My-Decisions.md): My Decisions List
+
+## v1.6 Participants and Notifications
     - [ ] [US-026](stories/US-026-Participant-List.md): Participant List Sidebar
     - [ ] [US-027](stories/US-027-Notifications.md): Decision Notifications (Push)
 
-## v1.6 Private Decisions
+## v1.7 Private Decisions
     - [ ] When creating a decision, let the user choose wether it is open or private
     - [ ] Create a list of participants for private decisions
     - [ ] Restrict the closing of decisions to the owner
 
-## v1.7 Production Readiness and Compliance
+## v1.8 Production Readiness and Compliance
     - [ ] Add a productive domain address
     - [ ] Add impress for legal requirements
     - [ ] Add data privacy statement
@@ -72,7 +74,7 @@
     - [ ] GDPR Compliant use of cookies
     - [ ] GDPR Compliant use of google services
 
-## v1.8 Security
+## v1.9 Security
     - [ ] Do a security audit
     - [ ] Audit user data access
     - [ ] Audit data access for private decisions
