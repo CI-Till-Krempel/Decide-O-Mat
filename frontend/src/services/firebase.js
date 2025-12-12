@@ -71,6 +71,17 @@ export const updateUserDisplayName = async (decisionId, displayName) => {
     return await updateUserDisplayNameFn({ decisionId, displayName });
 };
 
+export const generateMagicLink = async () => {
+    const generateFn = httpsCallable(functions, 'generateMagicLink');
+    const result = await generateFn();
+    return result.data.token;
+};
+
+export const registerParticipant = async (decisionId, encryptedDisplayName, plainDisplayName) => {
+    const registerParticipantFn = httpsCallable(functions, 'registerParticipant');
+    return await registerParticipantFn({ decisionId, encryptedDisplayName, plainDisplayName });
+};
+
 export const subscribeToDecision = (decisionId, callback) => {
     const docRef = doc(db, "decisions", decisionId);
     return onSnapshot(docRef, (doc) => {

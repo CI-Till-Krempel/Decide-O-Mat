@@ -48,7 +48,7 @@
 
 ## v1.4.5 Anonymous User Enhancements
     - [x] Anonymous Identity & One Vote Limit (US-021)
-    - [ ] Magic Link Identity Transfer (US-022)
+    - [x] Magic Link Identity Transfer (US-022)
 
 ## v1.5 User Authentication
     - [x] Integrate Firebase Authentication to enable User Authentication

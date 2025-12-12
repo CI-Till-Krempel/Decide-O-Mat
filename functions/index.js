@@ -102,7 +102,7 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const {decisionId, argumentId, displayName} = request.data;
+  const {decisionId, argumentId} = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !argumentId) {
@@ -144,7 +144,7 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
       // New vote
       transaction.set(voteRef, {
         userId: userId,
-        displayName: displayName || "Anonymous",
+        displayName: request.data.displayName || null, // Restore for unencrypted
         createdAt: FieldValue.serverTimestamp(),
       });
       transaction.update(argumentRef, {
@@ -185,7 +185,7 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const {decisionId, vote, displayName} = request.data;
+  const {decisionId, vote} = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !vote) {
@@ -236,7 +236,7 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
       // Update the vote
       transaction.update(voteRef, {
         vote: vote,
-        displayName: displayName || "Anonymous",
+        displayName: request.data.displayName || null, // Restore for unencrypted
         updatedAt: FieldValue.serverTimestamp(),
       });
     } else {
@@ -251,7 +251,7 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
       transaction.set(voteRef, {
         vote: vote,
         userId: userId,
-        displayName: displayName || "Anonymous",
+        displayName: request.data.displayName || null, // Restore displayName for unencrypted support
         createdAt: FieldValue.serverTimestamp(),
       });
     }
@@ -330,4 +330,72 @@ exports.updateUserDisplayName = onCall({cors: true}, async (request) => {
   }
 
   return {success: true, updated: operationCount};
+});
+
+/**
+ * Registers or updates a participant in a decision.
+ * Stores the encrypted display name.
+ * @param {Object} request - The request object.
+ * @param {string} request.data.decisionId - The decision ID.
+ * @param {string} request.data.encryptedDisplayName - The encrypted display name.
+ * @return {Promise<Object>} Success status.
+ */
+exports.registerParticipant = onCall({cors: true}, async (request) => {
+  // Authentication required
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
+  const {decisionId, encryptedDisplayName, plainDisplayName} = request.data;
+  const userId = request.auth.uid;
+
+  if (!decisionId || (!encryptedDisplayName && !plainDisplayName)) {
+    throw new HttpsError("invalid-argument", "Missing decisionId or display name.");
+  }
+
+  const db = admin.firestore();
+  const decisionRef = db.collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+
+  if (!decisionDoc.exists) {
+    throw new HttpsError("not-found", "Decision not found.");
+  }
+
+  const participantRef = decisionRef.collection("participants").doc(userId);
+
+  const data = {
+    updatedAt: FieldValue.serverTimestamp(),
+  };
+
+  if (encryptedDisplayName) {
+    data.encryptedDisplayName = encryptedDisplayName;
+  }
+  if (plainDisplayName) {
+    data.plainDisplayName = plainDisplayName;
+  }
+
+  await participantRef.set(data, {merge: true});
+
+  return {success: true};
+});
+
+/**
+ * Generates a magic link for identity transfer.
+ * @param {Object} request - The request object.
+ * @return {Promise<Object>} The magic link token.
+ */
+exports.generateMagicLink = onCall({cors: true}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
+  const userId = request.auth.uid;
+
+  try {
+    const customToken = await admin.auth().createCustomToken(userId);
+    return {token: customToken};
+  } catch (error) {
+    console.error("Error creating custom token:", error);
+    throw new HttpsError("internal", "Unable to create magic link token.");
+  }
 });

@@ -1,20 +1,51 @@
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useLocation } from 'react-router-dom';
+import EncryptionService from '../services/EncryptionService';
 
 import UserSettings from './UserSettings';
 
 export default function Header() {
-    // Actually UserSettings handles it. So we can remove useUser from Header entirely if imports allow.
-    // But let's just remove the destructuring for now or remove the line if possible.
+    const { id: routeParamsId } = useParams();
+    const location = useLocation();
+    const [encryptionKey, setEncryptionKey] = useState(null);
+    const [decisionId, setDecisionId] = useState(null);
 
+    useEffect(() => {
+        const parseUrl = async () => {
+            // Extract decisionId from path if not found in params (Header is often outside Route so useParams might be empty)
+            let currentId = routeParamsId;
+            if (!currentId) {
+                if (location.pathname.startsWith('/decision/')) {
+                    const parts = location.pathname.split('/');
+                    currentId = parts[2];
+                } else if (location.pathname.startsWith('/d/')) {
+                    const parts = location.pathname.split('/');
+                    currentId = parts[2];
+                }
+            }
+            setDecisionId(currentId);
 
-    // Attempt to get decisionId from params if we are on a decision page
-    // Note: This might not work if Header is outside the Routes that define :id
-    // But commonly it is. We can parse location.pathname manually if needed.
-    // For now let's just render UserSettings. If it needs decisionId to update votes, we might need a context or verify if useParams works.
-    const { id: decisionId } = useParams();
+            // Extract Key from Hash (format #key=...)
+            const hash = location.hash;
+            let keyString = null;
+            if (hash && hash.includes('key=')) {
+                keyString = hash.split('key=')[1];
+            }
 
-
+            if (keyString && EncryptionService.isEnabled()) {
+                try {
+                    const key = await EncryptionService.importKey(keyString);
+                    setEncryptionKey(key);
+                } catch (e) {
+                    console.warn("Header: Failed to parse encryption key from url", e);
+                    setEncryptionKey(null);
+                }
+            } else {
+                setEncryptionKey(null);
+            }
+        };
+        parseUrl();
+    }, [location, routeParamsId]);
 
     return (
         <header style={{
@@ -31,7 +62,7 @@ export default function Header() {
             </Link>
             <div>
                 {/* Unified User Settings / Login / Logout */}
-                <UserSettings decisionId={decisionId} />
+                <UserSettings decisionId={decisionId} encryptionKey={encryptionKey} />
             </div>
         </header>
     );

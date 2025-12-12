@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { voteArgument, subscribeToArgumentVotes } from '../services/firebase';
 import { useUser } from '../contexts/UserContext';
 import NamePrompt from './NamePrompt';
+import ParticipantService from '../services/ParticipantService';
 
-function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote }) {
+function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, participantMap, encryptionKey }) {
     const { user, setDisplayName } = useUser();
     const [votes, setVotes] = useState([]);
     const [voting, setVoting] = useState(false);
@@ -38,8 +39,21 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote })
 
     const performVote = async () => {
         setVoting(true);
+
         try {
-            await voteArgument(decisionId, argument.id, user.displayName);
+            // Register participant if not known (works for both encrypted and unencrypted)
+            if (user.displayName && (!participantMap || !participantMap.has(user.userId))) {
+                try {
+                    await ParticipantService.registerParticipant(decisionId, user.displayName, encryptionKey || null);
+                } catch (e) {
+                    console.warn("Auto-registration failed", e);
+                }
+            }
+
+            // Only send display name if we are NOT using encryption.
+            // If encryption is on, the name is in the participant map (registered above).
+            const nameToSend = encryptionKey ? null : user.displayName;
+            await voteArgument(decisionId, argument.id, nameToSend);
         } catch (error) {
             console.error("Error voting:", error);
             alert("Failed to vote. Please try again.");
@@ -48,12 +62,17 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote })
         }
     };
 
+    // ... handleNameSave ...
+
+
     const handleNameSave = async (name) => {
         setDisplayName(name);
         setShowNamePrompt(false);
         // Perform the vote after saving the name
         await performVote();
     };
+
+    const authorName = participantMap?.get(argument.authorId) || argument.authorName;
 
     return (
         <>
@@ -67,9 +86,9 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote })
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ flex: 1 }}>
                         <span style={{ fontSize: '1.1rem' }}>{argument.text}</span>
-                        {argument.authorName && (
+                        {authorName && (
                             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
-                                Added by {argument.authorName}
+                                Added by {authorName}
                             </div>
                         )}
                     </div>
@@ -105,7 +124,7 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote })
                                 color: 'var(--color-text)',
                                 border: '1px solid var(--color-border)'
                             }}>
-                                {vote.displayName || 'Anonymous'}
+                                {participantMap?.get(vote.userId) || vote.displayName || 'Anonymous'}
                             </span>
                         ))}
                     </div>

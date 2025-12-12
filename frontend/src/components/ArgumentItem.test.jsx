@@ -7,6 +7,7 @@ import ArgumentItem from './ArgumentItem';
 vi.mock('../services/firebase', () => ({
     voteArgument: vi.fn(),
     subscribeToArgumentVotes: vi.fn(),
+    registerParticipant: vi.fn(),
 }));
 
 import { voteArgument as mockVoteArgument, subscribeToArgumentVotes as mockSubscribeToArgumentVotes } from '../services/firebase';
@@ -15,7 +16,7 @@ import { voteArgument as mockVoteArgument, subscribeToArgumentVotes as mockSubsc
 vi.mock('../contexts/UserContext', async () => {
     return {
         useUser: vi.fn(() => ({
-            user: { userId: 'test-user-id', displayName: 'Test User' }
+            user: { userId: 'test-user-id', displayName: 'Test User', providerData: [] }
         }))
     };
 });

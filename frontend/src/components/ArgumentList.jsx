@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import ArgumentItem from './ArgumentItem';
 
-function ArgumentList({ arguments: args, type, decisionId, readOnly }) {
+function ArgumentList({ arguments: args, type, decisionId, readOnly, participantMap, encryptionKey }) {
     const [votedArgIds, setVotedArgIds] = useState(new Set());
 
     const handleVoteChange = useCallback((argId, isVoted) => {
@@ -81,6 +81,8 @@ function ArgumentList({ arguments: args, type, decisionId, readOnly }) {
                         readOnly={readOnly}
                         onVoteChange={handleVoteChange}
                         canVote={canVote}
+                        participantMap={participantMap}
+                        encryptionKey={encryptionKey}
                     />
                 ))}
             </ul>

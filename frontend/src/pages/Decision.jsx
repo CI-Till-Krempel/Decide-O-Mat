@@ -9,6 +9,7 @@ import Spinner from '../components/Spinner';
 import { useUser } from '../contexts/UserContext';
 import { toPng } from 'html-to-image';
 import EncryptionService from '../services/EncryptionService';
+import ParticipantService from '../services/ParticipantService';
 
 function Decision() {
     const { id } = useParams();
@@ -23,6 +24,7 @@ function Decision() {
     const [votingTarget, setVotingTarget] = useState(null);
     const [exporting, setExporting] = useState(false);
     const [finalVotesList, setFinalVotesList] = useState([]);
+    const [participantMap, setParticipantMap] = useState(new Map());
     const [showNamePrompt, setShowNamePrompt] = useState(false);
     const [pendingVoteType, setPendingVoteType] = useState(null);
     const [encryptionKey, setEncryptionKey] = useState(null);
@@ -45,16 +47,9 @@ function Decision() {
         let unsubscribeDecision = () => { };
         let unsubscribeArguments = () => { };
         let unsubscribeFinalVotes = () => { };
+        let unsubscribeParticipants = () => { };
 
         // We need to wait for key parsing (or determination that there is no key)
-        // Checks if we processed the hash logic. 
-        // encryptionKey is null initially. If URL has no key, it stays null.
-        // If URL has key, it sets key.
-        // We can run subscriptions immediately, and decrypt inside callback if key exists.
-        // However, key state might change async.
-        // To avoid complex dependency chains, we use the key in the callbacks via refs or just rebuild subs when key changes.
-        // Rebuilding subs when key changes is cleaner.
-
         const setupSubscriptions = async () => {
             const currentKey = encryptionKey; // Closure capture
 
@@ -103,6 +98,11 @@ function Decision() {
                 }));
                 setFinalVotesList(decryptedVotes);
             });
+
+            // Always subscribe to participants (for both encrypted and unencrypted names)
+            unsubscribeParticipants = ParticipantService.subscribeToParticipants(id, currentKey, (map) => {
+                setParticipantMap(map);
+            });
         };
 
         setupSubscriptions();
@@ -117,6 +117,7 @@ function Decision() {
             unsubscribeDecision();
             unsubscribeArguments();
             unsubscribeFinalVotes();
+            unsubscribeParticipants();
         };
     }, [id, encryptionKey]);
 
@@ -147,19 +148,27 @@ function Decision() {
             return;
         }
 
-        await performFinalVote(voteType, user.displayName);
+        await performFinalVote(voteType);
     };
 
-    const performFinalVote = async (voteType, displayName) => {
+    const performFinalVote = async (voteType) => {
         setVotingTarget(voteType);
 
         try {
-            let nameToSubmit = displayName || "Anonymous";
-            if (encryptionKey) {
-                nameToSubmit = await EncryptionService.encrypt(nameToSubmit, encryptionKey);
+            // Auto-register name if needed
+            if (user.displayName && encryptionKey && (!participantMap || !participantMap.get(user.userId))) {
+                try {
+                    await ParticipantService.registerParticipant(id, user.displayName, encryptionKey);
+                } catch (e) {
+                    console.warn("Auto-registration failed", e);
+                }
             }
 
-            await voteDecision(id, voteType, nameToSubmit);
+            // If we have a key, we rely on participant mapping (registered above).
+            // If we don't have a key (unencrypted decision), we send the display name in plaintext.
+            // This restores support for non-E2E decisions while preserving privacy for E2E ones.
+            const nameToSend = encryptionKey ? null : user.displayName;
+            await voteDecision(id, voteType, nameToSend);
 
             // Update local state
             setFinalVote(voteType);
@@ -174,10 +183,19 @@ function Decision() {
 
     const handleNameSave = async (name) => {
         setDisplayName(name);
+        if (encryptionKey) {
+            try {
+                // Register participant ID <-> Encrypted Name
+                await ParticipantService.registerParticipant(id, name, encryptionKey);
+            } catch (error) {
+                console.error("Failed to register participant name", error);
+                // Non-blocking? User can still vote, just name won't be visible to others.
+            }
+        }
         setShowNamePrompt(false);
-        // Perform the vote after saving the name, passing the name directly
+        // Perform the vote after saving the name
         if (pendingVoteType) {
-            await performFinalVote(pendingVoteType, name);
+            await performFinalVote(pendingVoteType);
             setPendingVoteType(null);
         }
     };
@@ -335,7 +353,7 @@ function Decision() {
                                                 color: 'var(--color-text)',
                                                 border: '1px solid var(--color-border)'
                                             }}>
-                                                {vote.displayName || 'Anonymous'}
+                                                {participantMap.get(vote.userId) || vote.displayName || 'Anonymous'}
                                             </span>
                                         ))}
                                     </div>
@@ -373,7 +391,7 @@ function Decision() {
                                                 color: 'var(--color-text)',
                                                 border: '1px solid var(--color-border)'
                                             }}>
-                                                {vote.displayName || 'Anonymous'}
+                                                {participantMap.get(vote.userId) || vote.displayName || 'Anonymous'}
                                             </span>
                                         ))}
                                     </div>
@@ -385,11 +403,25 @@ function Decision() {
 
                 <div className="arguments-container" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
                     <div className="pros-column" style={{ flex: 1 }}>
-                        <ArgumentList arguments={pros} type="pro" decisionId={id} readOnly={isClosed || exporting} />
+                        <ArgumentList
+                            arguments={pros}
+                            type="pro"
+                            decisionId={id}
+                            readOnly={isClosed || exporting}
+                            participantMap={participantMap}
+                            encryptionKey={encryptionKey}
+                        />
                         {!exporting && <AddArgumentForm decisionId={id} type="pro" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>
                     <div className="cons-column" style={{ flex: 1 }}>
-                        <ArgumentList arguments={cons} type="con" decisionId={id} readOnly={isClosed || exporting} />
+                        <ArgumentList
+                            arguments={cons}
+                            type="con"
+                            decisionId={id}
+                            readOnly={isClosed || exporting}
+                            participantMap={participantMap}
+                            encryptionKey={encryptionKey}
+                        />
                         {!exporting && <AddArgumentForm decisionId={id} type="con" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>
                 </div>
