@@ -52,6 +52,15 @@ vi.mock('../services/EncryptionService', () => ({
 }));
 import EncryptionService from '../services/EncryptionService';
 
+// Mock ParticipantService
+vi.mock('../services/ParticipantService', () => ({
+    default: {
+        subscribeToParticipants: vi.fn(),
+        registerParticipant: vi.fn(),
+    }
+}));
+import ParticipantService from '../services/ParticipantService';
+
 // Mock components
 vi.mock('../components/ArgumentList', () => ({
     default: ({ arguments: args, type, readOnly }) => (
@@ -123,6 +132,13 @@ describe('Decision Component', () => {
         EncryptionService.importKey.mockResolvedValue('mock-key');
         EncryptionService.decrypt.mockImplementation((text) => Promise.resolve(text.replace('encrypted-', '')));
         EncryptionService.encrypt.mockImplementation((text) => Promise.resolve('encrypted-' + text));
+
+        // Default ParticipantService mocks
+        ParticipantService.subscribeToParticipants.mockImplementation((id, key, callback) => {
+            callback(new Map());
+            return vi.fn();
+        });
+        ParticipantService.registerParticipant.mockResolvedValue();
     });
 
     // US-005: View Results
@@ -188,6 +204,10 @@ describe('Decision Component', () => {
 
         it('shows loading state initially', () => {
             mockSubscribeToDecision.mockImplementation(() => () => { });
+            mockSubscribeToArguments.mockImplementation(() => () => { });
+            mockSubscribeToFinalVotes.mockImplementation(() => () => { });
+            ParticipantService.subscribeToParticipants.mockImplementation(() => () => { });
+
             renderDecision();
 
             expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
@@ -241,6 +261,7 @@ describe('Decision Component', () => {
         });
 
         it('handles decryption failure gracefully', async () => {
+            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
             const encryptedDecision = {
                 ...mockDecision,
                 question: 'encrypted-Bad Data'
@@ -257,6 +278,31 @@ describe('Decision Component', () => {
 
             await waitFor(() => {
                 expect(screen.getAllByText('[Decryption Failed]')).toHaveLength(4); // Header + 3 args
+            });
+            consoleSpy.mockRestore();
+        });
+
+        it('displays decrypted participant names', async () => {
+            const encryptedVotes = [
+                { userId: 'u1', vote: 'yes', displayName: 'old-way', createdAt: { seconds: 100, nanoseconds: 0 } }
+            ];
+            mockSubscribeToFinalVotes.mockImplementation((id, callback) => {
+                callback(encryptedVotes);
+                return () => { };
+            });
+
+            // Mock participant map
+            const mockParticipants = new Map();
+            mockParticipants.set('u1', 'Decrypted Alice');
+            ParticipantService.subscribeToParticipants.mockImplementation((id, key, callback) => {
+                callback(mockParticipants);
+                return () => { };
+            });
+
+            renderDecision('/d/test-id#key=mock-key-string');
+
+            await waitFor(() => {
+                expect(screen.getByText('Decrypted Alice')).toBeInTheDocument();
             });
         });
     });
@@ -650,16 +696,24 @@ describe('Decision Component', () => {
         it('unsubscribes on unmount', async () => {
             const unsubscribeDecision = vi.fn();
             const unsubscribeArguments = vi.fn();
-            const unsubscribeFinalVotes = vi.fn(); // Mock this too
+            const unsubscribeFinalVotes = vi.fn();
+            const unsubscribeParticipants = vi.fn();
 
             mockSubscribeToDecision.mockReturnValue(unsubscribeDecision);
             mockSubscribeToArguments.mockReturnValue(unsubscribeArguments);
             mockSubscribeToFinalVotes.mockReturnValue(unsubscribeFinalVotes);
+            ParticipantService.subscribeToParticipants.mockImplementation(() => unsubscribeParticipants);
 
-            const { unmount } = renderDecision();
+            // We need key for participants subscription
+            const { unmount } = renderDecision('/d/test-id#key=mock-key-string');
 
             await waitFor(() => {
                 expect(mockSubscribeToDecision).toHaveBeenCalled();
+            });
+
+            // Ensure key is propagated
+            await waitFor(() => {
+                expect(ParticipantService.subscribeToParticipants).toHaveBeenCalled();
             });
 
             unmount();
@@ -667,6 +721,7 @@ describe('Decision Component', () => {
             expect(unsubscribeDecision).toHaveBeenCalled();
             expect(unsubscribeArguments).toHaveBeenCalled();
             expect(unsubscribeFinalVotes).toHaveBeenCalled();
+            expect(unsubscribeParticipants).toHaveBeenCalled();
         });
     });
 });

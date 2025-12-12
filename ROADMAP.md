@@ -47,7 +47,7 @@
     - [x] End-to-End Encryption (US-020)
 
 ## v1.4.5 Anonymous User Enhancements
-    - [ ] Anonymous Identity & One Vote Limit (US-021)
+    - [x] Anonymous Identity & One Vote Limit (US-021)
     - [ ] Magic Link Identity Transfer (US-022)
 
 ## v1.5 User Authentication

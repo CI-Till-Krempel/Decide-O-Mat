@@ -7,6 +7,7 @@ import { UserProvider } from './contexts/UserContext';
 import Header from './components/Header';
 import Login from './pages/Login';
 import Footer from './components/Footer';
+import MagicHandler from './pages/MagicHandler';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/d/:id" element={<Decision />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/magic" element={<MagicHandler />} />
             </Routes>
           </div>
           <Footer />
