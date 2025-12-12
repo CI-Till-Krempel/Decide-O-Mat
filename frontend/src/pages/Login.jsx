@@ -11,6 +11,7 @@ function Login() {
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [shouldLink, setShouldLink] = useState(false);
 
     // If already logged in (and not anonymous), redirect to home
     React.useEffect(() => {
@@ -23,7 +24,7 @@ function Login() {
         setError('');
         setLoading(true);
         try {
-            await loginWithGoogle();
+            await loginWithGoogle(shouldLink);
             navigate(-1); // Go back to where they came from
         } catch {
             setError('Failed to sign in with Google');
@@ -43,7 +44,7 @@ function Login() {
                 await loginEmail(email, password);
                 navigate(-1);
             } else if (mode === 'register') {
-                await registerEmail(email, password);
+                await registerEmail(email, password, shouldLink);
                 navigate(-1);
             } else if (mode === 'reset') {
                 await resetPassword(email);
@@ -134,6 +135,21 @@ function Login() {
                                 placeholder="••••••••"
                                 minLength={6}
                             />
+                        </div>
+                    )}
+
+                    {user && user.isAnonymous && mode !== 'reset' && (
+                        <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center' }}>
+                            <input
+                                type="checkbox"
+                                id="link-account"
+                                checked={shouldLink}
+                                onChange={(e) => setShouldLink(e.target.checked)}
+                                style={{ marginRight: '0.5rem' }}
+                            />
+                            <label htmlFor="link-account" style={{ fontSize: '0.875rem', color: 'var(--color-text-main)' }}>
+                                Link to my current guest account
+                            </label>
                         </div>
                     )}
 

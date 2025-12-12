@@ -93,10 +93,10 @@ export function UserProvider({ children }) {
         }
     }, [localDisplayName]);
 
-    const loginWithGoogle = async () => {
+    const loginWithGoogle = async (shouldLink = false) => {
         const provider = new GoogleAuthProvider();
         try {
-            if (auth.currentUser && auth.currentUser.isAnonymous) {
+            if (shouldLink && auth.currentUser && auth.currentUser.isAnonymous) {
                 // Try to upgrade the anonymous account
                 try {
                     const result = await linkWithPopup(auth.currentUser, provider);
@@ -119,9 +119,9 @@ export function UserProvider({ children }) {
         }
     };
 
-    const registerEmail = async (email, password) => {
+    const registerEmail = async (email, password, shouldLink = false) => {
         try {
-            if (auth.currentUser && auth.currentUser.isAnonymous) {
+            if (shouldLink && auth.currentUser && auth.currentUser.isAnonymous) {
                 // Try to link first -> "Upgrade"
                 const credential = EmailAuthProvider.credential(email, password);
                 /* 

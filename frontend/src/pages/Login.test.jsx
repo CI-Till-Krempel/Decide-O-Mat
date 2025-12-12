@@ -110,7 +110,17 @@ describe('Login Page', () => {
         fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
         await waitFor(() => {
-            expect(mockRegisterEmail).toHaveBeenCalledWith('new@example.com', 'newpass123');
+            expect(mockRegisterEmail).toHaveBeenCalledWith('new@example.com', 'newpass123', false);
+        });
+
+        // Test with linking checked
+        const linkCheckbox = screen.getByLabelText(/link to my current guest account/i);
+        fireEvent.click(linkCheckbox);
+
+        fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+        await waitFor(() => {
+            expect(mockRegisterEmail).toHaveBeenCalledWith('new@example.com', 'newpass123', true);
         });
     });
 
@@ -119,7 +129,17 @@ describe('Login Page', () => {
         fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }));
 
         await waitFor(() => {
-            expect(mockLoginWithGoogle).toHaveBeenCalled();
+            expect(mockLoginWithGoogle).toHaveBeenCalledWith(false);
+        });
+
+        // Test with linking checked
+        const linkCheckbox = screen.getByLabelText(/link to my current guest account/i);
+        fireEvent.click(linkCheckbox);
+
+        fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }));
+
+        await waitFor(() => {
+            expect(mockLoginWithGoogle).toHaveBeenCalledWith(true);
         });
     });
 });
