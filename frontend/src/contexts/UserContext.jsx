@@ -38,6 +38,7 @@ export function UserProvider({ children }) {
                             const newName = NameGenerator.generate();
                             setLocalDisplayName(newName);
                             localStorage.setItem('dom_display_name', newName);
+                            localStorage.setItem('dom_initial_name', newName);
                             localStorage.setItem('dom_display_name_uid', user.uid);
                             // Persist new name to profile immediately
                             try { await updateProfile(user, { displayName: newName }) } catch { /* ignore */ }
@@ -54,6 +55,7 @@ export function UserProvider({ children }) {
                                 const newName = NameGenerator.generate();
                                 setLocalDisplayName(newName);
                                 localStorage.setItem('dom_display_name', newName);
+                                localStorage.setItem('dom_initial_name', newName);
                                 localStorage.setItem('dom_display_name_uid', user.uid);
                                 // Persist new name to profile immediately
                                 try { await updateProfile(user, { displayName: newName }) } catch { /* ignore */ }
@@ -113,7 +115,7 @@ export function UserProvider({ children }) {
     // Determine the effective user
     const user = firebaseUser ? {
         userId: firebaseUser.uid,
-        displayName: firebaseUser.displayName || localDisplayName,
+        displayName: localDisplayName || firebaseUser.displayName,
         photoURL: firebaseUser.photoURL,
         // Treat as anonymous if explicit flag OR if no providers
         isAnonymous: firebaseUser.isAnonymous || firebaseUser.providerData.length === 0
@@ -147,8 +149,12 @@ export function UserProvider({ children }) {
         return nameToReturn;
     };
 
+    const getInitialName = () => {
+        return localStorage.getItem('dom_initial_name');
+    };
+
     return (
-        <UserContext.Provider value={{ user, login, logout, setDisplayName, resetToInitialName, loading }}>
+        <UserContext.Provider value={{ user, login, logout, setDisplayName, resetToInitialName, getInitialName, loading }}>
             {!loading && children}
         </UserContext.Provider>
     );
