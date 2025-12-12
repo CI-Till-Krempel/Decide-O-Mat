@@ -115,7 +115,7 @@ export function UserProvider({ children }) {
     // Determine the effective user
     const user = firebaseUser ? {
         userId: firebaseUser.uid,
-        displayName: firebaseUser.displayName || localDisplayName,
+        displayName: localDisplayName || firebaseUser.displayName,
         photoURL: firebaseUser.photoURL,
         // Treat as anonymous if explicit flag OR if no providers
         isAnonymous: firebaseUser.isAnonymous || firebaseUser.providerData.length === 0
