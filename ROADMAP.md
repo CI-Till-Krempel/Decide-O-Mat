@@ -51,7 +51,7 @@
     - [x] Magic Link Identity Transfer (US-022)
 
 ## v1.5 User Authentication
-    - [ ] Integrate Firebase Authentication to enable User Authentication
+    - [x] Integrate Firebase Authentication to enable User Authentication
     - [ ] Add minimal user registration
     - [ ] Add login via OAuth
     - [ ] Add logout
@@ -59,10 +59,6 @@
     - [ ] Add a simple user self service
     - [ ] Add a list of my decisions (both open and private)
 
-## v1.5.1 Deployment
-    - [ ] Create a separate development deployment
-    - [ ] Create a separate staging deployment
-    
 ## v1.6 Private Decisions
     - [ ] When creating a decision, let the user choose wether it is open or private
     - [ ] Create a list of participants for private decisions
