@@ -52,7 +52,7 @@
 
 ## v1.5 User Authentication
     - [x] Integrate Firebase Authentication to enable User Authentication
-    - [ ] [US-023](stories/US-023-User-Login.md): User Login & Registration (OAuth + Email/Pass)
+    - [x] [US-023](stories/US-023-User-Login.md): User Login & Registration (OAuth + Email/Pass)
     - [ ] [US-024](stories/US-024-User-Profile.md): User Profile & Self Service (Delete Account)
     - [ ] [US-025](stories/US-025-My-Decisions.md): My Decisions List
     - [ ] [US-026](stories/US-026-Participant-List.md): Participant List Sidebar
