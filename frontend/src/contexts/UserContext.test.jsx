@@ -8,31 +8,44 @@ const mockOnAuthStateChanged = vi.fn();
 const mockSignInWithPopup = vi.fn();
 const mockSignOut = vi.fn();
 const mockSignInAnonymously = vi.fn(() => Promise.resolve({ user: { uid: 'anon-uid', isAnonymous: true, providerData: [] } }));
+const mockLinkWithPopup = vi.fn(() => Promise.resolve({ user: { uid: 'linked-user', displayName: 'Linked User', isAnonymous: false, providerData: [{ providerId: 'google.com' }] } }));
+const mockLinkWithCredential = vi.fn(() => Promise.resolve({ user: { uid: 'linked-user', email: 'test@example.com', isAnonymous: false, providerData: [{ providerId: 'password' }] } }));
+const mockCreateUser = vi.fn(() => Promise.resolve({ user: { uid: 'new-user', isAnonymous: false, providerData: [{ providerId: 'password' }] } }));
 
 vi.mock('firebase/auth', () => ({
     getAuth: vi.fn(),
     connectAuthEmulator: vi.fn(),
-    GoogleAuthProvider: vi.fn(() => ({})),
+    GoogleAuthProvider: class { },
+    EmailAuthProvider: { credential: vi.fn() },
     signInWithPopup: (...args) => mockSignInWithPopup(...args),
     signInAnonymously: (...args) => mockSignInAnonymously(...args),
     signOut: (...args) => mockSignOut(...args),
     onAuthStateChanged: (...args) => mockOnAuthStateChanged(...args),
+    createUserWithEmailAndPassword: (...args) => mockCreateUser(...args),
+    signInWithEmailAndPassword: vi.fn(),
+    sendPasswordResetEmail: vi.fn(),
+    linkWithPopup: (...args) => mockLinkWithPopup(...args),
+    linkWithCredential: (...args) => mockLinkWithCredential(...args),
+    updateProfile: vi.fn(),
 }));
 
 // Mock services/firebase
 vi.mock('../services/firebase', () => ({
-    auth: {},
+    auth: { currentUser: { isAnonymous: true } }, // Default to anonymous for these tests
 }));
 
 // Test component to consume context
 const TestComponent = () => {
-    const { user, login, logout } = useUser();
+    const { user, loginWithGoogle, registerEmail, logout } = useUser();
     return (
         <div>
-            <div data-testid="user-id">{user.userId}</div>
-            <div data-testid="user-name">{user.displayName || 'null'}</div>
-            <div data-testid="is-anonymous">{user.isAnonymous ? 'true' : 'false'}</div>
-            <button onClick={login}>Login</button>
+            <div data-testid="user-id">{user ? user.userId : 'null'}</div>
+            <div data-testid="user-name">{user ? user.displayName : 'null'}</div>
+            <div data-testid="is-anonymous">{user && user.isAnonymous ? 'true' : 'false'}</div>
+            <button onClick={() => loginWithGoogle(false)}>Login No Link</button>
+            <button onClick={() => loginWithGoogle(true)}>Login With Link</button>
+            <button onClick={() => registerEmail('t@t.com', 'p', false)}>Register No Link</button>
+            <button onClick={() => registerEmail('t@t.com', 'p', true)}>Register With Link</button>
             <button onClick={logout}>Logout</button>
         </div>
     );
@@ -42,52 +55,61 @@ describe('UserContext', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
-        // Default onAuthStateChanged to return unsubscribe immediately
+        // Setup initial auth state as anonymous
         mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-            // Simulate initial loading finished with no user
-            callback(null);
+            callback({ uid: 'anon-uid', isAnonymous: true, providerData: [] });
             return () => { };
         });
     });
 
-    it('triggers anonymous sign-in if no user', async () => {
+    it('loginWithGoogle(false) calls signInWithPopup (new account)', async () => {
+        await act(async () => { render(<UserProvider><TestComponent /></UserProvider>); });
+
         await act(async () => {
-            render(
-                <UserProvider>
-                    <TestComponent />
-                </UserProvider>
-            );
+            screen.getByText('Login No Link').click();
         });
 
-        expect(mockSignInAnonymously).toHaveBeenCalled();
-        // Note: Since we mocked onAuthStateChanged to return null and stop, 
-        // the state update from signInAnonymously won't happen unless we wire it up manually in the mock 
-        // or verify the call effect.
+        expect(mockSignInWithPopup).toHaveBeenCalled();
+        expect(mockLinkWithPopup).not.toHaveBeenCalled();
     });
 
-    it('updates user when auth state changes', async () => {
-        let authCallback;
-        mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-            authCallback = callback;
-            return () => { };
-        });
+    it('loginWithGoogle(true) calls linkWithPopup (link account)', async () => {
+        // Ensure service mock reflects anonymous user
+        const { auth } = await import('../services/firebase');
+        auth.currentUser = { isAnonymous: true };
+
+        await act(async () => { render(<UserProvider><TestComponent /></UserProvider>); });
 
         await act(async () => {
-            render(
-                <UserProvider>
-                    <TestComponent />
-                </UserProvider>
-            );
+            screen.getByText('Login With Link').click();
         });
 
-        // Initially loading
-        // Trigger auth update
+        expect(mockLinkWithPopup).toHaveBeenCalled();
+        expect(mockSignInWithPopup).not.toHaveBeenCalled();
+    });
+
+    it('registerEmail(false) calls createUserWithEmailAndPassword (new account)', async () => {
+        await act(async () => { render(<UserProvider><TestComponent /></UserProvider>); });
+
         await act(async () => {
-            authCallback({ uid: 'firebase-uid', displayName: 'Firebase User', photoURL: 'url', providerData: [{ providerId: 'google.com' }] });
+            screen.getByText('Register No Link').click();
         });
 
-        expect(screen.getByTestId('is-anonymous')).toHaveTextContent('false');
-        expect(screen.getByTestId('user-id')).toHaveTextContent('firebase-uid');
-        expect(screen.getByTestId('user-name')).toHaveTextContent('Firebase User');
+        expect(mockCreateUser).toHaveBeenCalled();
+        expect(mockLinkWithCredential).not.toHaveBeenCalled();
+    });
+
+    it('registerEmail(true) calls linkWithCredential (link account)', async () => {
+        const { auth } = await import('../services/firebase');
+        auth.currentUser = { isAnonymous: true };
+
+        await act(async () => { render(<UserProvider><TestComponent /></UserProvider>); });
+
+        await act(async () => {
+            screen.getByText('Register With Link').click();
+        });
+
+        expect(mockLinkWithCredential).toHaveBeenCalled();
+        expect(mockCreateUser).not.toHaveBeenCalled();
     });
 });
