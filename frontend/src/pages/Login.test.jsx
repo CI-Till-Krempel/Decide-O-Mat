@@ -5,6 +5,11 @@ import Login from '../pages/Login';
 import { UserProvider } from '../contexts/UserContext';
 import { BrowserRouter } from 'react-router-dom';
 
+// Mock services/firebase to prevent initialization error
+vi.mock('../services/firebase', () => ({
+    auth: {},
+}));
+
 // Mock UserContext
 const mockLoginWithGoogle = vi.fn();
 const mockLoginEmail = vi.fn();
