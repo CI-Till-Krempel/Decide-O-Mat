@@ -99,7 +99,8 @@ export function UserProvider({ children }) {
             if (auth.currentUser && auth.currentUser.isAnonymous) {
                 // Try to upgrade the anonymous account
                 try {
-                    await linkWithPopup(auth.currentUser, provider);
+                    const result = await linkWithPopup(auth.currentUser, provider);
+                    setFirebaseUser(result.user);
                     return; // Success
                     // eslint-disable-next-line no-unused-vars
                 } catch (linkError) {
@@ -111,6 +112,9 @@ export function UserProvider({ children }) {
             await signInWithPopup(auth, provider);
         } catch (error) {
             console.error("Google Login failed:", error);
+            if (error.code === 'auth/user-token-expired') {
+                await signOut(auth); // Force re-auth
+            }
             throw error;
         }
     };
@@ -129,12 +133,16 @@ export function UserProvider({ children }) {
                 */
                 // Actually, linking requires the user to NOT exist yet with that credential.
                 // If we want to "Register" a new email on this anonymous user:
-                await linkWithCredential(auth.currentUser, credential);
+                const result = await linkWithCredential(auth.currentUser, credential);
+                setFirebaseUser(result.user); // Update local state immediately
             } else {
                 await createUserWithEmailAndPassword(auth, email, password);
             }
         } catch (error) {
             console.error("Registration failed:", error);
+            if (error.code === 'auth/user-token-expired') {
+                await signOut(auth);
+            }
             throw error;
         }
     };

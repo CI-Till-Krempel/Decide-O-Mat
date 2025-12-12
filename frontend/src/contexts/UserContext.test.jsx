@@ -21,8 +21,8 @@ vi.mock('firebase/auth', () => ({
     createUserWithEmailAndPassword: vi.fn(),
     signInWithEmailAndPassword: vi.fn(),
     sendPasswordResetEmail: vi.fn(),
-    linkWithPopup: vi.fn(),
-    linkWithCredential: vi.fn(),
+    linkWithPopup: vi.fn(() => Promise.resolve({ user: { uid: 'linked-user', displayName: 'Linked User' } })),
+    linkWithCredential: vi.fn(() => Promise.resolve({ user: { uid: 'linked-user', email: 'test@example.com' } })),
     updateProfile: vi.fn(),
 }));
 
