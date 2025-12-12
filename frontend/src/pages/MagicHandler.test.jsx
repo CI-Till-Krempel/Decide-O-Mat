@@ -16,6 +16,11 @@ vi.mock('../services/firebase', () => ({
     auth: { currentUser: null },
 }));
 
+// Mock UserContext
+vi.mock('../contexts/UserContext', () => ({
+    useUser: vi.fn(() => ({ user: null })),
+}));
+
 const renderWithRouter = (initialEntry) => {
     return render(
         <MemoryRouter initialEntries={[initialEntry]}>
@@ -34,7 +39,7 @@ describe('MagicHandler', () => {
 
     it('shows loading state initially', () => {
         renderWithRouter('/magic?token=test-token');
-        expect(screen.getByText(/transferring identity/i)).toBeInTheDocument();
+        expect(screen.getByText(/Processing/i)).toBeInTheDocument();
     });
 
     it('calls signInWithCustomToken with token from URL', async () => {

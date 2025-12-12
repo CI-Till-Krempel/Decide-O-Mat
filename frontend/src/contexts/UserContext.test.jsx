@@ -7,7 +7,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 const mockOnAuthStateChanged = vi.fn();
 const mockSignInWithPopup = vi.fn();
 const mockSignOut = vi.fn();
-const mockSignInAnonymously = vi.fn(() => Promise.resolve({ user: { uid: 'anon-uid', isAnonymous: true } }));
+const mockSignInAnonymously = vi.fn(() => Promise.resolve({ user: { uid: 'anon-uid', isAnonymous: true, providerData: [] } }));
 
 vi.mock('firebase/auth', () => ({
     getAuth: vi.fn(),
@@ -83,7 +83,7 @@ describe('UserContext', () => {
         // Initially loading
         // Trigger auth update
         await act(async () => {
-            authCallback({ uid: 'firebase-uid', displayName: 'Firebase User', photoURL: 'url' });
+            authCallback({ uid: 'firebase-uid', displayName: 'Firebase User', photoURL: 'url', providerData: [{ providerId: 'google.com' }] });
         });
 
         expect(screen.getByTestId('is-anonymous')).toHaveTextContent('false');
