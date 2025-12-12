@@ -6,10 +6,11 @@ import MagicLinkData from './MagicLinkData';
 import NameGenerator from '../utils/NameGenerator';
 
 function UserSettings({ decisionId, encryptionKey }) {
-    const { user, login, logout, setDisplayName, resetToInitialName } = useUser();
+    const { user, login, logout, setDisplayName, resetToInitialName, getInitialName } = useUser();
     const [isEditing, setIsEditing] = useState(false);
     const [showTransfer, setShowTransfer] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [editedName, setEditedName] = useState(user.displayName || '');
 
     useEffect(() => {
@@ -40,10 +41,16 @@ function UserSettings({ decisionId, encryptionKey }) {
         setIsEditing(false);
         setShowTransfer(false);
         setShowHelp(false);
+        setShowResetConfirm(false);
     };
 
-    const handleReset = async () => {
+    const handleResetClick = () => {
+        setShowResetConfirm(true);
+    };
+
+    const confirmReset = async () => {
         const restoredName = resetToInitialName();
+        setShowResetConfirm(false);
         // Sync with backend if participating in a decision
         if (decisionId && user.userId && restoredName) {
             try {
@@ -144,6 +151,73 @@ function UserSettings({ decisionId, encryptionKey }) {
         );
     }
 
+    if (showResetConfirm) {
+        const initialName = getInitialName();
+        return (
+            <div style={{
+                position: 'fixed',
+                top: '1rem',
+                right: '1rem',
+                padding: '1rem',
+                backgroundColor: 'white',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                zIndex: 100,
+                minWidth: '250px',
+                maxWidth: '300px'
+            }}>
+                <h4 style={{ marginTop: 0 }}>Reset Name?</h4>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                    This will revert your display name to your original anonymous identity:
+                </p>
+                <div style={{
+                    padding: '0.5rem',
+                    background: '#f5f5f5',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    marginBottom: '1rem',
+                    fontSize: '0.9rem'
+                }}>
+                    {initialName || 'Original Name'}
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button
+                        onClick={() => setShowResetConfirm(false)}
+                        style={{
+                            flex: 1,
+                            padding: '0.5rem',
+                            fontSize: '0.75rem',
+                            border: '1px solid #ddd',
+                            borderRadius: '4px',
+                            background: 'white',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={confirmReset}
+                        style={{
+                            flex: 1,
+                            padding: '0.5rem',
+                            fontSize: '0.75rem',
+                            border: 'none',
+                            borderRadius: '4px',
+                            background: 'var(--color-danger)',
+                            color: 'white',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        Reset
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     if (showHelp) {
         return (
             <div style={{
@@ -231,7 +305,7 @@ function UserSettings({ decisionId, encryptionKey }) {
                 {/* Actions Group */}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button
-                        onClick={handleReset}
+                        onClick={handleResetClick}
                         style={{
                             flex: 1,
                             padding: '0.4rem',
@@ -241,7 +315,7 @@ function UserSettings({ decisionId, encryptionKey }) {
                             background: 'white',
                             cursor: 'pointer'
                         }}
-                        title="Get a new random name"
+                        title="Reset to your initial anonymous name"
                     >
                         🔄 Reset
                     </button>

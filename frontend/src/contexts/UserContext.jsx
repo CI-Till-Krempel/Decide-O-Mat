@@ -149,8 +149,12 @@ export function UserProvider({ children }) {
         return nameToReturn;
     };
 
+    const getInitialName = () => {
+        return localStorage.getItem('dom_initial_name');
+    };
+
     return (
-        <UserContext.Provider value={{ user, login, logout, setDisplayName, resetToInitialName, loading }}>
+        <UserContext.Provider value={{ user, login, logout, setDisplayName, resetToInitialName, getInitialName, loading }}>
             {!loading && children}
         </UserContext.Provider>
     );
