@@ -16,3 +16,6 @@
 - **Database**: Add a `status` field to the decision document (default: 'open').
 - **Security**: Update Firestore rules to prevent writes to `arguments` or `votes` if the parent decision is closed.
 - **Frontend**: Real-time listener on the decision document to update the UI state immediately.
+
+## Implementation Plan
+- [IMP-006-Close-Decision](../plans/IMP-006-Close-Decision.md)

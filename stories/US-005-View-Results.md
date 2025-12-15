@@ -12,3 +12,6 @@
 ## Technical Notes
 - Frontend: Calculate the sum of votes from the loaded arguments.
 - Backend: Can optionally aggregate scores if performance becomes an issue, but client-side aggregation is fine for MVP.
+
+## Implementation Plan
+- [IMP-005-View-Results](../plans/IMP-005-View-Results.md)

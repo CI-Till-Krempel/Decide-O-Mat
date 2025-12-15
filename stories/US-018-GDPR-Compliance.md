@@ -11,3 +11,6 @@ As a user, I want my data to be handled in compliance with GDPR, including cooki
 ## Technical Notes
 -   Implement a Cookie Consent component.
 -   Integrate with Google Tag Manager or initialize Firebase Analytics conditionally.
+
+## Implementation Plan
+- [IMP-018-GDPR-Compliance](../plans/IMP-018-GDPR-Compliance.md)

@@ -12,3 +12,6 @@
 ## Technical Notes
 - The URL ID should be the document ID from the database.
 - Frontend: Use `navigator.clipboard.writeText()` for the copy functionality.
+
+## Implementation Plan
+- [IMP-002-Share-Decision](../plans/IMP-002-Share-Decision.md)

@@ -16,3 +16,6 @@ As a user, I want to export the decision results (question, pros, cons, net scor
 ## Technical Notes
 -   Use a library like `html2canvas` or `dom-to-image` to render the DOM to an image.
 -   Ensure the layout looks good in the exported image (might need a specific hidden container for rendering).
+
+## Implementation Plan
+- [IMP-007-Export-Results](../plans/IMP-007-Export-Results.md)

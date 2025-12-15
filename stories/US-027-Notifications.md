@@ -17,3 +17,6 @@ As a participant, I want to be notified when there are updates to a decision (ne
 - Requires `Firebase Cloud Messaging (FCM)`.
 - **Service Worker**: Need to implement a service worker to handle background messages.
 - **Token Management**: Store FCM tokens in a private subcollection of the user or decision-participant map (careful with stale tokens).
+
+## Implementation Plan
+- [IMP-027-Notifications](../plans/IMP-027-Notifications.md)

@@ -24,3 +24,6 @@
 ## Technical Notes
 - Create a specific route `/magic` or handle globally in `App.jsx`.
 - Update `localStorage` upon successful processing.
+
+## Implementation Plan
+- [IMP-022-Magic-Link](../plans/IMP-022-Magic-Link.md)

@@ -11,3 +11,6 @@ As a site owner, I want the application to be accessible via a professional cust
 ## Technical Notes
 -   Configure DNS records.
 -   Configure Firebase Hosting custom domain.
+
+## Implementation Plan
+- [IMP-017-Custom-Domain](../plans/IMP-017-Custom-Domain.md)

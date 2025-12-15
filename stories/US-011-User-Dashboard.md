@@ -13,3 +13,6 @@ As a logged-in user, I want to see a list of my decisions so that I can easily r
 -   Store `ownerId` in Decision documents.
 -   Query decisions where `ownerId == currentUser.uid`.
 -   Create `/dashboard` route.
+
+## Implementation Plan
+- [IMP-011-User-Dashboard](../plans/IMP-011-User-Dashboard.md)

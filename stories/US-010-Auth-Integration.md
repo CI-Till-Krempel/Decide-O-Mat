@@ -13,3 +13,6 @@ As a user, I want to be able to sign in so that I can securely manage my identit
 -   Enable Authentication in Firebase Console (Google, Email/Password).
 -   Implement `AuthContext` in React to manage user state.
 -   Update UI to show Login/Logout buttons.
+
+## Implementation Plan
+- [IMP-010-Auth-Integration](../plans/IMP-010-Auth-Integration.md)

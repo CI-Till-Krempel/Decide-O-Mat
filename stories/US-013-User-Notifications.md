@@ -14,3 +14,6 @@ As a decision owner, I want to be notified when there are updates to my decision
 -   Retrieve the parent decision to get the `ownerId`.
 -   Retrieve the user profile (from Auth or a `users` collection) to get the email (or use Auth SDK if possible/allowed).
 -   Use an email sending service (e.g., Firebase Extension "Trigger Email" or Nodemailer with SMTP).
+
+## Implementation Plan
+- [IMP-013-User-Notifications](../plans/IMP-013-User-Notifications.md)
