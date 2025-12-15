@@ -142,7 +142,7 @@ jobs:
           if ! command -v firebase &> /dev/null; then
              npm install -g firebase-tools
           fi
-          firebase deploy --only functions --project decide-o-mat-staging --force
+          firebase deploy --only functions,firestore --project decide-o-mat-staging --force
 
   deploy-prod:
     needs: build
@@ -180,7 +180,7 @@ jobs:
           if ! command -v firebase &> /dev/null; then
              npm install -g firebase-tools
           fi
-          firebase deploy --only functions --project decide-o-mat --force
+          firebase deploy --only functions,firestore --project decide-o-mat --force
 
 
 
