@@ -22,5 +22,5 @@
         "eslint-config-google": "^0.14.0"
     },
     "private": true,
-    "version": "1.4.1"
+    "version": "1.5.0"
 }

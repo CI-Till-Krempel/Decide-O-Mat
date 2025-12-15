@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2025-12-15
+
+### Added
+- **User Authentication**: Integrated Firebase Authentication supporting Google Sign-In and Email/Password registration.
+- **My Decisions**: A personalized list of decisions a user has created or participated in.
+- **Anonymous Identity Upgrades**:
+    - **One Vote Limit**: Enforced one vote per user per decision.
+    - **Magic Link**: Ability to transfer anonymous identity to another device via a magic link.
+    - **Profile Management**: Users can edit their display name and delete their account (GDPR compliance).
+- **Security**: Enhanced Firestore rules and backend validation for user actions.
+
+## [1.4.1] - 2025-12-12
+
+### Fixed
+- **Roles**: Corrected "Owner" badge visibility and added "Invitee" badge for participants.
+- **List Styling**: Removed bullet points from decision lists for cleaner UI.
+- **Testing**: Fixed frontend test failures in `Decision.test.jsx` related to encryption service mocking.
+
 ## [1.4.0] - 2025-12-10
 
 ### Added
