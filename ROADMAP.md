@@ -46,11 +46,9 @@
 ## v1.4 End-to-End Encryption
     - [x] End-to-End Encryption (US-020)
 
-## v1.4.5 Anonymous User Enhancements
+## v1.5 User Authentication and Anonymous User Enhancements
     - [x] Anonymous Identity & One Vote Limit (US-021)
     - [x] Magic Link Identity Transfer (US-022)
-
-## v1.5 User Authentication
     - [x] Integrate Firebase Authentication to enable User Authentication
     - [x] [US-023](stories/US-023-User-Login.md): User Login & Registration (OAuth + Email/Pass)
     - [x] [US-024](stories/US-024-User-Profile.md): User Profile & Self Service (Delete Account)
