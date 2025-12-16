@@ -13,3 +13,6 @@ As a developer, I want to have separate development and staging environments so 
 -   Update `.firebaserc` with aliases.
 -   Update GitHub Actions (`release.yml` or new `deploy.yml`).
 -   Use Firebase Hosting channels or separate projects.
+
+## Implementation Plan
+- [IMP-015-Deployment-Pipeline](../plans/IMP-015-Deployment-Pipeline.md)

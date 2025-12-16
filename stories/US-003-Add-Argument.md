@@ -13,3 +13,6 @@
 ## Technical Notes
 - Backend: API endpoint `POST /decisions/:id/arguments` accepting `{ type: 'pro'|'con', text: string }`.
 - Database: Arguments can be a sub-collection of the decision or an array within the decision document (watch out for size limits). Sub-collection is safer for scalability.
+
+## Implementation Plan
+- [IMP-003-Add-Argument](../plans/IMP-003-Add-Argument.md)

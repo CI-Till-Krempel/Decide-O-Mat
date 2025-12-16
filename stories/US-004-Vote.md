@@ -13,3 +13,6 @@
 ## Technical Notes
 - Backend: API endpoint `POST /arguments/:id/vote` accepting `{ value: 1 | -1 }`.
 - Database: Atomic increment of the vote counter on the argument document.
+
+## Implementation Plan
+- [IMP-004-Vote](../plans/IMP-004-Vote.md)

@@ -12,3 +12,6 @@ As a decision owner, I want to be the only one allowed to close my decision, so 
 ## Technical Notes
 -   Update `firestore.rules`.
 -   Update Frontend to check `currentUser.uid === decision.ownerId`.
+
+## Implementation Plan
+- [IMP-014-Restrict-Closing](../plans/IMP-014-Restrict-Closing.md)

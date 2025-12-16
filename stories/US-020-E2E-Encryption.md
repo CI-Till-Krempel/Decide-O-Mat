@@ -12,3 +12,6 @@ As a user, I want my private decisions to be end-to-end encrypted so that even t
 -   Use `Web Crypto API`.
 -   Generate key on creation, append to URL `#key=...`.
 -   Store encrypted blobs in Firestore.
+
+## Implementation Plan
+- [IMP-020-E2E-Encryption](../plans/IMP-020-E2E-Encryption.md)

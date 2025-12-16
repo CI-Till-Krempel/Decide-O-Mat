@@ -14,3 +14,6 @@ As a site owner, I want to display legal information (Impressum, Privacy Policy,
 ## Technical Notes
 -   Create new route `/legal/*` or individual routes.
 -   Create `Footer` component.
+
+## Implementation Plan
+- [IMP-016-Legal-Pages](../plans/IMP-016-Legal-Pages.md)

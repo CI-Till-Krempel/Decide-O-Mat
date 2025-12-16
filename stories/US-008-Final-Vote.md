@@ -13,3 +13,6 @@ As a user, I want to be able to cast a final vote (Yes/No) on the decision itsel
 -   Add `finalVotes` map (userId/deviceId -> vote) to the Decision document in Firestore.
 -   Or a subcollection `final_votes` if we expect many votes. Given MVP, a map or array in the document might suffice, but subcollection is safer for scalability.
 -   Update `Decision.jsx` to show the voting UI.
+
+## Implementation Plan
+- [IMP-008-Final-Vote](../plans/IMP-008-Final-Vote.md)

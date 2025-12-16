@@ -15,3 +15,6 @@ As a user, I want to identify myself with a name so that my contributions (argum
 -   Store `displayName` in `localStorage`.
 -   Include `authorName` in `arguments` documents.
 -   Update `voteArgument` to optionally store who voted (might need schema change to track *who* voted for what, currently just counts).
+
+## Implementation Plan
+- [IMP-009-User-Identification](../plans/IMP-009-User-Identification.md)

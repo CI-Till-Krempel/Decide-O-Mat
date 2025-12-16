@@ -15,3 +15,6 @@
 - Frontend: Simple form with one text input.
 - Backend: API endpoint `POST /decisions` that accepts `{ question: string }`.
 - Database: Create a new document in `decisions` collection with auto-generated ID.
+
+## Implementation Plan
+- [IMP-001-Create-Decision](../plans/IMP-001-Create-Decision.md)

@@ -21,6 +21,12 @@ Navigate the project documentation:
 - **[Changelog](CHANGELOG.md)**  
   History of all notable changes, features, and bug fixes for each released version.
 
+- **[User Concepts](USER_CONCEPTS.md)**  
+  Explanations of core user-facing concepts like Anonymous Identity.
+
+- **[Announcements](announcements/)**  
+  Release announcements and updates.
+
 ## Development Workflow
 
 ### Environments
@@ -35,12 +41,13 @@ We use a multi-stage environment setup to ensure stability:
 2.  **Staging (`staging`)**:
     *   **Trigger**: Automatically deployed on every push to the `main` branch.
     *   **Purpose**: Integration testing and verification in a live environment.
-    *   **URL**: `https://decide-o-mat-staging.web.app`
+    *   **URL**: `https://decide-o-mat-staging--decide-o-mat-staging.europe-west4.hosted.app/`
+    *   **Note**: The Staging environment is **not End-to-End Encrypted (E2EE)** to facilitate easier bug fixing and debugging.
 
 3.  **Production (`prod`)**:
     *   **Trigger**: Automatically deployed when a version tag (e.g., `v1.2.0`) is pushed.
     *   **Purpose**: Live application for end users.
-    *   **URL**: `https://decide-o-mat.web.app`
+    *   **URL**: `https://decide-o-mat-prod--decide-o-mat.europe-west4.hosted.app/`
 45: 
 46: ### Service Account Permissions
 

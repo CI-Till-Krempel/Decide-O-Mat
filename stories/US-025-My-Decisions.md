@@ -14,3 +14,6 @@ As a logged-in user, I want to see a list of decisions I have created or partici
 ## Technical Notes
 - Requires indexing decisions by `ownerId` and potentially a `participants` array field in the `decisions` document (or a separate collection `user_decisions` for scalability).
 - Since Firestore `participants` subcollection is hard to query for "all decisions I'm in", we might need to denormalize participation data (e.g., `participants_ids` array in decision doc, if <1000 participants).
+
+## Implementation Plan
+- [IMP-025-My-Decisions](../plans/IMP-025-My-Decisions.md)

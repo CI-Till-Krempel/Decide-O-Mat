@@ -22,3 +22,6 @@
 ## Technical Notes
 - Use `crypto.randomUUID()`.
 - Ensure new E2E flows utilize this ID instead of just the cookie.
+
+## Implementation Plan
+- [P-001-Anonymous-Users](../plans/P-001-Anonymous-Users.md)

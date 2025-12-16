@@ -16,3 +16,6 @@ As a user, I want to create an account or log in so that I can persist my identi
 ## Technical Notes
 - Use Firebase Authentication.
 - Existing anonymous users should be upgraded/linked if possible (Firebase `linkWithCredential`).
+
+## Implementation Plan
+- [IMP-023-User-Login](../plans/IMP-023-User-Login.md)

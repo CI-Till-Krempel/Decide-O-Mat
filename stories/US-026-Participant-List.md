@@ -15,3 +15,6 @@ As a user viewing a decision, I want to see a list of all participants involved,
 ## Technical Notes
 - We already have a `participants` subcollection.
 - We already subscribe to it in `ParticipantService`. This story is mainly about the *UI* realization (Sidebar).
+
+## Implementation Plan
+- [IMP-026-Participant-List](../plans/IMP-026-Participant-List.md)

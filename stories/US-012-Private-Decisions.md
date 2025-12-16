@@ -13,3 +13,6 @@ As a user, I want to create private decisions that are only accessible to specif
 -   Add `visibility` ('public', 'private') and `participants` (array of emails/uids) to Decision schema.
 -   Update Firestore rules to check `request.auth.uid` against `participants` or `ownerId` for private decisions.
 -   UI for managing participants.
+
+## Implementation Plan
+- [IMP-012-Private-Decisions](../plans/IMP-012-Private-Decisions.md)

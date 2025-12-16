@@ -20,3 +20,6 @@ As a logged-in user, I want to manage my profile and have the option to delete m
 ## Technical Notes
 - Firebase Admin SDK or Cloud Function trigger might be needed for comprehensive data cleanup (cascading deletes).
 - Frontend handles the auth user deletion.
+
+## Implementation Plan
+- [IMP-024-User-Profile](../plans/IMP-024-User-Profile.md)

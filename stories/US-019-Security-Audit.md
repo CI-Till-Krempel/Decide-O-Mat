@@ -12,3 +12,6 @@ As a site owner, I want to ensure the application is secure against common vulne
 -   Run `npm audit`.
 -   Review Firestore Rules.
 -   Check for XSS/CSRF vulnerabilities.
+
+## Implementation Plan
+- [IMP-019-Security-Audit](../plans/IMP-019-Security-Audit.md)
