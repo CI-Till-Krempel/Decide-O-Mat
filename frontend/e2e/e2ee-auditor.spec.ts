@@ -43,8 +43,13 @@ test.describe('E2EE Auditor Agent', () => {
 
         // We must enter a name first to add an argument
         // The UI prompts for name if not set
-        await page.getByPlaceholder('Add a Pro...').fill(argumentText);
-        await page.getByRole('button', { name: 'Add' }).first().click();
+        const argumentInput = page.getByPlaceholder('Add a Pro...');
+        await expect(argumentInput).toBeVisible();
+        await argumentInput.fill(argumentText);
+
+        const addButton = page.getByRole('button', { name: 'Add' }).first();
+        await expect(addButton).toBeEnabled();
+        await addButton.click();
 
         // Fill Name Prompt
         await expect(page.getByText("What's your name?")).toBeVisible();
