@@ -41,8 +41,36 @@ test.describe('E2EE Auditor Agent', () => {
             await route.continue();
         });
 
-        // We must enter a name first to add an argument
-        // The UI prompts for name if not set
+        // -------------------------------------------------------------
+        // Setup Routes early to capture all potential calls
+        // -------------------------------------------------------------
+
+        let registerParticipantRequest: any;
+        await page.route('**/registerParticipant', async route => {
+            console.log('registerParticipant intercepted');
+            registerParticipantRequest = route.request();
+            await route.continue();
+        });
+
+        // Explicitly set the name to ensure we are testing Encryption of the specific string
+        // The app auto-generates a name, so we must edit it.
+        const editButton = page.getByRole('button', { name: '✏️' });
+        await expect(editButton).toBeVisible();
+        await editButton.click();
+
+        const nameInput = page.getByPlaceholder('Enter your name');
+        await expect(nameInput).toBeVisible();
+        await nameInput.fill(displayName);
+
+        // This save triggers registerParticipant
+        await page.getByRole('button', { name: 'Save' }).click();
+
+        // Verify registration happened and was encrypted
+        await expect.poll(() => registerParticipantRequest).toBeDefined();
+        const firstRegData = registerParticipantRequest.postDataJSON();
+        expect(firstRegData.data.encryptedDisplayName).toBeDefined();
+        expect(firstRegData.data.encryptedDisplayName).not.toContain(displayName);
+
         const argumentInput = page.getByPlaceholder('Add a Pro...');
         await expect(argumentInput).toBeVisible();
         await argumentInput.fill(argumentText);
@@ -51,10 +79,8 @@ test.describe('E2EE Auditor Agent', () => {
         await expect(addButton).toBeEnabled();
         await addButton.click();
 
-        // Fill Name Prompt
-        await expect(page.getByText("What's your name?")).toBeVisible();
-        await page.getByPlaceholder('Enter your name').fill(displayName);
-        await page.getByRole('button', { name: 'Save' }).click();
+        // No name prompt expected now
+
 
         // Verify Add Argument Payload
         // Expected: { data: { text: "encrypted", authorName: "encrypted", ... } }
@@ -66,57 +92,32 @@ test.describe('E2EE Auditor Agent', () => {
         expect(argData.data.text).not.toEqual(argumentText);
 
         // -------------------------------------------------------------
-        // 3. Verify Encrypted Vote/Participant Registration
+        // 3. Verify Encrypted Vote
         // -------------------------------------------------------------
-        // When voting with an encrypted decision, we expect:
-        // A. registerParticipant call with encrypted name
-        // B. voteDecision call
 
-        let registerParticipantRequest: any;
-        await page.route('**/registerParticipant', async route => {
-            registerParticipantRequest = route.request();
-            await route.continue();
-        });
-
-        // We already set the name, so now just vote
-        await page.getByRole('button', { name: 'Yes' }).click();
-
-        // Verify Name Registration Payload
-        // Note: registerParticipant might store the name in Firestore directly or via function.
-        // Based on code inspection: ParticipantService.registerParticipant calls a function or firestore write.
-        // Ideally we check whatever network call writes the participant name.
-
-        // IF the app uses a direct write to firestore for participants, the URL will involve `firestore`
-        // IF it uses a callable, it will be `functions/registerParticipant`.
-        // Let's assume callable or check firestore write if callable fails.
-
-        // Actually, checking the code: "ParticipantService.registerParticipant" logic wasn't fully inspected, 
-        // but typically it handles the encryption. If it's a direct DB write, let's catch logical endpoint.
-        // The requirement is "User Data (Names)". We verified name in Argument.
-        // Let's also check if the vote itself is associated with a plaintext name.
+        // We already verified participant registration above.
+        // Now verify vote. Note: vote might trigger registerParticipant is map not updated,
+        // but we mainly care that voteDecision is clean.
 
         let voteDecisionRequest: any;
         await page.route('**/voteDecision', async route => {
+            console.log('voteDecision intercepted');
             voteDecisionRequest = route.request();
             await route.continue();
         });
 
-        await expect.poll(() => voteDecisionRequest).toBeDefined();
+        await expect(page.getByRole('button', { name: 'Yes' })).toBeVisible();
+        await page.getByRole('button', { name: 'Yes' }).click();
+
+        // Increased timeout for emulators
+        await expect.poll(() => voteDecisionRequest, { timeout: 15000 }).toBeDefined();
         const voteData = voteDecisionRequest.postDataJSON();
 
         // voteDecision(id, voteType, nameToSend)
         // If encrypted, nameToSend is null or encrypted?
         // Code says: const nameToSend = encryptionKey ? null : user.displayName;
-        // So the payload should have nameToSend: null (or undefined)
-
         if (voteData.data && voteData.data.nameToSend) {
             expect(voteData.data.nameToSend).not.toBe(displayName);
-        }
-
-        // If registerParticipant was a function call:
-        if (registerParticipantRequest) {
-            const regData = registerParticipantRequest.postDataJSON();
-            expect(regData.data.encryptedName).not.toContain(displayName);
         }
     });
 
