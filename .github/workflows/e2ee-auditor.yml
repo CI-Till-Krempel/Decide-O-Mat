@@ -35,6 +35,17 @@ jobs:
       - name: Install Firebase Tools
         run: npm install -g firebase-tools
 
+      - name: Create .env file
+        working-directory: ./frontend
+        run: |
+          echo "VITE_FIREBASE_API_KEY=fake-api-key" >> .env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=demo-test.firebaseapp.com" >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=demo-test" >> .env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=demo-test.appspot.com" >> .env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=000000000000" >> .env
+          echo "VITE_FIREBASE_APP_ID=1:000000000000:web:0000000000000000000000" >> .env
+          echo "VITE_ENABLE_ENCRYPTION=true" >> .env
+
       - name: Install Frontend Dependencies
         working-directory: ./frontend
         run: npm ci
