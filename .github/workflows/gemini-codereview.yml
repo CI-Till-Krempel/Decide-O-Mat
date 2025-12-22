@@ -64,6 +64,7 @@ jobs:
                   "includeTools": [
                     "add_comment_to_pending_review",
                     "create_pending_pull_request_review",
+                    "pull_request_read.get_review_comments",
                     "pull_request_read",
                     "submit_pending_pull_request_review"
                   ],
