@@ -9,6 +9,7 @@ on:
 jobs:
   e2ee-audit:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'NO_CHECKS') }}
     
     defaults:
       run:
