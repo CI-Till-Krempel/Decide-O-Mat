@@ -29,7 +29,13 @@ jobs:
           REPOSITORY: ${{ github.repository }}
         with:
           gemini_api_key: ${{ secrets.GEMINI_CLI_CODE_REVIEW_AGENT }}
-          prompt: "/gemini-review"
+          prompt: |
+            /gemini-review
+
+            Variable Context:
+            - Repository: ${{ github.repository }}
+            - Pull Request Number: ${{ github.event.pull_request.number }}
+
           settings: |-
             {
               "mcpServers": {
