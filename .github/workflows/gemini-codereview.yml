@@ -32,7 +32,7 @@ jobs:
         with:
           app-id: ${{ secrets.GEMINI_APP_ID }}
           private-key: ${{ secrets.GEMINI_APP_PRIVATE_KEY }}
-        uses: google-github-actions/run-gemini-cli@v0
+
       - name: Gemini CLI Code Review Action
         uses: google-github-actions/run-gemini-cli@v0.1.18
         env:
