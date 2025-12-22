@@ -1,0 +1,25 @@
+name: Gemini Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gemini Code Review
+        uses: google-github-actions/run-gemini-cli@v0.1.18
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_CLI_CODE_REVIEW_AGENT }}
+          command: review
