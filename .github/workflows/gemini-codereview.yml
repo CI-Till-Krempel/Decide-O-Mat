@@ -26,10 +26,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.GEMINI_APP_ID }}
+          private-key: ${{ secrets.GEMINI_APP_PRIVATE_KEY }}
+
       - name: Gemini CLI Code Review Action
         uses: google-github-actions/run-gemini-cli@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
           REPOSITORY: ${{ github.repository }}
         with:
