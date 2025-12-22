@@ -4,14 +4,17 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-permissions:
-  contents: read
-  pull-requests: write
-  issues: write
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}'
+  cancel-in-progress: true
 
 jobs:
   review:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,6 +23,44 @@ jobs:
 
       - name: Run Gemini Code Review
         uses: google-github-actions/run-gemini-cli@v0.1.18
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
         with:
           gemini_api_key: ${{ secrets.GEMINI_CLI_CODE_REVIEW_AGENT }}
-          prompt: "Review the code changes in this Pull Request. checking for bugs, design issues, and code quality. If this is a re-review, verify if previous discussions are resolved."
+          prompt: "/gemini-review"
+          settings: |-
+            {
+              "mcpServers": {
+                "github": {
+                  "command": "docker",
+                  "args": [
+                    "run",
+                    "-i",
+                    "--rm",
+                    "-e",
+                    "GITHUB_PERSONAL_ACCESS_TOKEN",
+                    "ghcr.io/github/github-mcp-server:v0.18.0"
+                  ],
+                  "includeTools": [
+                    "add_comment_to_pending_review",
+                    "create_pending_pull_request_review",
+                    "pull_request_read",
+                    "submit_pending_pull_request_review"
+                  ],
+                  "env": {
+                    "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+                  }
+                }
+              },
+              "tools": {
+                "core": [
+                  "run_shell_command(cat)",
+                  "run_shell_command(echo)",
+                  "run_shell_command(grep)",
+                  "run_shell_command(head)",
+                  "run_shell_command(tail)"
+                ]
+              }
+            }
