@@ -22,4 +22,4 @@ jobs:
         uses: google-github-actions/run-gemini-cli@v0.1.18
         with:
           gemini_api_key: ${{ secrets.GEMINI_CLI_CODE_REVIEW_AGENT }}
-          command: review
+          prompt: "Review the code changes in this Pull Request. checking for bugs, design issues, and code quality. If this is a re-review, verify if previous discussions are resolved."
