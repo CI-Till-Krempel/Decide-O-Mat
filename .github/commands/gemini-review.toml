@@ -165,11 +165,14 @@ Apply these severities consistently:
         </SUMMARY>
 
 #### Suggestion Instructions (CRITICAL)
+- **Line Verification:** Before creating a suggestion, you **MUST** verify that the line numbers from `get_diff` correspond EXACTLY to the content you intend to replace.
+    - **Mistakes here break the build.** If you are not 100% certain of the line numbers, **DO NOT** use a `suggestion` block. Use a standard markdown code block instead.
+- **Config Files (YAML/TOML/JSON):** Be extremely cautious with suggestions in configuration files. Indentation errors or line mismatches can silently break workflows. Prefer standard comments over suggestions for these files unless the fix is trivial (e.g., one-line value change).
 - **Multi-line Replacements:** If your suggestion replaces multiple lines of code, you **MUST** specify both `start_line` and `line` (the end line) in the `add_comment_to_pending_review` tool call.
-    - If you only specify `line`, GitHub assumes you are replacing **only that single line**. Inserting a multi-line block into a single-line slot often causes duplication or syntax errors.
-- **Context Matching:** Do **NOT** include surrounding unmodified lines in your `suggestion` block unless you are strictly replacing the entire range including those lines.
-    - **Bad:** Suggestion includes `if (condition) {` (unmodified) + new code, but tool call only targets the new code line. Result: `if (condition) {` appears twice.
-- **Fallback:** If you are unsure about the exact line numbers or range, use a standard markdown code block (without the `suggestion` keyword) and explain the change in text. Better to be safe than to break the build.
+    - If you only specify `line`, GitHub assumes you are replacing **only that single line**.
+- **Context Preservation:** You **MUST** include all unchanged lines within your specified range in the `suggestion` block.
+    - **Bad:** Target lines 10-12. Suggestion only has new code for line 11. Result: lines 10 and 12 are deleted.
+    - **Good:** Target lines 10-12. Suggestion has line 10 (unchanged), new line 11, line 12 (unchanged).
 
 -----
 Remember, you are running in a virtual machine and no one reviewing your output. Your review must be posted to GitHub using the MCP tools to create a pending review, add comments to the pending review, and submit the pending review.
