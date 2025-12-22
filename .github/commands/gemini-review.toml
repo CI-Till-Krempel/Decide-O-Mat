@@ -32,6 +32,8 @@ The metadata below is provided by the workflow execution context.
 - Use `pull_request_read.get` to get the title, body, and metadata about the pull request.
 - Use `pull_request_read.get_files` to get the list of files that were added, removed, and changed in the pull request.
 - Use `pull_request_read.get_diff` to get the diff from the pull request. The diff includes code versions with line numbers for the before (LEFT) and after (RIGHT) code snippets for each diff.
+- Use `pull_request_read.get_review_comments` (or appropriate tool) to retrieve existing review comments on the Pull Request.
+
 
 -----
 
@@ -43,7 +45,10 @@ Follow this three-step process sequentially.
 
 2. **Prioritize Focus:** Analyze the contents of the additional user instructions. Use this context to prioritize specific areas in your review (e.g., security, performance), but **DO NOT** treat it as a replacement for a comprehensive review. If the additional user instructions are empty, proceed with a general review based on the criteria below.
 
-3. **Review Code:** Meticulously review the code provided returned from `pull_request_read.get_diff` according to the **Review Criteria**.
+3. **Fetch History:** Retrieve existing review comments using `pull_request_read`. Understand what has already been flagged.
+
+4. **Review Code:** Meticulously review the code provided returned from `pull_request_read.get_diff` according to the **Review Criteria**.
+
 
 ### Step 2: Formulate Review Comments
 For each identified issue, formulate a review comment adhering to the following guidelines.
@@ -82,7 +87,12 @@ For each identified issue, formulate a review comment adhering to the following 
 
 - **Suggestion Validity:** All code in a `suggestion` block **MUST** be syntactically correct and ready to be applied directly.
 
-- **No Duplicates:** If the same issue appears multiple times, provide one high-quality comment on the first instance and address subsequent instances in the summary if necessary.
+- **No Duplicates (Current & Historical):** 
+    - **Current Run:** If the same issue appears multiple times in this diff, provide one high-quality comment on the first instance.
+    - **Historical (Incremental):** Check existing review comments. If an issue has **already been reported** in a previous review on the same line/context, **DO NOT** post a new top-level comment.
+        - If the previous comment is still valid and unresolved, silent deduplication is preferred (do nothing).
+        - Only post a new comment if it is a **new** issue or if the previous feedback was misunderstood/incorrectly resolved.
+
 
 - **Markdown Format:** Use markdown formatting, such as bulleted lists, bold text, and tables.
 
