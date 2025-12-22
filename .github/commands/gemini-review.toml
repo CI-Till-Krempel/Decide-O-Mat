@@ -152,27 +152,28 @@ Apply these severities consistently:
         </COMMENT>
 
 3. **Submit Final Review:** Call `submit_pending_pull_request_review`.
-    - **Event Type:** You **MUST** use "COMMENT". Do NOT use "APPROVE" or "REQUEST_CHANGES".
-    - **Incremental Summary:**
-        - If you have previously reviewed this PR and there are no *new* significant findings, keep the body minimal: "Incremental review complete. No new significant issues found."
-        - Do **NOT** repost a "General Feedback" section if it merely repeats previous points.
-    - **New Findings:** If there are new findings, use the standard format:
-        <SUMMARY>
-        ## 📋 Review Summary
-        (Brief assessment)
-        ## 🔍 General Feedback
-        (Bulleted list)
-        </SUMMARY>
+    - **Event Type:** You **MUST** use "COMMENT".
+    - **Summary Logic (Strict):**
+        - First, check the existing review comments you retrieved.
+        - **IF** a comment containing "📋 Review Summary" already exists:
+            - **DO NOT** post a new summary.
+            - **DO NOT** post a "General Feedback" section.
+            - Just submit the review with any new inline comments.
+        - **ELSE** (First run only):
+            - Post the standard summary format:
+                <SUMMARY>
+                ## 📋 Review Summary
+                (Brief assessment)
+                ## 🔍 General Feedback
+                (Bulleted list)
+                </SUMMARY>
 
-#### Suggestion Instructions (CRITICAL)
-- **Line Verification:** Before creating a suggestion, you **MUST** verify that the line numbers from `get_diff` correspond EXACTLY to the content you intend to replace.
-    - **Mistakes here break the build.** If you are not 100% certain of the line numbers, **DO NOT** use a `suggestion` block. Use a standard markdown code block instead.
-- **Config Files (YAML/TOML/JSON):** Be extremely cautious with suggestions in configuration files. Indentation errors or line mismatches can silently break workflows. Prefer standard comments over suggestions for these files unless the fix is trivial (e.g., one-line value change).
-- **Multi-line Replacements:** If your suggestion replaces multiple lines of code, you **MUST** specify both `start_line` and `line` (the end line) in the `add_comment_to_pending_review` tool call.
-    - If you only specify `line`, GitHub assumes you are replacing **only that single line**.
-- **Context Preservation:** You **MUST** include all unchanged lines within your specified range in the `suggestion` block.
-    - **Bad:** Target lines 10-12. Suggestion only has new code for line 11. Result: lines 10 and 12 are deleted.
-    - **Good:** Target lines 10-12. Suggestion has line 10 (unchanged), new line 11, line 12 (unchanged).
+#### Suggestion Instructions (CRITICAL CHANGE)
+- **DISABLE SUGGESTIONS:** Do **NOT** use GitHub suggestion blocks (```suggestion).
+    - Previous attempts have resulted in broken builds due to line number mismatches.
+    - **Use Standard Code Blocks:** Instead, use standard markdown code blocks (e.g., ```python, ```javascript) to show the improved code.
+    - **Explain:** Clearly explain what lines should be changed in the text of your comment.
+    - **Goal:** It is better to provide a correct text description than a broken "one-click" suggestion that corrupts the file.
 
 -----
 Remember, you are running in a virtual machine and no one reviewing your output. Your review must be posted to GitHub using the MCP tools to create a pending review, add comments to the pending review, and submit the pending review.
