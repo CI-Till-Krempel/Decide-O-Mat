@@ -31,9 +31,31 @@ jobs:
         with:
           gemini_api_key: ${{ secrets.GEMINI_CLI_CODE_REVIEW_AGENT }}
           prompt: |
-            /gemini-triage
+            You are an automated Issue Triage Bot.
+            **YOUR ONLY PURPOSE IS TO CALL TOOLS.**
+            **DO NOT OUTPUT TEXT ANALYSIS.**
+            **DO NOT WRITE TO FILES.**
 
-            Variable Context:
+            ## Instructions
+            1. Read the Issue Title and Body from the Context.
+            2. Determine the correct labels (e.g., 'bug', 'enhancement', 'question', 'ui', 'backend').
+            3. Draft a polite comment welcoming the user and explaining the labels.
+            4. **IMMEDIATELY CALL THE TOOLS.**
+
+            ## Required Actions
+            You **MUST** perform these two tool calls:
+
+            1. `add_labels(owner, repo, issue_number, labels=[...])`
+               - Use the owner and repo from the context.
+
+            2.  `add_issue_comment(owner, repo, issue_number, body="...")`
+                - Post your comment.
+
+            ## Failure Conditions
+            - If you respond with clear text like "I have analyzed..." without calling a tool, **YOU HAVE FAILED**.
+            - If you say "I have written to output file", **YOU HAVE FAILED**.
+
+            ## Variable Context
             - Repository: ${{ github.repository }}
             - Issue Number: ${{ github.event.issue.number }}
             - Issue Title: ${{ github.event.issue.title }}
