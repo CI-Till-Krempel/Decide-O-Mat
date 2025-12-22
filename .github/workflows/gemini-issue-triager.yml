@@ -45,7 +45,7 @@ jobs:
             ## Required Actions
             You **MUST** perform these two tool calls:
 
-            1. `add_labels(owner, repo, issue_number, labels=[...])`
+            1. `add_issue_labels(owner, repo, issue_number, labels=[...])`
                - Use the owner and repo from the context.
 
             2.  `add_issue_comment(owner, repo, issue_number, body="...")`
@@ -77,7 +77,7 @@ jobs:
                   ],
                   "includeTools": [
                     "issue_read",
-                    "add_labels",
+                    "add_issue_labels",
                     "add_issue_comment"
                   ],
                   "env": {
