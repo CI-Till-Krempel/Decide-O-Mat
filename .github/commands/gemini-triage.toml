@@ -1,6 +1,6 @@
 command = "gemini-triage"
 description = "Triage a GitHub Issue"
-model = "gemini-1.5-pro-latest"
+model = "gemini-1.5-flash-latest"
 
 [prompt]
 text = """
