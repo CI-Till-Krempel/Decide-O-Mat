@@ -45,15 +45,15 @@ jobs:
             ## Required Actions
             You **MUST** perform these two tool calls:
 
-            1. `add_issue_labels(owner, repo, issue_number, labels=[...])`
-               - Use the owner and repo from the context.
+            1. `issue_write(method='update', owner=..., repo=..., issue_number=..., labels=[...])`
+               - Use this to apply the chosen labels.
 
             2.  `add_issue_comment(owner, repo, issue_number, body="...")`
                 - Post your comment.
 
             ## Failure Conditions
             - If you respond with clear text like "I have analyzed..." without calling a tool, **YOU HAVE FAILED**.
-            - If you say "I have written to output file", **YOU HAVE FAILED**.
+            - If you try to call `add_labels` or `add_issue_labels`, **YOU HAVE FAILED** (they do not exist).
 
             ## Variable Context
             - Repository: ${{ github.repository }}
@@ -77,7 +77,7 @@ jobs:
                   ],
                   "includeTools": [
                     "issue_read",
-                    "add_issue_labels",
+                    "issue_write",
                     "add_issue_comment"
                   ],
                   "env": {
