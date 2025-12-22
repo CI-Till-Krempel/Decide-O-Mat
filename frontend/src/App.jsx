@@ -12,7 +12,7 @@ import MagicHandler from './pages/MagicHandler';
 
 function App() {
   useEffect(() => {
-    const version = "v1.4.1";
+    const version = "1.4.1";
     // Check various env naming conventions or defaults
     const mode = import.meta.env.MODE || 'production';
     const stage = mode === 'production' ? '' : ` (${mode})`;

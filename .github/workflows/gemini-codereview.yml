@@ -3,13 +3,18 @@ name: Gemini Code Review
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
 
 concurrency:
-  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}'
+  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}'
   cancel-in-progress: true
 
 jobs:
   review:
+    if: |
+      github.event_name == 'pull_request' || 
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/gemini-review'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,11 +26,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Gemini Code Review
+      - name: Gemini CLI Code Review Action
         uses: google-github-actions/run-gemini-cli@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
           REPOSITORY: ${{ github.repository }}
         with:
           gemini_api_key: ${{ secrets.GEMINI_CLI_CODE_REVIEW_AGENT }}
@@ -34,7 +39,7 @@ jobs:
 
             Variable Context:
             - Repository: ${{ github.repository }}
-            - Pull Request Number: ${{ github.event.pull_request.number }}
+            - Pull Request Number: ${{ github.event.pull_request.number || github.event.issue.number }}
 
           settings: |-
             {
