@@ -6,12 +6,13 @@ Decide-O-Mat uses a multi-tier environment strategy to balance developer velocit
 
 ### 1. Local Development (`localhost`)
 - **Goal**: Rapid iteration and testing.
-- **App Check**: **Enforced**, but bypassed using a debug token.
+- **App Check**: Uses **App Check Emulator**.
 - **Authentication**: Firebase Emulators.
 - **Database**: Local Firestore Emulator (data is ephemeral).
 - **Setup**:
-  - Developers must register a **Local Debug Token** in the Firebase Console.
-  - This token is printed in the browser console on first run.
+  - Ensure `VITE_RECAPTCHA_SITE_KEY` is set (can be a placeholder if only using emulators).
+  - Run `firebase emulators:start` to start the App Check emulator.
+  - The client automatically connects to the emulator; no Debug Token registration is required in the console.
 
 ### 2. Staging (`decide-o-mat-staging`)
 - **Goal**: Integration testing, bug tracing, and error monitoring.
