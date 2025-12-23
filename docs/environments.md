@@ -89,3 +89,5 @@ Controls whether requests are actually blocked.
 
 ### SDK Version & Testing
 > **Info**: We use a `CustomProvider` in `frontend/src/services/firebase.js` to mock App Check on localhost. This works around issues with `connectAppCheckEmulator` in recent Firebase SDK versions.
+>
+> **CI Note**: In the `e2ee-auditor` workflow, we temporarily overwrite `firestore.rules` with permissive rules. This is because the App Check Emulator does not reliably start in "Demo Project" mode, preventing Firestore from verifying the local tokens.
