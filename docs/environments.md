@@ -45,3 +45,8 @@ To secure the application, App Check must be configured in the Firebase Console 
     - Add it as "Localhost".
 
 > **Note**: For Staging, you strictly *do not* need to enable the "Enforcement" switch in the UI if the code handles it, but enabling it in "Unenforced Mode" gives you visibility into % of verified traffic.
+
+### SDK Version & Testing
+> **IMPORTANT**: The E2EE Auditor tests rely on `connectAppCheckEmulator` to verify App Check enforcement locally. This function is available in Firebase JS SDK **v11.x**.
+>
+> ⚠️ **Do not upgrade to `firebase` v12.x** without verifying that `connectAppCheckEmulator` (or an equivalent replacement) is available. In tested v12 builds, this function was missing, causing CI tests to fail because they could not connect to the App Check emulator.
