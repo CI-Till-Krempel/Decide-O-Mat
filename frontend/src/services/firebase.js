@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, getDocs, doc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
-import { initializeAppCheck, ReCaptchaV3Provider, connectAppCheckEmulator } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaV3Provider, CustomProvider } from "firebase/app-check";
 
 // ... (imports)
 const firebaseConfig = {
@@ -24,17 +24,28 @@ const auth = getAuth(app);
 // Initialize App Check
 let appCheck;
 const reCaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-if (reCaptchaSiteKey) {
-    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-        // Enable debug token for localhost
-        self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-    }
-
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    // Use CustomProvider for localhost to avoid hitting real backend
+    console.log("Using CustomProvider for App Check on localhost");
+    appCheck = initializeAppCheck(app, {
+        provider: new CustomProvider({
+            getToken: async () => {
+                return {
+                    token: "fake-app-check-token",
+                    expireTimeMillis: Date.now() + 60 * 60 * 1000,
+                };
+            }
+        }),
+        isTokenAutoRefreshEnabled: true
+    });
+} else {
+    // Use ReCaptcha for other environments
     appCheck = initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
         isTokenAutoRefreshEnabled: true
     });
 }
+
 
 // Connect to emulators if running locally
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
@@ -44,8 +55,7 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     connectAuthEmulator(auth, "http://localhost:9099");
 
     if (appCheck) {
-        console.log("Connecting to App Check Emulator...");
-        connectAppCheckEmulator(appCheck, "http://localhost:9090", { isTokenAutoRefreshEnabled: true });
+        console.log("App Check initialized.");
     }
 
     console.log("Functions region:", functions.region);
