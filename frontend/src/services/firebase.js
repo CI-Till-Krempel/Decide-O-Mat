@@ -2,17 +2,11 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, getDocs, doc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
-import { initializeAppCheck, ReCaptchaV3Provider, CustomProvider } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaV3Provider, CustomProvider, getToken } from "firebase/app-check";
 
 // ... (imports)
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    // ...
 };
 
 // Initialize Firebase
@@ -39,10 +33,20 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 } else {
     // Use ReCaptcha for other environments
     if (reCaptchaSiteKey) {
+        console.log(`Initializing App Check with Site Key: ${reCaptchaSiteKey.substring(0, 5)}...`);
         appCheck = initializeAppCheck(app, {
             provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
             isTokenAutoRefreshEnabled: true
         });
+
+        // Debug: Attempt to fetch token immediately to check for errors
+        getToken(appCheck)
+            .then((tokenResult) => {
+                console.log("App Check Token success:", tokenResult.token ? "Token received" : "No token");
+            })
+            .catch((err) => {
+                console.error("App Check Token failed:", err);
+            });
     } else {
         console.warn("VITE_RECAPTCHA_SITE_KEY is missing. App Check will not be initialized.");
     }
