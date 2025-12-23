@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "chrome-devtools-frontend": "^1.0.1561528"
+  }
+}

@@ -1,4 +1,4 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 
 if (admin.apps.length === 0) {
@@ -23,7 +23,10 @@ const animals = [
   "Wasp", "Weasel", "Whale", "Wolf", "Wombat", "Woodpecker", "Worm", "Yak", "Zebra",
 ];
 
-exports.deleteUser = onCall({cors: true}, async (request) => {
+// Staging/Prod differentiation: Enforce App Check ONLY in Prod ('decide-o-mat')
+const enforceAppCheck = process.env.GCLOUD_PROJECT === 'decide-o-mat';
+
+exports.deleteUser = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
   // 1. Authentication Check
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -92,7 +95,7 @@ exports.deleteUser = onCall({cors: true}, async (request) => {
     // 4. Delete Auth User
     await admin.auth().deleteUser(uid);
 
-    return {success: true, count: operationCount, anonymizedName: deletedName};
+    return { success: true, count: operationCount, anonymizedName: deletedName };
   } catch (error) {
     console.error("Error deleting user:", error);
     throw new HttpsError("internal", "Failed to delete user account.", error);

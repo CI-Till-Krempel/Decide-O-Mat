@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, getDocs, doc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,6 +19,21 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app);
 const auth = getAuth(app);
+
+// Initialize App Check
+const reCaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+if (reCaptchaSiteKey) {
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        // Enable debug token for localhost
+        // This prints a debug token to the console which can be added to the Firebase Console
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    }
+
+    initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
+        isTokenAutoRefreshEnabled: true
+    });
+}
 
 // Connect to emulators if running locally
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
