@@ -64,6 +64,13 @@ For work triggered by a GitHub Issue:
     - Mention the PR (e.g., "Fixed in PR #123").
     - Close the issue if applicable (or let the PR merge close it, but the comment is mandatory).
 
+### 5.2 Smart PR Labels
+Use the following labels to optimize the CI/CD pipeline and review process. Be mindful to apply them correctly based on the scope of your changes:
+
+*   **`NO_CHECKS`**: Use when the PR **does not modify any code** (e.g., modifying `task.md`, `README.md` text only). This skips expensive build and lint checks.
+*   **`NO_DEPLOY`**: Use when the PR **only affects documentation or GitHub Actions** configurations. This prevents unnecessary deployment attempts to staging.
+*   **`NO_REVIEW`**: Use for **automated version updates** or trivial dependency bumps that do not require human review.
+
 ### 6. Release Preparation
 - **Announcement Post**: For every major and minor release, generate a short blog post announcing the new version.
     - **Location**: `announcements/v[VERSION].md`
