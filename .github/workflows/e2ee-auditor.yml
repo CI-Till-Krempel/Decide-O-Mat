@@ -61,6 +61,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Configure Permissive Firestore Rules for CI
+        working-directory: ./
         run: |
           cat <<EOF > firestore.rules
           rules_version = '2';
@@ -81,4 +82,5 @@ jobs:
 
       - name: Restore Secure Firestore Rules
         if: always()
+        working-directory: ./
         run: git checkout HEAD -- firestore.rules
