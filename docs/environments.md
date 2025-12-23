@@ -38,12 +38,8 @@ To secure the application, App Check must be configured in the Firebase Console 
 1.  **Navigate to Console**: [Firebase Console](https://console.firebase.google.com/) -> **App Check**.
 2.  **Register App**: Select your web app and register it with **reCAPTCHA v3**.
     - You will need a reCAPTCHA Secret Key from [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin).
-3.  **Local Debug Token**:
-    - Build/Run the app locally (`npm run dev`).
-    - Inspect the browser console for: `App Check debug token: XXXXX...`
-    - Copy this token.
-    - Go to **App Check** -> **Apps** -> **Manage debug tokens**.
-    - Add it as "Localhost".
+3.  **Local Development**:
+    - No configuration needed for localhost. Ideally, ensure `VITE_RECAPTCHA_SITE_KEY` is set in `.env` (even to a dummy value) so the provider initializes.
 
 > **Note**: For Staging, you strictly *do not* need to enable the "Enforcement" switch in the UI if the code handles it, but enabling it in "Unenforced Mode" gives you visibility into % of verified traffic.
 
