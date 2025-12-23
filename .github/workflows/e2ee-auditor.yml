@@ -78,3 +78,7 @@ jobs:
         run: firebase emulators:exec --project demo-test 'cd frontend && npm run test:e2e'
         env:
           CI: true
+
+      - name: Restore Secure Firestore Rules
+        if: always()
+        run: git checkout firestore.rules
