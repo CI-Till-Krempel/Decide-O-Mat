@@ -17,13 +17,11 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const functions = getFunctions(app);
-const auth = getAuth(app);
 
-// Initialize App Check
+// Initialize App Check BEFORE other services to ensure tokens are attached to earliest requests
 let appCheck;
 const reCaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     // Use CustomProvider for localhost to avoid hitting real backend
     console.log("Using CustomProvider for App Check on localhost");
@@ -40,12 +38,19 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     });
 } else {
     // Use ReCaptcha for other environments
-    appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
-        isTokenAutoRefreshEnabled: true
-    });
+    if (reCaptchaSiteKey) {
+        appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
+            isTokenAutoRefreshEnabled: true
+        });
+    } else {
+        console.warn("VITE_RECAPTCHA_SITE_KEY is missing. App Check will not be initialized.");
+    }
 }
 
+const db = getFirestore(app);
+const functions = getFunctions(app);
+const auth = getAuth(app);
 
 // Connect to emulators if running locally
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
