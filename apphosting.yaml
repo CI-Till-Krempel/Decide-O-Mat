@@ -27,6 +27,8 @@ env:
     secret: VITE_FIREBASE_APP_ID
   - variable: VITE_FIREBASE_MEASUREMENT_ID
     secret: VITE_FIREBASE_MEASUREMENT_ID
+  - variable: VITE_RECAPTCHA_SITE_KEY
+    secret: VITE_RECAPTCHA_SITE_KEY
   # Staging/Production values should be set in the App Hosting Console config
   # or validated via defaults if not secret.
   # VITE_APP_ENV and VITE_COMMIT_HASH must be passed via App Hosting environment config
