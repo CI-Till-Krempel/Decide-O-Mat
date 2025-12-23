@@ -13,7 +13,9 @@ const db = admin.firestore();
  * @param {string} request.data.question - The question to decide on.
  * @return {Promise<Object>} The created decision ID.
  */
-exports.createDecision = onCall({cors: true}, async (request) => {
+const {enforceAppCheck} = require("./config");
+
+exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   const question = request.data.question;
 
   if (!question || typeof question !== "string" || question.trim().length === 0) {
@@ -46,7 +48,7 @@ exports.createDecision = onCall({cors: true}, async (request) => {
  * @param {string} [request.data.authorId] - Optional unique ID of the author.
  * @return {Promise<Object>} The created argument ID.
  */
-exports.addArgument = onCall({cors: true}, async (request) => {
+exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   const {decisionId, type, text, authorName, authorId} = request.data;
 
   if (!decisionId || !type || !text) {
@@ -98,7 +100,7 @@ exports.addArgument = onCall({cors: true}, async (request) => {
  * @param {number} request.data.change - Vote change (1 to vote, -1 to unvote).
  * @return {Promise<Object>} Success status.
  */
-exports.voteArgument = onCall({cors: true}, async (request) => {
+exports.voteArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -163,7 +165,7 @@ exports.voteArgument = onCall({cors: true}, async (request) => {
   return {success: true};
 });
 
-exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
+exports.toggleDecisionStatus = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   const {decisionId, status} = request.data;
 
   if (!decisionId || !status) {
@@ -186,7 +188,7 @@ exports.toggleDecisionStatus = onCall({cors: true}, async (request) => {
   return {success: true, status: status};
 });
 
-exports.voteDecision = onCall({cors: true}, async (request) => {
+exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -282,7 +284,7 @@ exports.voteDecision = onCall({cors: true}, async (request) => {
  * @param {string} request.data.displayName - The new display name.
  * @return {Promise<Object>} Success status.
  */
-exports.updateUserDisplayName = onCall({cors: true}, async (request) => {
+exports.updateUserDisplayName = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -348,7 +350,7 @@ exports.updateUserDisplayName = onCall({cors: true}, async (request) => {
  * @param {string} request.data.encryptedDisplayName - The encrypted display name.
  * @return {Promise<Object>} Success status.
  */
-exports.registerParticipant = onCall({cors: true}, async (request) => {
+exports.registerParticipant = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -397,7 +399,7 @@ exports.registerParticipant = onCall({cors: true}, async (request) => {
  * @param {Object} request - The request object.
  * @return {Promise<Object>} The magic link token.
  */
-exports.generateMagicLink = onCall({cors: true}, async (request) => {
+exports.generateMagicLink = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }

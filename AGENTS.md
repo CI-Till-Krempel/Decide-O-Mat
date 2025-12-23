@@ -33,6 +33,17 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Commit Frequently**: Commit code as soon as a small unit of work is stable and verified.
 - **Commit Messages**: Use descriptive messages explaining *what* changed and *why*.
 
+### 3.1 Pre-Push Checklist
+Before pushing any code to the repository, you **MUST** ensure the following:
+1.  **Commit All Changes**: Verify there are no unstaged or uncommitted changes (`git status` should be clean).
+2.  **Green Build**: ensure the build succeeds for **BOTH** frontend and functions.
+    - `cd frontend && npm run build`
+    - `cd functions && npm run build` (if applicable/script exists) or verify syntax.
+3.  **Passing Linters**: ensure linting passes for **BOTH** directories.
+    - `cd frontend && npm run lint`
+    - `cd functions && npm run lint`
+**Do not push if any of these checks fail.**
+
 ### 4. Documentation
 - **Implementation Notes**: For every non-trivial task, create a technical note in the `implementations/` directory.
     - **Filename**: `[Story-ID]-[Description]-[Date].md` (e.g., `IMP-010-Auth-Integration-2025-12-02.md`).
@@ -52,6 +63,13 @@ For work triggered by a GitHub Issue:
 4.  **Issue Comment**: After creating the PR, comment on the original Issue.
     - Mention the PR (e.g., "Fixed in PR #123").
     - Close the issue if applicable (or let the PR merge close it, but the comment is mandatory).
+
+### 5.2 Smart PR Labels
+Use the following labels to optimize the CI/CD pipeline and review process. Be mindful to apply them correctly based on the scope of your changes:
+
+*   **`NO_CHECKS`**: Use when the PR **does not modify any code** (e.g., modifying `task.md`, `README.md` text only). This skips expensive build and lint checks.
+*   **`NO_DEPLOY`**: Use when the PR **only affects documentation or GitHub Actions** configurations. This prevents unnecessary deployment attempts to staging.
+*   **`NO_REVIEW`**: Use to **disable the AI Code Reviewer**. This saves costs for changes that do not require intelligent analysis (e.g., auto-generated files, lockfile updates, or trivial bumps).
 
 ### 6. Release Preparation
 - **Announcement Post**: For every major and minor release, generate a short blog post announcing the new version.

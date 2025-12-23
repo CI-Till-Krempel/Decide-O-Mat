@@ -2,7 +2,9 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, getDocs, doc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
+import { initializeAppCheck, ReCaptchaV3Provider, CustomProvider } from "firebase/app-check";
 
+// ... (imports)
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -19,12 +21,43 @@ const db = getFirestore(app);
 const functions = getFunctions(app);
 const auth = getAuth(app);
 
+// Initialize App Check
+let appCheck;
+const reCaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    // Use CustomProvider for localhost to avoid hitting real backend
+    console.log("Using CustomProvider for App Check on localhost");
+    appCheck = initializeAppCheck(app, {
+        provider: new CustomProvider({
+            getToken: async () => {
+                return {
+                    token: "fake-app-check-token",
+                    expireTimeMillis: Date.now() + 60 * 60 * 1000,
+                };
+            }
+        }),
+        isTokenAutoRefreshEnabled: true
+    });
+} else {
+    // Use ReCaptcha for other environments
+    appCheck = initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
+        isTokenAutoRefreshEnabled: true
+    });
+}
+
+
 // Connect to emulators if running locally
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     console.log("Connecting to Firebase Emulators...");
     connectFirestoreEmulator(db, 'localhost', 8080);
     connectFunctionsEmulator(functions, 'localhost', 5001);
     connectAuthEmulator(auth, "http://localhost:9099");
+
+    if (appCheck) {
+        console.log("App Check initialized.");
+    }
+
     console.log("Functions region:", functions.region);
 }
 

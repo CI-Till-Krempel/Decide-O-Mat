@@ -154,12 +154,12 @@ Apply these severities consistently:
 3. **Submit Final Review:** Call `submit_pending_pull_request_review`.
     - **Event Type:** You **MUST** use "COMMENT".
     - **Summary Logic (Strict):**
-        - First, check the existing review comments you retrieved.
-        - **IF** a comment containing "📋 Review Summary" already exists:
-            - **DO NOT** post a new summary.
-            - **DO NOT** post a "General Feedback" section.
-            - Just submit the review with any new inline comments.
-        - **ELSE** (First run only):
+        - First, check existing reviews and comments.
+        - **IF** you (or another bot instance) have ALREADY posted a "General Feedback" section in a previous review:
+            - **DO NOT** post a "General Feedback" section again.
+            - **DO NOT** post a new "Review Summary" unless your assessment has fundamentally changed.
+            - Just submit the review with your inline comments and a minimal summary (e.g. "Review updated.").
+        - **ELSE** (First time only):
             - Post the standard summary format:
                 <SUMMARY>
                 ## 📋 Review Summary

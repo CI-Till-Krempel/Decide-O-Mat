@@ -23,7 +23,10 @@ const animals = [
   "Wasp", "Weasel", "Whale", "Wolf", "Wombat", "Woodpecker", "Worm", "Yak", "Zebra",
 ];
 
-exports.deleteUser = onCall({cors: true}, async (request) => {
+// Staging/Prod differentiation: Enforce App Check ONLY in Prod ('decide-o-mat')
+const {enforceAppCheck} = require("./config");
+
+exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   // 1. Authentication Check
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");

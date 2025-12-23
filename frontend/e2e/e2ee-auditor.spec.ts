@@ -18,6 +18,10 @@ test.describe('E2EE Auditor Agent', () => {
             await route.continue();
         });
 
+        // Debug: Log browser console to stdout
+        page.on('console', msg => console.log(`BROWSER: ${msg.text()}`));
+        page.on('pageerror', err => console.log(`BROWSER ERROR: ${err}`));
+
         await page.goto('/');
         await page.getByPlaceholder('What do you need to decide?').fill(decisionQuestion);
         await page.getByRole('button', { name: 'Start Deciding' }).click();
