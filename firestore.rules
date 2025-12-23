@@ -7,22 +7,22 @@ service cloud.firestore {
       allow write: if false; // Only manageable via Cloud Functions
       
       match /finalVotes/{userId} {
-        allow read: if request.app != null;
+        allow read: if true; // TEMPORARY DEBUG: Disable App Check
         allow write: if false;
       }
 
       match /arguments/{argumentId} {
-        allow read: if request.app != null;
+        allow read: if true; // TEMPORARY DEBUG: Disable App Check
         allow write: if false;
         
         match /votes/{userId} {
-          allow read: if request.app != null;
+          allow read: if true; // TEMPORARY DEBUG: Disable App Check
           allow write: if false;
         }
       }
       
       match /participants/{userId} {
-        allow read: if request.app != null;
+        allow read: if true; // TEMPORARY DEBUG: Disable App Check
         allow write: if false;
       }
     }
