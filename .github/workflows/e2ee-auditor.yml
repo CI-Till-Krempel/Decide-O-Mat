@@ -62,6 +62,6 @@ jobs:
 
       - name: 🕵️‍♀️ Run E2EE Auditor with Emulators
         working-directory: ./
-        run: firebase emulators:exec --project demo-test --only auth,firestore,functions,appcheck 'cd frontend && npm run test:e2e'
+        run: firebase emulators:exec --project demo-test 'cd frontend && npm run test:e2e'
         env:
           CI: true
