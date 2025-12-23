@@ -33,6 +33,17 @@ This document outlines the "Lean Agentic Workflow" adopted for the development o
 - **Commit Frequently**: Commit code as soon as a small unit of work is stable and verified.
 - **Commit Messages**: Use descriptive messages explaining *what* changed and *why*.
 
+### 3.1 Pre-Push Checklist
+Before pushing any code to the repository, you **MUST** ensure the following:
+1.  **Commit All Changes**: Verify there are no unstaged or uncommitted changes (`git status` should be clean).
+2.  **Green Build**: ensure the build succeeds for **BOTH** frontend and functions.
+    - `cd frontend && npm run build`
+    - `cd functions && npm run build` (if applicable/script exists) or verify syntax.
+3.  **Passing Linters**: ensure linting passes for **BOTH** directories.
+    - `cd frontend && npm run lint`
+    - `cd functions && npm run lint`
+**Do not push if any of these checks fail.**
+
 ### 4. Documentation
 - **Implementation Notes**: For every non-trivial task, create a technical note in the `implementations/` directory.
     - **Filename**: `[Story-ID]-[Description]-[Date].md` (e.g., `IMP-010-Auth-Integration-2025-12-02.md`).
