@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, getDocs, doc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
-import { initializeAppCheck, ReCaptchaV3Provider, CustomProvider, getToken } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider, CustomProvider, getToken } from "firebase/app-check";
 
 // ... (imports)
 const firebaseConfig = {
@@ -37,11 +37,11 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         isTokenAutoRefreshEnabled: true
     });
 } else {
-    // Use ReCaptcha for other environments
+    // Use ReCaptcha Enterprise for other environments
     if (reCaptchaSiteKey) {
-        console.log(`Initializing App Check with Site Key: ${reCaptchaSiteKey.substring(0, 5)}...`);
+        console.log(`Initializing App Check (Enterprise) with Site Key: ${reCaptchaSiteKey.substring(0, 5)}...`);
         appCheck = initializeAppCheck(app, {
-            provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
+            provider: new ReCaptchaEnterpriseProvider(reCaptchaSiteKey),
             isTokenAutoRefreshEnabled: true
         });
 
