@@ -33,13 +33,57 @@ Decide-O-Mat uses a multi-tier environment strategy to balance developer velocit
 
 ### Firebase App Check Setup
 
-To secure the application, App Check must be configured in the Firebase Console for each project.
+To secure the application, App Check must be configured in both the Google Cloud Console (for keys) and the Firebase Console (for enforcement).
 
-1.  **Navigate to Console**: [Firebase Console](https://console.firebase.google.com/) -> **App Check**.
-2.  **Register App**: Select your web app and register it with **reCAPTCHA v3**.
-    - You will need a reCAPTCHA Secret Key from [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin).
-3.  **Local Development**:
-    - No configuration needed for localhost. Ideally, ensure `VITE_RECAPTCHA_SITE_KEY` is set in `.env` (even to a dummy value) so the provider initializes.
+#### Phase 1: Create Keys (Google Cloud Console)
+You need valid reCAPTCHA v3 keys. It is best practice to have **separate keys for Staging and Production** to prevent pollution of traffic metrics.
+
+1.  Go to the [reCAPTCHA Admin Console](https://www.google.com/recaptcha/admin/create).
+2.  **Create a new site**:
+    *   **Label**: `Decide-O-Mat Staging` (or Prod).
+    *   **reCAPTCHA type**: **v3** (Score based).
+    *   **Domains**: Add your domains:
+        *   `localhost` (for Staging/Dev keys)
+        *   `127.0.0.1` (for Staging/Dev keys)
+        *   `your-staging-project.web.app`
+        *   `your-production-domain.com` (for Prod keys)
+3.  **Copy Keys**: You will get two keys:
+    *   **Site Key**: Public. Goes into your frontend code (`.env`).
+    *   **Secret Key**: Private. Goes into the Firebase Console.
+
+#### Phase 2: Configure Firebase (Firebase Console)
+Link the secret key to your Firebase project.
+
+1.  Go to the [Firebase Console](https://console.firebase.google.com/).
+2.  Select your project (Staging or Prod).
+3.  Navigate to **Build** -> **App Check**.
+4.  Click **Get Started** (if it's your first time).
+5.  **Register your Web App**:
+    *   Find your web app in the list.
+    *   Click **Register** (or the reCAPTCHA icon).
+    *   Select **reCAPTCHA v3**.
+    *   Paste the **Secret Key** (from Phase 1).
+    *   Click **Save**.
+
+#### Phase 3: Update Environment Variables (Frontend)
+Your frontend needs the **Site Key** to initialize the provider.
+
+1.  Open your `.env` file (or `.env.staging` / `.env.production`).
+2.  Update the variable:
+    ```bash
+    VITE_RECAPTCHA_SITE_KEY=your_copied_site_key_here
+    ```
+3.  **Deploy**: When you deploy to Firebase Hosting, this key will be baked into the build.
+
+#### Phase 4: Enforcement Settings
+Controls whether requests are actually blocked.
+
+*   **Staging**:
+    *   In Firebase Console -> App Check -> **APIs** tab.
+    *   Expand **Cloud Firestore** and **Cloud Functions**.
+    *   You can leave enforcement **OFF** initially to monitor traffic.
+*   **Production**:
+    *   Once you see verify successful traffic in the "Metrics" tab, turn enforcement **ON** in the Console.
 
 > **Note**: For Staging, you strictly *do not* need to enable the "Enforcement" switch in the UI if the code handles it, but enabling it in "Unenforced Mode" gives you visibility into % of verified traffic.
 
