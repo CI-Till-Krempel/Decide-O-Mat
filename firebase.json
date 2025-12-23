@@ -46,6 +46,9 @@
     "hosting": {
       "port": 5002
     },
+    "appcheck": {
+      "port": 9090
+    },
     "ui": {
       "enabled": true
     },

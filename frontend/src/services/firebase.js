@@ -2,8 +2,9 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator, collection, getDoc, getDocs, doc, query, orderBy, where, onSnapshot } from "firebase/firestore";
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 import { getAuth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaV3Provider, connectAppCheckEmulator } from "firebase/app-check";
 
+// ... (imports)
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -21,15 +22,15 @@ const functions = getFunctions(app);
 const auth = getAuth(app);
 
 // Initialize App Check
+let appCheck;
 const reCaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 if (reCaptchaSiteKey) {
     if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         // Enable debug token for localhost
-        // This prints a debug token to the console which can be added to the Firebase Console
         self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     }
 
-    initializeAppCheck(app, {
+    appCheck = initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider(reCaptchaSiteKey),
         isTokenAutoRefreshEnabled: true
     });
@@ -41,6 +42,12 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     connectFirestoreEmulator(db, 'localhost', 8080);
     connectFunctionsEmulator(functions, 'localhost', 5001);
     connectAuthEmulator(auth, "http://localhost:9099");
+
+    if (appCheck) {
+        console.log("Connecting to App Check Emulator...");
+        connectAppCheckEmulator(appCheck, "http://localhost:9090", { isTokenAutoRefreshEnabled: true });
+    }
+
     console.log("Functions region:", functions.region);
 }
 

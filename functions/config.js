@@ -1,1 +1,1 @@
-exports.enforceAppCheck = process.env.GCLOUD_PROJECT === 'decide-o-mat';
+exports.enforceAppCheck = process.env.GCLOUD_PROJECT === "decide-o-mat";

@@ -46,6 +46,7 @@ jobs:
           echo "VITE_FIREBASE_MESSAGING_SENDER_ID=000000000000" >> .env
           echo "VITE_FIREBASE_APP_ID=1:000000000000:web:0000000000000000000000" >> .env
           echo "VITE_ENABLE_ENCRYPTION=true" >> .env
+          echo "VITE_RECAPTCHA_SITE_KEY=fake-site-key" >> .env
 
       - name: Install Frontend Dependencies
         working-directory: ./frontend
@@ -61,6 +62,6 @@ jobs:
 
       - name: 🕵️‍♀️ Run E2EE Auditor with Emulators
         working-directory: ./
-        run: firebase emulators:exec --project demo-test --only auth,firestore,functions 'cd frontend && npm run test:e2e'
+        run: firebase emulators:exec --project demo-test --only auth,firestore,functions,appcheck 'cd frontend && npm run test:e2e'
         env:
           CI: true
