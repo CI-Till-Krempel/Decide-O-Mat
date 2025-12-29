@@ -3,26 +3,26 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /decisions/{decisionId} {
-      allow read: if request.auth != null; // TEMPORARY DEBUG: Bypass App Check, require Auth
+      allow read: if request.app != null;
       allow write: if false; // Only manageable via Cloud Functions
       
       match /finalVotes/{userId} {
-        allow read: if request.auth != null; // TEMPORARY DEBUG: Bypass App Check, require Auth
+        allow read: if request.app != null;
         allow write: if false;
       }
 
       match /arguments/{argumentId} {
-        allow read: if request.auth != null; // TEMPORARY DEBUG: Bypass App Check, require Auth
+        allow read: if request.app != null;
         allow write: if false;
         
         match /votes/{userId} {
-          allow read: if request.auth != null; // TEMPORARY DEBUG: Bypass App Check, require Auth
+          allow read: if request.app != null;
           allow write: if false;
         }
       }
       
       match /participants/{userId} {
-        allow read: if request.auth != null; // TEMPORARY DEBUG: Bypass App Check, require Auth
+        allow read: if request.app != null;
         allow write: if false;
       }
     }
