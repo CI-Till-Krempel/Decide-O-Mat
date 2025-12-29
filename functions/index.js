@@ -15,6 +15,15 @@ const db = admin.firestore();
  */
 const {enforceAppCheck} = require("./config");
 
+exports.debugAppCheck = onCall({cors: true, enforceAppCheck: false}, async (request) => {
+  console.log("App Check Debug:", JSON.stringify(request.app));
+  return {
+    app: request.app || null,
+    auth: request.auth || null,
+    enforceAppCheckConfig: enforceAppCheck,
+  };
+});
+
 exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   const question = request.data.question;
 

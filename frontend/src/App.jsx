@@ -17,6 +17,17 @@ function App() {
     const mode = import.meta.env.MODE || 'production';
     const stage = mode === 'production' ? '' : ` (${mode})`;
     document.title = `Decide-O-Mat: ${version}${stage} - Group decisions made easy !`;
+
+    // DEBUG APP CHECK
+    import('./services/firebase').then(async ({ functions }) => {
+      const { httpsCallable } = await import('firebase/functions');
+      const debugFn = httpsCallable(functions, 'debugAppCheck');
+      debugFn().then(result => {
+        console.log("DEBUG APP CHECK RESULT:", result.data);
+      }).catch(err => {
+        console.error("DEBUG APP CHECK FAILED:", err);
+      });
+    });
   }, []);
 
   return (
