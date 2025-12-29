@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /decisions/{decisionId} {
-      allow read: if request.app != null;
+      allow read: if true; // TEMPORARY DEBUG: Disable App Check on ROOT
       allow write: if false; // Only manageable via Cloud Functions
       
       match /finalVotes/{userId} {
