@@ -16,7 +16,6 @@ function App() {
     // Check various env naming conventions or defaults
     const mode = import.meta.env.MODE || 'production';
     const stage = mode === 'production' ? '' : ` (${mode})`;
-    const stage = mode === 'production' ? '' : ` (${mode})`;
     document.title = `Decide-O-Mat: ${version}${stage} - Group decisions made easy !`;
 
     // DEBUG APP CHECK
