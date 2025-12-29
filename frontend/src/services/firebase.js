@@ -56,7 +56,22 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     } else {
         console.warn("VITE_RECAPTCHA_SITE_KEY is missing. App Check will not be initialized.");
     }
+    console.warn("VITE_RECAPTCHA_SITE_KEY is missing. App Check will not be initialized.");
 }
+}
+
+// Helper to ensure App Check is ready before making requests
+export const ensureAppCheck = async () => {
+    if (!appCheck) return Promise.resolve(false);
+    try {
+        const result = await getToken(appCheck, false); // forceRefresh = false
+        console.log("ensureAppCheck: Token ready", result.token.substring(0, 5) + "...");
+        return true;
+    } catch (err) {
+        console.error("ensureAppCheck: Error getting token", err);
+        return false;
+    }
+};
 
 const db = getFirestore(app);
 const functions = getFunctions(app);
