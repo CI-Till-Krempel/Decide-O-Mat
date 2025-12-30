@@ -63,7 +63,14 @@ For work triggered by a GitHub Issue:
 4.  **Issue Comment**: After creating the PR, comment on the original Issue.
     - Mention the PR (e.g., "Fixed in PR #123").
     - Close the issue if applicable (or let the PR merge close it, but the comment is mandatory).
+    - Mention the PR (e.g., "Fixed in PR #123").
+    - Close the issue if applicable (or let the PR merge close it, but the comment is mandatory).
 
+### 5.3 Verification of Version Control Actions
+**CRITICAL**: You must verify the success of git operations before considering a task complete.
+1.  **Push Verification**: After running `git push`, you MUST checks its output or status to ensure it succeeded. Do not assume background commands succeed.
+2.  **PR Verification**: After creating a PR, use `gh pr view` to confirm it exists and is open.
+3.  **No Silent Failures**: If a push or PR command fails, you must inform the user and retry.
 ### 5.2 Smart PR Labels
 Use the following labels to optimize the CI/CD pipeline and review process. Be mindful to apply them correctly based on the scope of your changes:
 
