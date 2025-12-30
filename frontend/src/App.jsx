@@ -11,6 +11,8 @@ import MyDecisions from './pages/MyDecisions';
 import MagicHandler from './pages/MagicHandler';
 
 function App() {
+  const [isReady, setIsReady] = React.useState(false);
+
   useEffect(() => {
     const version = "v1.4.1";
     // Check various env naming conventions or defaults
@@ -18,8 +20,14 @@ function App() {
     const stage = mode === 'production' ? '' : ` (${mode})`;
     document.title = `Decide-O-Mat: ${version}${stage} - Group decisions made easy !`;
 
-    // DEBUG APP CHECK
-    import('./services/firebase').then(async ({ functions }) => {
+    // Wait for App Check logic
+    import('./services/firebase').then(async ({ ensureAppCheck, functions }) => {
+      // 1. Ensure App Check Token is ready
+      await ensureAppCheck();
+      console.log("App Check Initialized - Mounting App");
+      setIsReady(true); // Mount the app/providers only now
+
+      // 2. Debug App Check logs (keep for now)
       const { httpsCallable } = await import('firebase/functions');
       const debugFn = httpsCallable(functions, 'debugAppCheck');
       debugFn().then(result => {
@@ -29,6 +37,10 @@ function App() {
       });
     });
   }, []);
+
+  if (!isReady) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Initializing Security...</div>;
+  }
 
   return (
     <UserProvider>

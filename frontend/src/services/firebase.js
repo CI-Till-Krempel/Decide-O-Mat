@@ -56,8 +56,6 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     } else {
         console.warn("VITE_RECAPTCHA_SITE_KEY is missing. App Check will not be initialized.");
     }
-    console.warn("VITE_RECAPTCHA_SITE_KEY is missing. App Check will not be initialized.");
-}
 }
 
 // Helper to ensure App Check is ready before making requests
