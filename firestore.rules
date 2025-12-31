@@ -1,5 +1,4 @@
-rules_version = '2';
-
+// Deploy trigger
 service cloud.firestore {
   match /databases/{database}/documents {
     match /decisions/{decisionId} {
