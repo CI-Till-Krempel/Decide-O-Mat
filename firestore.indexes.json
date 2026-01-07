@@ -1,4 +1,43 @@
 {
-    "indexes": [],
+    "indexes": [
+        {
+            "collectionGroup": "decisions",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "ownerId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                },
+                {
+                    "fieldPath": "__name__",
+                    "order": "DESCENDING"
+                }
+            ],
+            "density": "SPARSE_ALL"
+        },
+        {
+            "collectionGroup": "decisions",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "participantIds",
+                    "arrayConfig": "CONTAINS"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                },
+                {
+                    "fieldPath": "__name__",
+                    "order": "DESCENDING"
+                }
+            ],
+            "density": "SPARSE_ALL"
+        }
+    ],
     "fieldOverrides": []
 }
