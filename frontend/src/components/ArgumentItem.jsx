@@ -72,7 +72,7 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, p
         await performVote();
     };
 
-    const authorName = participantMap?.get(argument.authorId) || argument.authorName;
+    const authorName = participantMap?.get(argument.authorId)?.name || argument.authorName;
 
     return (
         <>
@@ -124,7 +124,7 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, p
                                 color: 'var(--color-text)',
                                 border: '1px solid var(--color-border)'
                             }}>
-                                {participantMap?.get(vote.userId) || vote.displayName || 'Anonymous'}
+                                {participantMap?.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
                             </span>
                         ))}
                     </div>

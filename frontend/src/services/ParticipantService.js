@@ -45,17 +45,17 @@ const ParticipantService = {
                 if (data.encryptedDisplayName && key) {
                     try {
                         const name = await EncryptionService.decrypt(data.encryptedDisplayName, key);
-                        participantMap.set(doc.id, name);
+                        participantMap.set(doc.id, { name, isAnonymous: data.isAnonymous, photoURL: data.photoURL });
                     } catch (e) {
                         console.warn(`Failed to decrypt name for user ${doc.id}`, e);
-                        participantMap.set(doc.id, "Unknown (Decryption Failed)");
+                        participantMap.set(doc.id, { name: "Unknown (Decryption Failed)", isAnonymous: data.isAnonymous, photoURL: data.photoURL });
                     }
                 } else if (data.plainDisplayName) {
                     // Support unencrypted names
-                    participantMap.set(doc.id, data.plainDisplayName);
+                    participantMap.set(doc.id, { name: data.plainDisplayName, isAnonymous: data.isAnonymous, photoURL: data.photoURL });
                 } else if (data.displayName) {
                     // Fallback for logic that might write 'displayName'
-                    participantMap.set(doc.id, data.displayName);
+                    participantMap.set(doc.id, { name: data.displayName, isAnonymous: data.isAnonymous, photoURL: data.photoURL });
                 }
             });
 

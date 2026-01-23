@@ -10,6 +10,8 @@ import { useUser } from '../contexts/UserContext';
 import { toPng } from 'html-to-image';
 import EncryptionService from '../services/EncryptionService';
 import ParticipantService from '../services/ParticipantService';
+import ParticipantList from '../components/ParticipantList';
+import NotificationService from '../services/NotificationService';
 
 function Decision() {
     const { id } = useParams();
@@ -28,6 +30,8 @@ function Decision() {
     const [showNamePrompt, setShowNamePrompt] = useState(false);
     const [pendingVoteType, setPendingVoteType] = useState(null);
     const [encryptionKey, setEncryptionKey] = useState(null);
+    const [showParticipants, setShowParticipants] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
     const decisionRef = useRef(null);
 
     // Parse key from URL hash
@@ -142,6 +146,17 @@ function Decision() {
         } catch (error) {
             console.error("Error toggling status:", error);
             alert("Failed to update decision status.");
+        }
+    };
+
+    const handleToggleNotifications = async () => {
+        if (!user.userId) return;
+        const granted = await NotificationService.requestPermission(id, user.userId);
+        if (granted) {
+            setNotificationsEnabled(true);
+            alert("Notifications enabled!");
+        } else {
+            alert("Could not enable notifications. Please check your browser settings.");
         }
     };
 
@@ -261,6 +276,12 @@ function Decision() {
 
     return (
         <div className="container">
+            <ParticipantList
+                participantMap={participantMap}
+                isOpen={showParticipants}
+                onClose={() => setShowParticipants(false)}
+            />
+
             {showNamePrompt && (
                 <NamePrompt
                     onSave={handleNameSave}
@@ -273,6 +294,24 @@ function Decision() {
 
             <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0.5rem', gap: '0.5rem' }}>
+                        <button
+                            onClick={handleToggleNotifications}
+                            className="btn"
+                            title="Enable Notifications"
+                            style={{ background: 'transparent', color: notificationsEnabled ? 'var(--color-primary)' : 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
+                        >
+                            {notificationsEnabled ? '🔔' : '🔕'}
+                        </button>
+                        <button
+                            onClick={() => setShowParticipants(true)}
+                            className="btn"
+                            style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)' }}
+                        >
+                            👥 Participants
+                        </button>
+                    </div>
+
                     <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>
 
                     {isClosed && (
@@ -360,7 +399,7 @@ function Decision() {
                                                 color: 'var(--color-text)',
                                                 border: '1px solid var(--color-border)'
                                             }}>
-                                                {participantMap.get(vote.userId) || vote.displayName || 'Anonymous'}
+                                                {participantMap.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
                                             </span>
                                         ))}
                                     </div>
@@ -398,7 +437,7 @@ function Decision() {
                                                 color: 'var(--color-text)',
                                                 border: '1px solid var(--color-border)'
                                             }}>
-                                                {participantMap.get(vote.userId) || vote.displayName || 'Anonymous'}
+                                                {participantMap.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
                                             </span>
                                         ))}
                                     </div>
