@@ -10,30 +10,12 @@ const ParticipantList = ({ participantMap, isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            right: 0,
-            height: '100vh',
-            width: '300px',
-            backgroundColor: 'var(--color-surface)',
-            boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
-            zIndex: 1000,
-            padding: '2rem 1rem',
-            overflowY: 'auto',
-            transition: 'transform 0.3s ease-in-out',
-            transform: isOpen ? 'translateX(0)' : 'translateX(100%)'
-        }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div className={`participant-list-overlay ${isOpen ? 'open' : 'closed'}`}>
+            <div className="participant-header">
                 <h2 style={{ fontSize: '1.25rem' }}>Participants ({participants.length})</h2>
                 <button
                     onClick={onClose}
-                    style={{
-                        background: 'transparent',
-                        border: 'none',
-                        fontSize: '1.5rem',
-                        cursor: 'pointer'
-                    }}
+                    className="participant-close-btn"
                 >
                     &times;
                 </button>
@@ -47,27 +29,12 @@ const ParticipantList = ({ participantMap, isOpen, onClose }) => {
                 )}
 
                 {participants.map((p) => (
-                    <div key={p.id} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '0.5rem',
-                        borderRadius: '8px',
-                        backgroundColor: 'var(--color-background)',
-                        border: '1px solid var(--color-border)'
-                    }}>
+                    <div key={p.id} className="participant-item">
                         {p.photoURL ? (
-                            <img src={p.photoURL} alt={p.name} style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                            <img src={p.photoURL} alt={p.name} className="participant-avatar" />
                         ) : (
-                            <div style={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: '50%',
+                            <div className="participant-avatar" style={{
                                 backgroundColor: p.isAnonymous ? '#fef08a' : '#bbf7d0', // Yellow vs Green
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '1.2rem'
                             }}>
                                 {p.isAnonymous ? '👤' : '🟢'}
                             </div>

@@ -54,18 +54,24 @@ describe('MagicHandler', () => {
     });
 
     it('shows success message and redirects on success', async () => {
-        signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
-        renderWithRouter('/magic?token=valid-token');
+        vi.useFakeTimers();
+        try {
+            signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
+            renderWithRouter('/magic?token=valid-token');
 
-        await waitFor(() => {
-            expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
-        });
+            await waitFor(() => {
+                expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
+            });
 
-        // Check redirect to home (after timeout) - mocked by testing library wait? 
-        // We can check if "Home Page" appears eventually
-        await waitFor(() => {
-            expect(screen.getByText('Home Page')).toBeInTheDocument();
-        }, { timeout: 3000 });
+            // Fast-forward time to trigger redirect
+            vi.advanceTimersByTime(2500);
+
+            await waitFor(() => {
+                expect(screen.getByText('Home Page')).toBeInTheDocument();
+            });
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     it('shows error message on failure', async () => {

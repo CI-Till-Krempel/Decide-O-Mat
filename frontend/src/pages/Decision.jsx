@@ -13,6 +13,8 @@ import ParticipantService from '../services/ParticipantService';
 import ParticipantList from '../components/ParticipantList';
 import NotificationService from '../services/NotificationService';
 
+import Toast from '../components/Toast';
+
 function Decision() {
     const { id } = useParams();
     const location = useLocation();
@@ -32,6 +34,7 @@ function Decision() {
     const [encryptionKey, setEncryptionKey] = useState(null);
     const [showParticipants, setShowParticipants] = useState(false);
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [toast, setToast] = useState(null); // { message, type }
     const decisionRef = useRef(null);
 
     // Parse key from URL hash
@@ -145,7 +148,7 @@ function Decision() {
             await toggleDecisionStatus(id, newStatus);
         } catch (error) {
             console.error("Error toggling status:", error);
-            alert("Failed to update decision status.");
+            setToast({ message: "Failed to update decision status.", type: 'error' });
         }
     };
 
@@ -154,9 +157,9 @@ function Decision() {
         const granted = await NotificationService.requestPermission(id, user.userId);
         if (granted) {
             setNotificationsEnabled(true);
-            alert("Notifications enabled!");
+            setToast({ message: "Notifications enabled!", type: 'success' });
         } else {
-            alert("Could not enable notifications. Please check your browser settings.");
+            setToast({ message: "Could not enable notifications. Please check your browser settings.", type: 'error' });
         }
     };
 
@@ -197,7 +200,7 @@ function Decision() {
             localStorage.setItem(`decision_vote_${id}`, voteType);
         } catch (error) {
             console.error("Error voting:", error);
-            alert("Failed to cast vote.");
+            setToast({ message: "Failed to cast vote.", type: 'error' });
         } finally {
             setVotingTarget(null);
         }
@@ -247,7 +250,7 @@ function Decision() {
             link.click();
         } catch (err) {
             console.error('Error exporting image:', err);
-            alert('Failed to export image.');
+            setToast({ message: 'Failed to export image.', type: 'error' });
         } finally {
             setExporting(false);
         }
@@ -276,6 +279,14 @@ function Decision() {
 
     return (
         <div className="container">
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
+
             <ParticipantList
                 participantMap={participantMap}
                 isOpen={showParticipants}

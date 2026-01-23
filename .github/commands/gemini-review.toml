@@ -162,16 +162,9 @@ Apply these severities consistently:
     - **Summary Logic (Strict):**
         - **IF** you have successfully resolved discussions and found NO new Critical/High issues:
             - Submit the review with the body: "**Looks good to me! 🚀** All major issues appear resolved."
-        - **ELSE IF** (First time only):
-            - Post the standard summary format:
-                <SUMMARY>
-                ## 📋 Review Summary
-                (Brief assessment)
-                ## 🔍 General Feedback
-                (Bulleted list)
-                </SUMMARY>
         - **ELSE**:
             - Just submit the review with your inline comments and a minimal summary (e.g. "Review updated.").
+        - **NEVER** post a "Review Summary" or "General Feedback" section if you have already posted one in this PR.
 
 #### Suggestion Instructions (CRITICAL CHANGE)
 - **DISABLE SUGGESTIONS:** Do **NOT** use GitHub suggestion blocks (```suggestion).

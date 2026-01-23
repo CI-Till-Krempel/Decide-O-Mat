@@ -619,7 +619,6 @@ describe('Decision Component', () => {
 
         it('handles voting error gracefully', async () => {
             const user = userEvent.setup();
-            const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
             mockVoteDecision.mockRejectedValue(new Error('Network error'));
 
             renderDecision();
@@ -632,10 +631,8 @@ describe('Decision Component', () => {
             await user.click(yesButton);
 
             await waitFor(() => {
-                expect(alertSpy).toHaveBeenCalledWith('Failed to cast vote.');
+                expect(screen.getByText('Failed to cast vote.')).toBeInTheDocument();
             });
-
-            alertSpy.mockRestore();
         });
     });
 
