@@ -6,22 +6,22 @@ service cloud.firestore {
       allow write: if false; // Only manageable via Cloud Functions
       
       match /finalVotes/{userId} {
-        allow read: if debug(request.app) != null;
+        allow read: if debug(request.app) != null || true;
         allow write: if false;
       }
 
       match /arguments/{argumentId} {
-        allow read: if debug(request.app) != null;
+        allow read: if debug(request.app) != null || true;
         allow write: if false;
         
         match /votes/{userId} {
-          allow read: if debug(request.app) != null;
+          allow read: if debug(request.app) != null || true;
           allow write: if false;
         }
       }
       
       match /participants/{userId} {
-        allow read: if debug(request.app) != null;
+        allow read: if debug(request.app) != null || true;
         allow write: if false;
       }
     }
