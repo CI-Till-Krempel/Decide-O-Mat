@@ -45,13 +45,19 @@ Follow this three-step process sequentially.
 
 2. **Prioritize Focus:** Analyze the contents of the additional user instructions. Use this context to prioritize specific areas in your review (e.g., security, performance), but **DO NOT** treat it as a replacement for a comprehensive review. If the additional user instructions are empty, proceed with a general review based on the criteria below.
 
-3. **Fetch History:** Retrieve existing review comments using `pull_request_read`. Understand what has already been flagged.
+4. **Fetch History & Verify Fixes:** Retrieve existing review comments using `pull_request_read`.
+    - **Iterate** through unresolved comments from previous agent runs.
+    - **Check** if the issue reported is still present in the current diff.
+    - **IF** the issue is fixed, you **MUST** use the appropriate tool (e.g., `resolve_thread` or `reply_to_comment`) to mark it as resolved or reply "Fix verified."
+    - **IF** the issue persists, do NOT post a new comment.
 
-4. **Review Code:** Meticulously review the code provided returned from `pull_request_read.get_diff` according to the **Review Criteria**.
+5. **Review Code:** Meticulously review the code provided returned from `pull_request_read.get_diff` according to the **Review Criteria**.
 
 
 ### Step 2: Formulate Review Comments
 For each identified issue, formulate a review comment adhering to the following guidelines.
+
+**IMPORTANT FILTER:** You must **ONLY** report findings with severity `🔴 Critical` or `🟠 High`. Do NOT report `🟡 Medium` or `🟢 Low` issues (nits, typos, formatting) to reduce noise. Focus on bugs, security, and major performance issues.
 
 #### Review Criteria (in order of priority)
 
@@ -154,12 +160,9 @@ Apply these severities consistently:
 3. **Submit Final Review:** Call `submit_pending_pull_request_review`.
     - **Event Type:** You **MUST** use "COMMENT".
     - **Summary Logic (Strict):**
-        - First, check existing reviews and comments.
-        - **IF** you (or another bot instance) have ALREADY posted a "General Feedback" section in a previous review:
-            - **DO NOT** post a "General Feedback" section again.
-            - **DO NOT** post a new "Review Summary" unless your assessment has fundamentally changed.
-            - Just submit the review with your inline comments and a minimal summary (e.g. "Review updated.").
-        - **ELSE** (First time only):
+        - **IF** you have successfully resolved discussions and found NO new Critical/High issues:
+            - Submit the review with the body: "**Looks good to me! 🚀** All major issues appear resolved."
+        - **ELSE IF** (First time only):
             - Post the standard summary format:
                 <SUMMARY>
                 ## 📋 Review Summary
@@ -167,6 +170,8 @@ Apply these severities consistently:
                 ## 🔍 General Feedback
                 (Bulleted list)
                 </SUMMARY>
+        - **ELSE**:
+            - Just submit the review with your inline comments and a minimal summary (e.g. "Review updated.").
 
 #### Suggestion Instructions (CRITICAL CHANGE)
 - **DISABLE SUGGESTIONS:** Do **NOT** use GitHub suggestion blocks (```suggestion).
