@@ -2,11 +2,18 @@ import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { doc, updateDoc, getFirestore } from "firebase/firestore";
 import { app } from "./firebase"; // We need to export app from firebase.js
 
-const messaging = getMessaging(app);
+let messaging = null;
+try {
+    messaging = getMessaging(app);
+} catch (error) {
+    console.warn("Firebase Messaging failed to initialize (this is expected in tests):", error);
+}
+
 const db = getFirestore(app);
 
 const NotificationService = {
     requestPermission: async (decisionId, userId) => {
+        if (!messaging) return false;
         try {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
@@ -15,7 +22,6 @@ const NotificationService = {
                 });
 
                 if (token) {
-                    console.log('FCM Token:', token);
                     await NotificationService.saveToken(decisionId, userId, token);
                     return true;
                 }
@@ -42,6 +48,10 @@ const NotificationService = {
 
     onMessageListener: () =>
         new Promise((resolve) => {
+            if (!messaging) {
+                resolve(null);
+                return;
+            }
             onMessage(messaging, (payload) => {
                 resolve(payload);
             });

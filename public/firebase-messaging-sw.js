@@ -21,13 +21,15 @@ firebase.initializeApp(firebaseConfig);
 // messages.
 const messaging = firebase.messaging();
 
+const ICON_URL = '/vite.svg'; // Use generic app icon
+
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
     // Customize notification here
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
         body: payload.notification.body,
-        icon: '/vite.svg', // Ensure this exists or use logo
+        icon: ICON_URL,
         data: payload.data
     };
 
