@@ -1,5 +1,6 @@
 // Deploy trigger
 service cloud.firestore {
+  // Force Update 2026-01-23 10:25
   match /databases/{database}/documents {
     match /decisions/{decisionId} {
       allow read: if debug(request.app) != null || true;
