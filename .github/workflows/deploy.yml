@@ -48,13 +48,13 @@ jobs:
           # But we want to run tests once.
           # Let's keep 'test' job separate, and 'deploy' jobs will build and deploy.
           # Mock values for CI build since we don't deploy this artifact
-          VITE_FIREBASE_API_KEY: "mock_key"
-          VITE_FIREBASE_AUTH_DOMAIN: "mock_domain"
-          VITE_FIREBASE_PROJECT_ID: "mock_project"
-          VITE_FIREBASE_STORAGE_BUCKET: "mock_bucket"
-          VITE_FIREBASE_MESSAGING_SENDER_ID: "mock_sender"
-          VITE_FIREBASE_APP_ID: "mock_app_id"
-          VITE_FIREBASE_MEASUREMENT_ID: "mock_measurement_id"
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
 
       - name: Install Functions Dependencies
         run: |
@@ -103,14 +103,14 @@ jobs:
         env:
           VITE_APP_ENV: Staging
           VITE_COMMIT_HASH: ${{ github.sha }}
-          # Mock values for verification build
-          VITE_FIREBASE_API_KEY: "mock"
-          VITE_FIREBASE_AUTH_DOMAIN: "mock"
-          VITE_FIREBASE_PROJECT_ID: "mock"
-          VITE_FIREBASE_STORAGE_BUCKET: "mock"
-          VITE_FIREBASE_MESSAGING_SENDER_ID: "mock"
-          VITE_FIREBASE_APP_ID: "mock"
-          VITE_FIREBASE_MEASUREMENT_ID: "mock"
+          # Injected Secrets for SW generation
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
 
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v3
