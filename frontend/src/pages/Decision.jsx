@@ -467,6 +467,7 @@ function Decision() {
                             readOnly={isClosed || exporting}
                             participantMap={participantMap}
                             encryptionKey={encryptionKey}
+                            onError={(msg) => setToast({ message: msg, type: 'error' })}
                         />
                         {!exporting && <AddArgumentForm decisionId={id} type="pro" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>
@@ -478,6 +479,7 @@ function Decision() {
                             readOnly={isClosed || exporting}
                             participantMap={participantMap}
                             encryptionKey={encryptionKey}
+                            onError={(msg) => setToast({ message: msg, type: 'error' })}
                         />
                         {!exporting && <AddArgumentForm decisionId={id} type="con" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>

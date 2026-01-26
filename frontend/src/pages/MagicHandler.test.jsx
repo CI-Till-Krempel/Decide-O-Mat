@@ -88,11 +88,9 @@ describe('MagicHandler', () => {
         consoleSpy.mockRestore();
     });
 
-    it('shows error if no token provided', async () => {
+    it('shows error if no token provided', () => {
         renderWithRouter('/magic');
-        await waitFor(() => {
-            expect(screen.getByText(/transfer failed/i)).toBeInTheDocument();
-        });
+        expect(screen.getByText(/transfer failed/i)).toBeInTheDocument();
         expect(signInWithCustomToken).not.toHaveBeenCalled();
     });
 });

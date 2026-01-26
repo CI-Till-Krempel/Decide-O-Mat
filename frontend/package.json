@@ -4,7 +4,7 @@
   "version": "1.5.2",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/generate-sw.js && vite",
     "build": "node scripts/generate-sw.js && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
