@@ -10,6 +10,10 @@ import { useUser } from '../contexts/UserContext';
 import { toPng } from 'html-to-image';
 import EncryptionService from '../services/EncryptionService';
 import ParticipantService from '../services/ParticipantService';
+import ParticipantList from '../components/ParticipantList';
+import NotificationService from '../services/NotificationService';
+
+import Toast from '../components/Toast';
 
 function Decision() {
     const { id } = useParams();
@@ -28,6 +32,9 @@ function Decision() {
     const [showNamePrompt, setShowNamePrompt] = useState(false);
     const [pendingVoteType, setPendingVoteType] = useState(null);
     const [encryptionKey, setEncryptionKey] = useState(null);
+    const [showParticipants, setShowParticipants] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [toast, setToast] = useState(null); // { message, type }
     const decisionRef = useRef(null);
 
     // Parse key from URL hash
@@ -141,7 +148,18 @@ function Decision() {
             await toggleDecisionStatus(id, newStatus);
         } catch (error) {
             console.error("Error toggling status:", error);
-            alert("Failed to update decision status.");
+            setToast({ message: "Failed to update decision status.", type: 'error' });
+        }
+    };
+
+    const handleToggleNotifications = async () => {
+        if (!user.userId) return;
+        const granted = await NotificationService.requestPermission(id, user.userId);
+        if (granted) {
+            setNotificationsEnabled(true);
+            setToast({ message: "Notifications enabled!", type: 'success' });
+        } else {
+            setToast({ message: "Could not enable notifications. Please check your browser settings.", type: 'error' });
         }
     };
 
@@ -182,7 +200,7 @@ function Decision() {
             localStorage.setItem(`decision_vote_${id}`, voteType);
         } catch (error) {
             console.error("Error voting:", error);
-            alert("Failed to cast vote.");
+            setToast({ message: "Failed to cast vote.", type: 'error' });
         } finally {
             setVotingTarget(null);
         }
@@ -232,7 +250,7 @@ function Decision() {
             link.click();
         } catch (err) {
             console.error('Error exporting image:', err);
-            alert('Failed to export image.');
+            setToast({ message: 'Failed to export image.', type: 'error' });
         } finally {
             setExporting(false);
         }
@@ -261,6 +279,20 @@ function Decision() {
 
     return (
         <div className="container">
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
+
+            <ParticipantList
+                participantMap={participantMap}
+                isOpen={showParticipants}
+                onClose={() => setShowParticipants(false)}
+            />
+
             {showNamePrompt && (
                 <NamePrompt
                     onSave={handleNameSave}
@@ -273,6 +305,24 @@ function Decision() {
 
             <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0.5rem', gap: '0.5rem' }}>
+                        <button
+                            onClick={handleToggleNotifications}
+                            className="btn"
+                            title="Enable Notifications"
+                            style={{ background: 'transparent', color: notificationsEnabled ? 'var(--color-primary)' : 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
+                        >
+                            {notificationsEnabled ? '🔔' : '🔕'}
+                        </button>
+                        <button
+                            onClick={() => setShowParticipants(true)}
+                            className="btn"
+                            style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)' }}
+                        >
+                            👥 Participants
+                        </button>
+                    </div>
+
                     <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>
 
                     {isClosed && (
@@ -360,7 +410,7 @@ function Decision() {
                                                 color: 'var(--color-text)',
                                                 border: '1px solid var(--color-border)'
                                             }}>
-                                                {participantMap.get(vote.userId) || vote.displayName || 'Anonymous'}
+                                                {participantMap.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
                                             </span>
                                         ))}
                                     </div>
@@ -398,7 +448,7 @@ function Decision() {
                                                 color: 'var(--color-text)',
                                                 border: '1px solid var(--color-border)'
                                             }}>
-                                                {participantMap.get(vote.userId) || vote.displayName || 'Anonymous'}
+                                                {participantMap.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
                                             </span>
                                         ))}
                                     </div>
@@ -417,6 +467,7 @@ function Decision() {
                             readOnly={isClosed || exporting}
                             participantMap={participantMap}
                             encryptionKey={encryptionKey}
+                            onError={(msg) => setToast({ message: msg, type: 'error' })}
                         />
                         {!exporting && <AddArgumentForm decisionId={id} type="pro" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>
@@ -428,6 +479,7 @@ function Decision() {
                             readOnly={isClosed || exporting}
                             participantMap={participantMap}
                             encryptionKey={encryptionKey}
+                            onError={(msg) => setToast({ message: msg, type: 'error' })}
                         />
                         {!exporting && <AddArgumentForm decisionId={id} type="con" readOnly={isClosed} encryptionKey={encryptionKey} />}
                     </div>

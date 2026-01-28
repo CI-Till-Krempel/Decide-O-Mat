@@ -4,7 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import NamePrompt from './NamePrompt';
 import ParticipantService from '../services/ParticipantService';
 
-function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, participantMap, encryptionKey }) {
+function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, participantMap, encryptionKey, onError }) {
     const { user, setDisplayName } = useUser();
     const [votes, setVotes] = useState([]);
     const [voting, setVoting] = useState(false);
@@ -56,14 +56,15 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, p
             await voteArgument(decisionId, argument.id, nameToSend);
         } catch (error) {
             console.error("Error voting:", error);
-            alert("Failed to vote. Please try again.");
+            if (onError) {
+                onError("Failed to vote. Please try again.");
+            } else {
+                alert("Failed to vote. Please try again.");
+            }
         } finally {
             setVoting(false);
         }
     };
-
-    // ... handleNameSave ...
-
 
     const handleNameSave = async (name) => {
         setDisplayName(name);
@@ -72,7 +73,7 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, p
         await performVote();
     };
 
-    const authorName = participantMap?.get(argument.authorId) || argument.authorName;
+    const authorName = participantMap?.get(argument.authorId)?.name || argument.authorName;
 
     return (
         <>
@@ -124,7 +125,7 @@ function ArgumentItem({ argument, decisionId, readOnly, onVoteChange, canVote, p
                                 color: 'var(--color-text)',
                                 border: '1px solid var(--color-border)'
                             }}>
-                                {participantMap?.get(vote.userId) || vote.displayName || 'Anonymous'}
+                                {participantMap?.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
                             </span>
                         ))}
                     </div>

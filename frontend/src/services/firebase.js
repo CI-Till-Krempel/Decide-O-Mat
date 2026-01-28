@@ -252,4 +252,4 @@ export const subscribeToArguments = (decisionId, callback) => {
     });
 };
 
-export { db, functions, auth, signInAnonymously };
+export { db, functions, auth, signInAnonymously, app };

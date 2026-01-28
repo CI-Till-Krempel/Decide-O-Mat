@@ -64,6 +64,19 @@ vi.mock('../services/ParticipantService', () => ({
 }));
 import ParticipantService from '../services/ParticipantService';
 
+// Mock NotificationService
+vi.mock('../services/NotificationService', () => ({
+    default: {
+        requestPermission: vi.fn().mockResolvedValue(true),
+        saveToken: vi.fn(),
+    }
+}));
+
+// Mock ParticipantList component
+vi.mock('../components/ParticipantList', () => ({
+    default: () => <div data-testid="participant-list">ParticipantList</div>
+}));
+
 // Mock components
 vi.mock('../components/ArgumentList', () => ({
     default: ({ arguments: args, type, readOnly }) => (
@@ -296,7 +309,7 @@ describe('Decision Component', () => {
 
             // Mock participant map
             const mockParticipants = new Map();
-            mockParticipants.set('u1', 'Decrypted Alice');
+            mockParticipants.set('u1', { name: 'Decrypted Alice' });
             ParticipantService.subscribeToParticipants.mockImplementation((id, key, callback) => {
                 callback(mockParticipants);
                 return () => { };
@@ -606,7 +619,6 @@ describe('Decision Component', () => {
 
         it('handles voting error gracefully', async () => {
             const user = userEvent.setup();
-            const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
             mockVoteDecision.mockRejectedValue(new Error('Network error'));
 
             renderDecision();
@@ -619,10 +631,8 @@ describe('Decision Component', () => {
             await user.click(yesButton);
 
             await waitFor(() => {
-                expect(alertSpy).toHaveBeenCalledWith('Failed to cast vote.');
+                expect(screen.getByText('Failed to cast vote.')).toBeInTheDocument();
             });
-
-            alertSpy.mockRestore();
         });
     });
 

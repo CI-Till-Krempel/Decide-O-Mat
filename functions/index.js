@@ -1,4 +1,5 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const {FieldValue} = require("firebase-admin/firestore");
 
@@ -16,7 +17,6 @@ const db = admin.firestore();
 const {enforceAppCheck} = require("./config");
 
 exports.debugAppCheck = onCall({cors: true, enforceAppCheck: false}, async (request) => {
-  console.log("App Check Debug:", JSON.stringify(request.app));
   return {
     app: request.app || null,
     auth: request.auth || null,
@@ -393,6 +393,13 @@ exports.registerParticipant = onCall({cors: true, enforceAppCheck: enforceAppChe
     data.plainDisplayName = plainDisplayName;
   }
 
+  if (request.auth.token) {
+    data.isAnonymous = request.auth.token.firebase.sign_in_provider === "anonymous";
+    if (request.auth.token.picture) {
+      data.photoURL = request.auth.token.picture;
+    }
+  }
+
   await participantRef.set(data, {merge: true});
 
   // Also ensuring they are in the participantIds array for easy querying
@@ -426,3 +433,89 @@ exports.generateMagicLink = onCall({cors: true, enforceAppCheck: enforceAppCheck
 
 const {deleteUser} = require("./deleteUser");
 exports.deleteUser = deleteUser;
+
+exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{argumentId}", async (event) => {
+  const {decisionId} = event.params;
+  const snap = event.data;
+  if (!snap) {
+    console.warn("No data associated with the event");
+    return;
+  }
+  const argument = snap.data();
+  // Safe navigation for authorId
+  const authorId = argument ? (argument.authorId || null) : null;
+
+  if (!argument) {
+    console.warn("No argument data found");
+    return;
+  }
+
+  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+  if (!decisionDoc.exists) return;
+
+  const question = decisionDoc.data().question || "Decision";
+  // Truncate quite aggressively
+  const displayQuestion = question.length > 50 ? question.substring(0, 47) + "..." : question;
+
+  const payload = {
+    notification: {
+      title: "New Argument",
+      body: `New argument in: ${displayQuestion}`,
+    },
+  };
+
+  const participantsSnapshot = await decisionRef.collection("participants").get();
+  const tokens = [];
+
+  participantsSnapshot.forEach((doc) => {
+    // Don't notify the author
+    if (doc.id !== authorId) {
+      const data = doc.data();
+      if (data.fcmToken) {
+        tokens.push(data.fcmToken);
+      }
+    }
+  });
+
+  if (tokens.length > 0) {
+    const response = await admin.messaging().sendEachForMulticast({
+      tokens,
+      notification: payload.notification,
+    });
+    console.info(`Sent ${response.successCount} messages. Failed: ${response.failureCount}`);
+  }
+});
+
+exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", async (event) => {
+  const {decisionId} = event.params;
+  const before = event.data.before.data();
+  const after = event.data.after.data();
+
+  if (before.status === after.status) return;
+
+  const newStatus = after.status;
+  const title = newStatus === "closed" ? "Decision Closed" : "Decision Re-opened";
+  const body = newStatus === "closed" ? "A decision has been reached." : "Additional input is requested.";
+
+  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const participantsSnapshot = await decisionRef.collection("participants").get();
+  const tokens = [];
+
+  participantsSnapshot.forEach((doc) => {
+    const data = doc.data();
+    if (data.fcmToken) {
+      tokens.push(data.fcmToken);
+    }
+  });
+
+  if (tokens.length > 0) {
+    await admin.messaging().sendEachForMulticast({
+      tokens,
+      notification: {
+        title: title,
+        body: body,
+      },
+    });
+  }
+});

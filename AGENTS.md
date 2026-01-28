@@ -55,7 +55,13 @@ Before pushing any code to the repository, you **MUST** ensure the following:
 - **Update Roadmap**: When creating a PR, check off the completed story or task list item in `ROADMAP.md` and mark it as done.
 - **Branch Protection**: NEVER push directly to `main`. ALL changes must be merged via Pull Requests, without exception.
 
-### 5.1 Issue Resolution Process
+### 5.2 Pull Request Feedback & Issue Resolution
+When receiving comments on a Pull Request:
+1.  **Analyze**: Understand the reviewer's concern (bug, style, performance, etc.).
+2.  **Fix**: Implement the fix in the code.
+3.  **Reply**: Reply to *each* discussion on GitHub using the CLI or API, explaining the solution (e.g., "Fixed in [commit-hash]. I added a null check...").
+4.  **Resolve**: If possible, resolve the conversation.
+
 For work triggered by a GitHub Issue:
 1.  **Fresh Branch**: Always create a fresh branch from `main` for the specific issue.
 2.  **Implementation**: Follow the standard Implementation Cycle.
