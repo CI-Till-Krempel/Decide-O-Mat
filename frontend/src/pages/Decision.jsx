@@ -306,7 +306,7 @@ function Decision() {
 
             <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0.5rem', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '0.5rem', gap: '0.5rem' }}>
                         <button
                             onClick={handleToggleNotifications}
                             className="btn"
