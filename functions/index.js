@@ -44,6 +44,9 @@ exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
     participantIds: request.auth ? [request.auth.uid] : [],
   });
 
+  // Ensure owner is added to participants subcollection
+  await ensureParticipant(db, decisionRef.id, request.auth.uid, request.auth);
+
   return {id: decisionRef.id};
 });
 
@@ -98,6 +101,11 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
 
   await argumentRef.set(argumentData);
 
+  // Ensure author is added to participants subcollection
+  if (request.auth) {
+    await ensureParticipant(db, decisionId, request.auth.uid, request.auth, authorName);
+  }
+
   return {id: argumentRef.id};
 });
 
@@ -146,6 +154,9 @@ exports.voteArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
   // Use a transaction to ensure atomic updates
   await db.runTransaction(async (transaction) => {
     const existingVote = await transaction.get(voteRef);
+
+    // Ensure participant exists
+    await ensureParticipant(db, decisionId, userId, request.auth, request.data.displayName, transaction);
 
     if (existingVote.exists) {
       // User is trying to vote again - remove their vote (unvote)
@@ -230,6 +241,9 @@ exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
 
   // Use a transaction to ensure atomic updates
   await admin.firestore().runTransaction(async (transaction) => {
+    // Ensure participant exists
+    await ensureParticipant(db, decisionId, userId, request.auth, request.data.displayName, transaction);
+
     const existingVote = await transaction.get(voteRef);
     let yesChange = 0;
     let noChange = 0;
@@ -519,3 +533,54 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
     });
   }
 });
+
+/**
+ * Helper to ensure a user is in the participants subcollection.
+ * @param {Object} db - Firestore instance or transaction.
+ * @param {string} decisionId - The decision ID.
+ * @param {string} userId - The user ID.
+ * @param {Object} auth - Auth context.
+ * @param {string} [displayName] - Optional display name.
+ * @param {Object} [transaction] - Optional transaction object.
+ */
+async function ensureParticipant(dbInstance, decisionId, userId, auth, displayName = null, transaction = null) {
+  // If dbInstance is the global db (Firestore), getting a ref is normal.
+  // If we are passing the global 'db' variable from outer scope, that works.
+  // Note: logic in voteArgument/voteDecision uses 'db' or 'admin.firestore()' which is the app db.
+
+  // Create reference based on the global db (which we need properly scoped or passed)
+  // For safety, we use admin.firestore() to create the ref, as 'db' might not be passed correctly if called as helper
+  const firestore = admin.firestore();
+  const participantRef = firestore.collection("decisions").doc(decisionId).collection("participants").doc(userId);
+
+  const prepareData = () => {
+    const data = {
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+    if (auth && auth.token) {
+      data.isAnonymous = auth.token.firebase.sign_in_provider === "anonymous";
+      if (auth.token.picture) {
+        data.photoURL = auth.token.picture;
+      }
+    }
+    if (displayName) {
+      data.plainDisplayName = displayName;
+    }
+    return data;
+  };
+
+  if (transaction) {
+    const doc = await transaction.get(participantRef);
+    if (!doc.exists) {
+      transaction.set(participantRef, prepareData());
+    }
+    // If it exists, we could update the name, but let's stick to simple "ensure existence" for now
+    // unless encryption/plain name logic is strict.
+  } else {
+    // Standard fetch
+    const doc = await participantRef.get();
+    if (!doc.exists) {
+      await participantRef.set(prepareData(), {merge: true});
+    }
+  }
+}
