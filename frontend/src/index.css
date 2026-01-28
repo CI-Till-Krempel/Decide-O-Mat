@@ -1,17 +1,26 @@
 :root {
-  --color-primary: #6366f1; /* Indigo 500 */
-  --color-primary-hover: #4f46e5; /* Indigo 600 */
-  --color-secondary: #ec4899; /* Pink 500 */
-  --color-background: #f8fafc; /* Slate 50 */
+  --color-primary: #6366f1;
+  /* Indigo 500 */
+  --color-primary-hover: #4f46e5;
+  /* Indigo 600 */
+  --color-secondary: #ec4899;
+  /* Pink 500 */
+  --color-background: #f8fafc;
+  /* Slate 50 */
   --color-surface: #ffffff;
-  --color-text-main: #1e293b; /* Slate 800 */
-  --color-text-muted: #64748b; /* Slate 500 */
-  --color-border: #e2e8f0; /* Slate 200 */
-  --color-success: #22c55e; /* Green 500 */
-  --color-danger: #ef4444; /* Red 500 */
+  --color-text-main: #1e293b;
+  /* Slate 800 */
+  --color-text-muted: #64748b;
+  /* Slate 500 */
+  --color-border: #e2e8f0;
+  /* Slate 200 */
+  --color-success: #22c55e;
+  /* Green 500 */
+  --color-danger: #ef4444;
+  /* Red 500 */
 
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -35,7 +44,12 @@ body {
   box-sizing: border-box;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   font-weight: 600;
   line-height: 1.2;
@@ -99,11 +113,11 @@ button {
 .participant-list-overlay {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   height: 100vh;
   width: 300px;
   background-color: var(--color-surface);
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   padding: 2rem 1rem;
   overflow-y: auto;
@@ -115,7 +129,7 @@ button {
 }
 
 .participant-list-overlay.closed {
-  transform: translateX(100%);
+  transform: translateX(-100%);
 }
 
 .participant-header {
@@ -177,6 +191,7 @@ button {
     opacity: 0;
     transform: translate(-50%, 20px);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, 0);
