@@ -1,11 +1,15 @@
 import React from 'react';
 
-const ParticipantList = ({ participantMap, isOpen, onClose }) => {
+const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
     // Convert map to array
     const participants = Array.from(participantMap.entries()).map(([id, data]) => ({
         id,
         ...data
-    }));
+    })).sort((a, b) => {
+        if (a.id === ownerId) return -1;
+        if (b.id === ownerId) return 1;
+        return 0;
+    });
 
     if (!isOpen) return null;
 

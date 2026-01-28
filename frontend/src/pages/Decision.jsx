@@ -291,6 +291,7 @@ function Decision() {
                 participantMap={participantMap}
                 isOpen={showParticipants}
                 onClose={() => setShowParticipants(false)}
+                ownerId={decision?.ownerId}
             />
 
             {showNamePrompt && (

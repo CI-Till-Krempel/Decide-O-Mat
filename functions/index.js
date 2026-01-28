@@ -1,7 +1,7 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
-const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
-const {FieldValue} = require("firebase-admin/firestore");
+const { FieldValue } = require("firebase-admin/firestore");
 
 // setGlobalOptions({region: "europe-west1"});
 
@@ -14,9 +14,9 @@ const db = admin.firestore();
  * @param {string} request.data.question - The question to decide on.
  * @return {Promise<Object>} The created decision ID.
  */
-const {enforceAppCheck} = require("./config");
+const { enforceAppCheck } = require("./config");
 
-exports.debugAppCheck = onCall({cors: true, enforceAppCheck: false}, async (request) => {
+exports.debugAppCheck = onCall({ cors: true, enforceAppCheck: false }, async (request) => {
   return {
     app: request.app || null,
     auth: request.auth || null,
@@ -24,7 +24,7 @@ exports.debugAppCheck = onCall({cors: true, enforceAppCheck: false}, async (requ
   };
 });
 
-exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+exports.createDecision = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
   const question = request.data.question;
 
   if (!question || typeof question !== "string" || question.trim().length === 0) {
@@ -44,7 +44,10 @@ exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
     participantIds: request.auth ? [request.auth.uid] : [],
   });
 
-  return {id: decisionRef.id};
+  // Ensure owner is added to participants subcollection
+  await ensureParticipant(db, decisionRef.id, request.auth.uid, request.auth);
+
+  return { id: decisionRef.id };
 });
 
 /**
@@ -57,8 +60,8 @@ exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
  * @param {string} [request.data.authorId] - Optional unique ID of the author.
  * @return {Promise<Object>} The created argument ID.
  */
-exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
-  const {decisionId, type, text, authorName, authorId} = request.data;
+exports.addArgument = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
+  const { decisionId, type, text, authorName, authorId } = request.data;
 
   if (!decisionId || !type || !text) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
@@ -98,7 +101,12 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
 
   await argumentRef.set(argumentData);
 
-  return {id: argumentRef.id};
+  // Ensure author is added to participants subcollection
+  if (request.auth) {
+    await ensureParticipant(db, decisionId, request.auth.uid, request.auth, authorName);
+  }
+
+  return { id: argumentRef.id };
 });
 
 /**
@@ -109,13 +117,13 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
  * @param {number} request.data.change - Vote change (1 to vote, -1 to unvote).
  * @return {Promise<Object>} Success status.
  */
-exports.voteArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+exports.voteArgument = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const {decisionId, argumentId} = request.data;
+  const { decisionId, argumentId } = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !argumentId) {
@@ -142,10 +150,14 @@ exports.voteArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
 
   // Check if user has already voted for this argument
   const voteRef = argumentRef.collection("votes").doc(userId);
+  const participantDocRef = decisionRef.collection("participants").doc(userId);
 
   // Use a transaction to ensure atomic updates
   await db.runTransaction(async (transaction) => {
     const existingVote = await transaction.get(voteRef);
+
+    // Ensure participant exists
+    await ensureParticipant(db, decisionId, userId, request.auth, request.data.displayName, transaction);
 
     if (existingVote.exists) {
       // User is trying to vote again - remove their vote (unvote)
@@ -171,11 +183,11 @@ exports.voteArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
     }
   });
 
-  return {success: true};
+  return { success: true };
 });
 
-exports.toggleDecisionStatus = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
-  const {decisionId, status} = request.data;
+exports.toggleDecisionStatus = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
+  const { decisionId, status } = request.data;
 
   if (!decisionId || !status) {
     throw new HttpsError("invalid-argument", "Missing decisionId or status");
@@ -192,18 +204,18 @@ exports.toggleDecisionStatus = onCall({cors: true, enforceAppCheck: enforceAppCh
     throw new HttpsError("not-found", "Decision not found");
   }
 
-  await decisionRef.update({status: status});
+  await decisionRef.update({ status: status });
 
-  return {success: true, status: status};
+  return { success: true, status: status };
 });
 
-exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+exports.voteDecision = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const {decisionId, vote} = request.data;
+  const { decisionId, vote } = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !vote) {
@@ -230,6 +242,9 @@ exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
 
   // Use a transaction to ensure atomic updates
   await admin.firestore().runTransaction(async (transaction) => {
+    // Ensure participant exists
+    await ensureParticipant(db, decisionId, userId, request.auth, request.data.displayName, transaction);
+
     const existingVote = await transaction.get(voteRef);
     let yesChange = 0;
     let noChange = 0;
@@ -282,7 +297,7 @@ exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
     });
   });
 
-  return {success: true};
+  return { success: true };
 });
 
 /**
@@ -293,13 +308,13 @@ exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
  * @param {string} request.data.displayName - The new display name.
  * @return {Promise<Object>} Success status.
  */
-exports.updateUserDisplayName = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+exports.updateUserDisplayName = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const {decisionId, displayName} = request.data;
+  const { decisionId, displayName } = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || !displayName) {
@@ -321,7 +336,7 @@ exports.updateUserDisplayName = onCall({cors: true, enforceAppCheck: enforceAppC
   const finalVoteRef = decisionRef.collection("finalVotes").doc(userId);
   const finalVoteDoc = await finalVoteRef.get();
   if (finalVoteDoc.exists) {
-    batch.update(finalVoteRef, {displayName: displayName});
+    batch.update(finalVoteRef, { displayName: displayName });
     operationCount++;
   }
 
@@ -332,14 +347,14 @@ exports.updateUserDisplayName = onCall({cors: true, enforceAppCheck: enforceAppC
   const voteReadPromises = argumentsSnapshot.docs.map(async (argDoc) => {
     const voteRef = argDoc.ref.collection("votes").doc(userId);
     const voteDoc = await voteRef.get();
-    return {ref: voteRef, exists: voteDoc.exists};
+    return { ref: voteRef, exists: voteDoc.exists };
   });
 
   const voteResults = await Promise.all(voteReadPromises);
 
   voteResults.forEach((result) => {
     if (result.exists) {
-      batch.update(result.ref, {displayName: displayName});
+      batch.update(result.ref, { displayName: displayName });
       operationCount++;
     }
   });
@@ -348,7 +363,7 @@ exports.updateUserDisplayName = onCall({cors: true, enforceAppCheck: enforceAppC
     await batch.commit();
   }
 
-  return {success: true, updated: operationCount};
+  return { success: true, updated: operationCount };
 });
 
 /**
@@ -359,13 +374,13 @@ exports.updateUserDisplayName = onCall({cors: true, enforceAppCheck: enforceAppC
  * @param {string} request.data.encryptedDisplayName - The encrypted display name.
  * @return {Promise<Object>} Success status.
  */
-exports.registerParticipant = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+exports.registerParticipant = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
   // Authentication required
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
 
-  const {decisionId, encryptedDisplayName, plainDisplayName} = request.data;
+  const { decisionId, encryptedDisplayName, plainDisplayName } = request.data;
   const userId = request.auth.uid;
 
   if (!decisionId || (!encryptedDisplayName && !plainDisplayName)) {
@@ -400,14 +415,14 @@ exports.registerParticipant = onCall({cors: true, enforceAppCheck: enforceAppChe
     }
   }
 
-  await participantRef.set(data, {merge: true});
+  await participantRef.set(data, { merge: true });
 
   // Also ensuring they are in the participantIds array for easy querying
   await decisionRef.update({
     participantIds: FieldValue.arrayUnion(userId),
   });
 
-  return {success: true};
+  return { success: true };
 });
 
 /**
@@ -415,7 +430,7 @@ exports.registerParticipant = onCall({cors: true, enforceAppCheck: enforceAppChe
  * @param {Object} request - The request object.
  * @return {Promise<Object>} The magic link token.
  */
-exports.generateMagicLink = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+exports.generateMagicLink = onCall({ cors: true, enforceAppCheck: enforceAppCheck }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
   }
@@ -424,18 +439,18 @@ exports.generateMagicLink = onCall({cors: true, enforceAppCheck: enforceAppCheck
 
   try {
     const customToken = await admin.auth().createCustomToken(userId);
-    return {token: customToken};
+    return { token: customToken };
   } catch (error) {
     console.error("Error creating custom token:", error);
     throw new HttpsError("internal", "Unable to create magic link token.");
   }
 });
 
-const {deleteUser} = require("./deleteUser");
+const { deleteUser } = require("./deleteUser");
 exports.deleteUser = deleteUser;
 
 exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{argumentId}", async (event) => {
-  const {decisionId} = event.params;
+  const { decisionId } = event.params;
   const snap = event.data;
   if (!snap) {
     console.warn("No data associated with the event");
@@ -488,7 +503,7 @@ exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{
 });
 
 exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", async (event) => {
-  const {decisionId} = event.params;
+  const { decisionId } = event.params;
   const before = event.data.before.data();
   const after = event.data.after.data();
 
@@ -519,3 +534,54 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
     });
   }
 });
+
+/**
+ * Helper to ensure a user is in the participants subcollection.
+ * @param {Object} db - Firestore instance or transaction.
+ * @param {string} decisionId - The decision ID.
+ * @param {string} userId - The user ID.
+ * @param {Object} auth - Auth context.
+ * @param {string} [displayName] - Optional display name.
+ * @param {Object} [transaction] - Optional transaction object.
+ */
+async function ensureParticipant(dbInstance, decisionId, userId, auth, displayName = null, transaction = null) {
+  // If dbInstance is the global db (Firestore), getting a ref is normal.
+  // If we are passing the global 'db' variable from outer scope, that works.
+  // Note: logic in voteArgument/voteDecision uses 'db' or 'admin.firestore()' which is the app db.
+
+  // Create reference based on the global db (which we need properly scoped or passed)
+  // For safety, we use admin.firestore() to create the ref, as 'db' might not be passed correctly if called as helper
+  const firestore = admin.firestore();
+  const participantRef = firestore.collection("decisions").doc(decisionId).collection("participants").doc(userId);
+
+  const prepareData = () => {
+    const data = {
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+    if (auth && auth.token) {
+      data.isAnonymous = auth.token.firebase.sign_in_provider === "anonymous";
+      if (auth.token.picture) {
+        data.photoURL = auth.token.picture;
+      }
+    }
+    if (displayName) {
+      data.plainDisplayName = displayName;
+    }
+    return data;
+  };
+
+  if (transaction) {
+    const doc = await transaction.get(participantRef);
+    if (!doc.exists) {
+      transaction.set(participantRef, prepareData());
+    }
+    // If it exists, we could update the name, but let's stick to simple "ensure existence" for now
+    // unless encryption/plain name logic is strict.
+  } else {
+    // Standard fetch
+    const doc = await participantRef.get();
+    if (!doc.exists) {
+      await participantRef.set(prepareData(), { merge: true });
+    }
+  }
+}
