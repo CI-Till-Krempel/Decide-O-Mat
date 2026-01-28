@@ -160,11 +160,16 @@ Apply these severities consistently:
 3. **Submit Final Review:** Call `submit_pending_pull_request_review`.
     - **Event Type:** You **MUST** use "COMMENT".
     - **Summary Logic (Strict):**
-        - **IF** you have successfully resolved discussions and found NO new Critical/High issues:
-            - Submit the review with the body: "**Looks good to me! 🚀** All major issues appear resolved."
-        - **ELSE**:
-            - Just submit the review with your inline comments and a minimal summary (e.g. "Review updated.").
-        - **NEVER** post a "Review Summary" or "General Feedback" section if you have already posted one in this PR.
+        - **CHECK HISTORY FIRST:** Before writing any summary, check existing PR comments for a "General Feedback" or "Review Summary" from yourself.
+        - **IF** an existing summary exists:
+            - **DO NOT** create a new top-level summary.
+            - Only submit your inline comments.
+            - If you found no new issues and resolved previous ones, you may post a simple comment "All major issues resolved."
+        - **ELSE IF** (No existing summary) **AND** (No new Critical/High issues):
+             - Submit the review with the body: "**Looks good to me! 🚀**"
+        - **ELSE** (No existing summary AND found issues):
+             - You may provide a concise summary.
+        - **CRITICAL:** DO NOT SPAM. Updating existing threads is better than new comments.
 
 #### Suggestion Instructions (CRITICAL CHANGE)
 - **DISABLE SUGGESTIONS:** Do **NOT** use GitHub suggestion blocks (```suggestion).
