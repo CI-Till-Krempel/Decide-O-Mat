@@ -92,3 +92,15 @@ Use the following labels to optimize the CI/CD pipeline and review process. Be m
 ## Communication
 - Use the `notify_user` tool to request reviews or ask questions.
 - Be concise and specific in your communication.
+
+## Automated Agents
+
+### Boy-Scout Coding Agent
+- **Purpose**: To improve code quality by fixing small issues (linting, TODOs, etc.) daily.
+- **Schedule**: Runs every weekday at 5:00 AM UTC.
+- **Workflow**: `.github/workflows/boy-scout.yml`
+- **Behavior**:
+    1.  Scans the repository for issues.
+    2.  Selects one high-priority, small task.
+    3.  Creates a fix, runs tests, and opens a Pull Request.
+- **Configuration**: controlled via the workflow file (System Prompt).
