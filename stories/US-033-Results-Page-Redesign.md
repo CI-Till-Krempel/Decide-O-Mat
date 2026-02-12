@@ -8,7 +8,7 @@
 1. **Election Results Hero**: A variant of the Election hero component showing a results/ballot icon instead of thumbs-up/down, with the question text centered.
 2. **Column Headers**: "Headline" labels (Pro/Con) with "+" add buttons (for reopened decisions).
 3. **Sorted Statements**: All statements sorted by vote count (highest first) within their pro/con column.
-4. **Voter Chips**: Each statement shows voter name chips ("Zustimmung von" / "Wer hat noch zugestimmt?").
+4. **Voter Chips**: Each statement shows voter name chips: "Approved by" (Figma: "Zustimmung von") / "Who else approved?" (Figma: "Wer hat noch zugestimmt?").
 5. **Reopened State**: When a decision is reopened, vote buttons ("+") reappear on each statement card, allowing new votes.
 6. **FAB**: Floating action button at bottom-right (share or export).
 7. **No Banner**: The current red/green "Decision Closed: Approved/Rejected" banner is removed and replaced by the Election Results hero component.

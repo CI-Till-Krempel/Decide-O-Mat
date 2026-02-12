@@ -21,11 +21,11 @@ This is the largest story — it touches the core decision page and multiple sub
 - Replaces current `ArgumentItem.jsx` rendering.
 - Dark card with subtle border.
 - Layout:
-  - Top: "Statement von [Author]" label (small, muted).
+  - Top: "Statement by [Author]" (Figma: "Statement von [Author]") label (small, muted).
   - Middle: Statement text (white).
   - Right: Heart/circle vote icon button.
-  - Bottom: "Zustimmung von" label + voter name chips.
-- Variant: Own statement (orange/coral accent + "Dein Statement" label).
+  - Bottom: "Approval from" (Figma: "Zustimmung von") label + voter name chips.
+- Variant: Own statement (orange/coral accent + "Your Statement" (Figma: "Dein Statement") label).
 - Props: `argument`, `isOwn`, `voters`, `hasVoted`, `onVote`, `canVote`.
 
 #### [NEW] `frontend/src/components/FloatingArgumentInput.jsx` + `.module.css`
@@ -42,7 +42,7 @@ This is the largest story — it touches the core decision page and multiple sub
 - Props: `icon`, `onClick`, `label` (for a11y).
 
 #### [NEW] `frontend/src/components/ColumnHeader.jsx` + `.module.css`
-- Label text ("Pro hinzufuegen" / "Kontra hinzufuegen").
+- Label text ("Add pro" (Figma: "Pro hinzufuegen") / "Add contra" (Figma: "Kontra hinzufuegen")).
 - Circular purple "+" button.
 - Props: `label`, `onAdd`.
 

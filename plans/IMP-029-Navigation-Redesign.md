@@ -8,7 +8,7 @@ Redesign the navigation bar to match the Figma dark-themed navigation component.
 ### Frontend
 #### [MODIFY] `frontend/src/components/Header.jsx`
 - Restructure JSX layout:
-  - Left section: Logo ("Decide-O-Mat" in display font) + nav links ("Entscheidung", "Aktivitaeten").
+  - Left section: Logo ("Decide-O-Mat" in display font) + nav links ("Decision" (Figma: "Entscheidung"), "Activities" (Figma: "Aktivitaeten")).
   - Center section: Dark mode toggle button (if US-028 includes theme toggle).
   - Right section: User avatar + display name + edit icon + "Log in" button.
 - Remove old inline styles; use CSS Module.
@@ -28,8 +28,8 @@ Redesign the navigation bar to match the Figma dark-themed navigation component.
 - Split the edit-name functionality into a modal/popover triggered by the pencil icon.
 
 ### Routing
-- Ensure "Entscheidung" links to `/` (home/create decision).
-- Ensure "Aktivitaeten" links to `/my-decisions` (archive page).
+- Ensure "Decision" (Figma: "Entscheidung") links to `/` (home/create decision).
+- Ensure "Activities" (Figma: "Aktivitaeten") links to `/my-decisions` (archive page).
 
 ## Verification Plan
 

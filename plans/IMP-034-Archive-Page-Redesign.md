@@ -1,7 +1,7 @@
 # Implementation Plan - US-034: Archive / My Decisions Page Redesign
 
 ## Goal
-Redesign the My Decisions page as the "Aktivitaeten" archive page with running/archived sections and context menus.
+Redesign the My Decisions page as the "Activities" (Figma: "Aktivitaeten") archive page with running/archived sections and context menus.
 
 ## Proposed Changes
 
@@ -14,8 +14,8 @@ Redesign the My Decisions page as the "Aktivitaeten" archive page with running/a
   - Center: Decision question text (bold, white).
   - Right: "..." context menu trigger button.
 - Variants:
-  - **Running**: Green/lime accent border, relative time ("Seit 6 Minuten"), green menu button.
-  - **Archived**: Standard border, absolute date ("12. Januar 2026 um 12:26 Uhr").
+  - **Running**: Green/lime accent border, relative time ("6 minutes ago" (Figma: "Seit 6 Minuten")), green menu button.
+  - **Archived**: Standard border, absolute date ("January 12, 2026 at 12:26 PM" (Figma: "12. Januar 2026 um 12:26 Uhr")).
 - Props: `decision`, `variant` ('running' | 'archived'), `onMenuAction`.
 - Click handler: Navigate to decision page.
 
@@ -30,14 +30,14 @@ Redesign the My Decisions page as the "Aktivitaeten" archive page with running/a
 ### Frontend — Modified Components
 
 #### [MODIFY] `frontend/src/pages/MyDecisions.jsx`
-- Rename conceptually to "Aktivitaeten" (archive) page.
+- Rename conceptually to "Activities" (Figma: "Aktivitaeten") archive page.
 - Split fetched decisions into two groups:
   - `runningDecisions`: `status === 'open'`
   - `archivedDecisions`: `status === 'closed'`
 - Restructure layout:
-  - Page heading: "Welche Entscheidungen laufen gerade?"
+  - Page heading: "Which decisions are currently running?" (Figma: "Welche Entscheidungen laufen gerade?")
   - Running section: Render `<DecisionCard variant="running" />` for each.
-  - "Alle Aktivitaeten" section heading.
+  - "All activities" (Figma: "Alle Aktivitaeten") section heading.
   - Archived grid: Two-column CSS Grid of `<DecisionCard variant="archived" />`.
 - Add context menu state management:
   - `activeMenuId`: Which card's menu is open.
@@ -53,7 +53,7 @@ Redesign the My Decisions page as the "Aktivitaeten" archive page with running/a
 
 ### Utility
 #### [NEW] `frontend/src/utils/timeAgo.js`
-- Helper function: `timeAgo(date)` → returns relative time string ("Seit 6 Minuten", "Vor 2 Stunden").
+- Helper function: `timeAgo(date)` → returns relative time string ("6 minutes ago" (Figma: "Seit 6 Minuten"), "2 hours ago" (Figma: "Vor 2 Stunden")).
 - Or: Use `Intl.RelativeTimeFormat` for locale-aware formatting.
 
 ### Context Menu Actions

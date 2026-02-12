@@ -58,16 +58,16 @@ Implement backend and frontend support for editing questions, deleting decisions
 
 ### Frontend — Statistics (Deferred)
 - The statistics view has no Figma design.
-- For now: The "Statistik anzeigen" menu item can navigate to the decision page (which shows the data).
+- For now: The "Show statistics" (Figma: "Statistik anzeigen") menu item can navigate to the decision page (which shows the data).
 - Future: Create a dedicated statistics modal/page when design is available.
 
 ### Integration with Archive Page (US-034)
 
 #### [MODIFY] `frontend/src/pages/MyDecisions.jsx`
 - Wire context menu actions:
-  - "Frage bearbeiten" → Open `<EditQuestionModal />`.
-  - "Entscheidung loeschen" → Open `<ConfirmDeleteDialog />`.
-  - "Statistik anzeigen" → Navigate to decision page (temporary).
+  - "Edit question" (Figma: "Frage bearbeiten") → Open `<EditQuestionModal />`.
+  - "Delete decision" (Figma: "Entscheidung loeschen") → Open `<ConfirmDeleteDialog />`.
+  - "Show statistics" (Figma: "Statistik anzeigen") → Navigate to decision page (temporary).
 
 ## Verification Plan
 

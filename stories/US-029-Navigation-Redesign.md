@@ -7,7 +7,7 @@
 ## Acceptance Criteria
 1. **Dark Background**: Full-width dark navigation bar, seamless with page background.
 2. **Logo**: "Decide-O-Mat" in bold display font (left-aligned).
-3. **Navigation Links**: "Entscheidung" (new decision/home) and "Aktivitaeten" (archive/my decisions) links.
+3. **Navigation Links**: "Decision" (Figma: "Entscheidung") for new decision/home and "Activities" (Figma: "Aktivitaeten") for archive/my decisions.
 4. **Dark Mode Toggle**: A circular button with a moon/sun icon to switch between dark and light themes (if theme toggle is decided in US-028).
 5. **User Section** (right-aligned):
    - User avatar (emoji or photo)

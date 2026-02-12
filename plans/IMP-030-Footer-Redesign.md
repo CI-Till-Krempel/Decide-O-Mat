@@ -8,7 +8,7 @@ Redesign the footer to match the Figma design with legal links and branding.
 ### Frontend
 #### [MODIFY] `frontend/src/components/Footer.jsx`
 - Restructure JSX layout:
-  - Left section: Legal links — "AGB", "Datenschutz", "Impressum".
+  - Left section: Legal links — "Terms" (Figma: "AGB"), "Privacy" (Figma: "Datenschutz"), "Imprint" (Figma: "Impressum").
   - Right section: "Decide-O-Mat" text + version number.
 - Remove encryption status indicator (or relocate — decision pending).
 - Remove old inline styles; use CSS Module.
@@ -22,9 +22,9 @@ Redesign the footer to match the Figma design with legal links and branding.
 
 ### Routing
 - Add placeholder routes for legal pages:
-  - `/legal/terms` (AGB)
-  - `/legal/privacy` (Datenschutz)
-  - `/legal/imprint` (Impressum)
+  - `/legal/terms` (Figma: "AGB")
+  - `/legal/privacy` (Figma: "Datenschutz")
+  - `/legal/imprint` (Figma: "Impressum")
 - These render placeholder content until US-016 is fully implemented.
 
 #### [MODIFY] `frontend/src/App.jsx` (or router config)

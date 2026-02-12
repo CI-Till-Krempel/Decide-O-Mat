@@ -7,21 +7,21 @@
 ## Acceptance Criteria
 
 ### Edit Question
-1. **Trigger**: "Frage bearbeiten" action from the archive context menu.
+1. **Trigger**: "Edit question" (Figma: "Frage bearbeiten") action from the archive context menu.
 2. **Inline Edit or Modal**: User can modify the question text (implementation TBD — no detailed design).
 3. **Encryption**: If the decision is E2E encrypted, the question must be re-encrypted with the stored key.
 4. **Authorization**: Only the decision owner can edit the question.
 5. **Real-time Update**: The updated question propagates to all subscribed clients.
 
 ### Delete Decision
-6. **Trigger**: "Entscheidung loeschen" action from the archive context menu.
+6. **Trigger**: "Delete decision" (Figma: "Entscheidung loeschen") action from the archive context menu.
 7. **Confirmation**: User must confirm the deletion (dialog or inline confirmation).
 8. **Cascade Delete**: All subcollections are deleted (arguments, votes, participants, finalVotes).
 9. **Authorization**: Only the decision owner can delete a decision.
 10. **Feedback**: Success/error toast notification after deletion.
 
 ### View Statistics
-11. **Trigger**: "Statistik anzeigen" from context menu OR statistics icon in the Election hero.
+11. **Trigger**: "View statistics" (Figma: "Statistik anzeigen") from context menu OR statistics icon in the Election hero.
 12. **Content**: TBD (no Figma design exists for the statistics view).
 13. **Possible Metrics**: Total votes, vote distribution, participation timeline, argument count, most-voted argument.
 

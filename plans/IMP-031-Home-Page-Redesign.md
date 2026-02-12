@@ -1,7 +1,7 @@
 # Implementation Plan - US-031: Home Page Redesign
 
 ## Goal
-Redesign the home page to match the Figma "Startseite" with a full-bleed dark layout, background illustration, and new input UX.
+Redesign the home page to match the Figma "Home page" (Figma: "Startseite") with a full-bleed dark layout, background illustration, and new input UX.
 
 ## Proposed Changes
 
@@ -11,10 +11,10 @@ Redesign the home page to match the Figma "Startseite" with a full-bleed dark la
 - Restructure JSX:
   - Background illustration layer (absolute/fixed positioned).
   - Centered content container (~578px max-width):
-    - Heading: "Einfach entscheiden" (large, bold, white).
+    - Heading: "Simply decide" (Figma: "Einfach entscheiden") (large, bold, white).
     - Description paragraph (light gray, max-width constrained).
     - Input section:
-      - Floating-label text input ("Zur Klaerung stehende Frage").
+      - Floating-label text input ("Question to be decided" (Figma: "Zur Klaerung stehende Frage")).
       - Clear button (X icon) visible when text is present.
       - Circular green submit button (arrow-right icon) centered below input.
   - Remove inline "Start Deciding" button.
