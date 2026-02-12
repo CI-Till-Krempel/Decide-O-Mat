@@ -112,6 +112,9 @@
     "privacyPolicy": "Privacy Policy",
     "imprint": "Imprint"
   },
+  "legal": {
+    "placeholder": "This page is under construction. Content will be available soon."
+  },
   "addArgumentForm": {
     "placeholderPro": "Add a Pro...",
     "placeholderCon": "Add a Con...",

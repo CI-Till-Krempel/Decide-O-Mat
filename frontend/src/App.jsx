@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Footer from './components/Footer';
 import MyDecisions from './pages/MyDecisions';
 import MagicHandler from './pages/MagicHandler';
+import LegalPage from './pages/LegalPage';
 
 function App() {
   const [isReady, setIsReady] = React.useState(false);
@@ -54,6 +55,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/my-decisions" element={<MyDecisions />} />
               <Route path="/magic" element={<MagicHandler />} />
+              <Route path="/legal/:section" element={<LegalPage />} />
             </Routes>
           </div>
           <Footer />
