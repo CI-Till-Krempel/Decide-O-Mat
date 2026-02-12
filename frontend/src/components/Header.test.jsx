@@ -21,13 +21,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 // Mock UserContext
-vi.mock('../contexts/UserContext', async () => {
-    const actual = await vi.importActual('../contexts/UserContext');
-    return {
-        ...actual,
-        useUser: vi.fn(() => ({ user: null })),
-    };
-});
+vi.mock('../contexts/UserContext', () => ({
+    useUser: vi.fn(() => ({ user: null })),
+}));
 
 // Mock EncryptionService
 vi.mock('../services/EncryptionService', () => ({
@@ -42,7 +38,7 @@ vi.mock('./UserSettings', () => ({
     default: () => <div data-testid="user-settings-panel">UserSettings</div>,
 }));
 
-const { useUser } = await import('../contexts/UserContext');
+import { useUser } from '../contexts/UserContext';
 
 function renderHeader(initialPath = '/') {
     return render(
