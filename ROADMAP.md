@@ -69,7 +69,7 @@
 ## v1.7 Participants and Notifications
 - **Goal**: Make visible who participates in a decision and enable notifications on new votes, arguments or versions.
 - **Features**:
-    - [ ] [US-026](stories/US-026-Participant-List.md): Participant List Sidebar
+- [ ] [US-012](stories/US-012-Private-Decisions.md): Private Decisions (Choose open/private, create a participant list)
     - [ ] [US-027](stories/US-027-Notifications.md): Decision Notifications (Push)
 
 ## v1.8 Private Decisions
