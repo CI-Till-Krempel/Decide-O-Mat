@@ -1,8 +1,9 @@
 {
   "home": {
     "title": "Decide-O-Mat",
-    "subtitle": "The easiest way to make group decisions. No login required.",
-    "inputPlaceholder": "What do you need to decide?",
+    "subtitle": "Simply decide",
+    "description": "A person makes an estimated 20,000 to 35,000 decisions per day, most of which happen automatically and unconsciously. Only about 5% of these decisions are conscious and require careful consideration, while the remaining 95% are so-called \"micro-decisions\" made quickly and often without thinking.",
+    "inputPlaceholder": "Enter your question here",
     "inputLabel": "Question to be decided",
     "buttonStart": "Start Deciding",
     "buttonStarting": "Creating...",

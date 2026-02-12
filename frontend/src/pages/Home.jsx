@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../services/firebase';
 import EncryptionService from '../services/EncryptionService';
+import styles from './Home.module.css';
+
+function ArrowIcon() {
+    return (
+        <svg className={styles.submitIcon} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" />
+        </svg>
+    );
+}
 
 export default function Home() {
+    const { t } = useTranslation();
     const [question, setQuestion] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -37,41 +48,61 @@ export default function Home() {
             navigate(targetUrl);
         } catch (err) {
             console.error(err);
-            setError('Failed to create decision. Please try again.');
+            setError(t('home.errorCreateFailed'));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="container">
-            <div className="card" style={{ textAlign: 'center', padding: '3rem 1.5rem' }}>
-                <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Decide-O-Mat</h1>
-                <p style={{ fontSize: '1.25rem', color: 'var(--color-text-muted)', marginBottom: '2rem' }}>
-                    The easiest way to make group decisions. No login required.
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', width: '100%', maxWidth: '500px' }}>
+        <div className={styles.page}>
+            <div className={styles.bgBlob1} />
+            <div className={styles.bgBlob2} />
+            <div className={styles.bgBlob3} />
+
+            <div className={styles.content}>
+                <div>
+                    <h1 className={styles.headline}>{t('home.subtitle')}</h1>
+                    <p className={styles.description}>{t('home.description')}</p>
+                </div>
+
+                <div className={styles.questionSection}>
+                    <div className={styles.inputWrapper}>
+                        <label className={styles.inputLabel}>{t('home.inputLabel')}</label>
                         <input
                             type="text"
-                            className="input"
-                            placeholder="What do you need to decide?"
+                            className={styles.inputField}
+                            placeholder={t('home.inputPlaceholder')}
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleStart()}
                             disabled={loading}
                         />
-                        <button
-                            className="btn btn-primary"
-                            style={{ whiteSpace: 'nowrap' }}
-                            onClick={handleStart}
-                            disabled={loading}
-                        >
-                            {loading ? 'Creating...' : 'Start Deciding'}
-                        </button>
+                        {question && (
+                            <button
+                                type="button"
+                                className={styles.clearButton}
+                                onClick={() => setQuestion('')}
+                                aria-label="Clear"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
+                                </svg>
+                            </button>
+                        )}
                     </div>
-                    {error && <p style={{ color: 'var(--color-danger)' }}>{error}</p>}
+
+                    <button
+                        className={styles.submitButton}
+                        onClick={handleStart}
+                        disabled={loading || !question.trim()}
+                        aria-label={t('home.buttonStart')}
+                    >
+                        <ArrowIcon />
+                    </button>
                 </div>
+
+                {error && <p className={styles.error}>{error}</p>}
             </div>
         </div>
     );
