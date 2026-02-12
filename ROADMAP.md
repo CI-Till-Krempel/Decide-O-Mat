@@ -53,20 +53,33 @@
     - [x] [US-024](stories/US-024-User-Profile.md): User Profile & Self Service (Delete Account)
     - [x] [US-025](stories/US-025-My-Decisions.md): My Decisions List
 
-## v1.6 Participants and Notifications
+## v1.6 Design Overhaul
+- **Goal**: Apply the Figma design system to the entire application — dark theme, new component library, and improved UX patterns.
+- **Figma Design File**: `ac7nNE0NZCX5iJy25dxDkY`
+- **Features**:
+    - [ ] [US-028](stories/US-028-Design-System-Foundation.md): Design System Foundation (tokens, CSS architecture, dark theme)
+    - [ ] [US-029](stories/US-029-Navigation-Redesign.md): Navigation Bar Redesign
+    - [ ] [US-030](stories/US-030-Footer-Redesign.md): Footer Redesign (legal links, branding)
+    - [ ] [US-031](stories/US-031-Home-Page-Redesign.md): Home Page Redesign (Startseite)
+    - [ ] [US-032](stories/US-032-Voting-Page-Redesign.md): Voting Page Redesign (Election hero, statement cards, floating input, FAB)
+    - [ ] [US-033](stories/US-033-Results-Page-Redesign.md): Results Page Redesign
+    - [ ] [US-034](stories/US-034-Archive-Page-Redesign.md): Archive / My Decisions Page Redesign (Aktivitaeten)
+    - [ ] [US-035](stories/US-035-Decision-Management-Actions.md): Decision Management Actions (edit question, delete decision, statistics)
+
+## v1.7 Participants and Notifications
 - **Goal**: Make visible who participates in a decision and enable notifications on new votes, arguments or versions.
 - **Features**:
     - [ ] [US-026](stories/US-026-Participant-List.md): Participant List Sidebar
     - [ ] [US-027](stories/US-027-Notifications.md): Decision Notifications (Push)
 
-## v1.7 Private Decisions
+## v1.8 Private Decisions
 - **Goal**: Make decisions private and limit participation to a list of users.
 - **Features**:
     - [ ] [US-012](stories/US-012-Private-Decisions.md): Private Decisions (Choose open/private, participant list)
     - [ ] [US-012](stories/US-012-Private-Decisions.md): Create a list of participants for private decisions
     - [ ] [US-014](stories/US-014-Restrict-Closing.md): Restrict the closing of decisions to the owner
 
-## v1.8 Production Readiness and Compliance
+## v1.9 Production Readiness and Compliance
 - **Goal**: Make the app production ready and compliant with legal requirements.
     - [ ] [US-017](stories/US-017-Custom-Domain.md): Add a productive domain address
     - [ ] [US-016](stories/US-016-Legal-Pages.md): Legal Pages (Impress, Terms, Privacy Policy)
@@ -76,7 +89,7 @@
     - [ ] [US-018](stories/US-018-GDPR-Compliance.md): GDPR Compliant use of cookies
     - [ ] [US-018](stories/US-018-GDPR-Compliance.md): GDPR Compliant use of google services
 
-## v1.9 Security
+## v1.10 Security
 - **Goal**: Make the app production ready and secure and safe to use.
     - [ ] [US-019](stories/US-019-Security-Audit.md): Do a security audit
     - [ ] [US-019](stories/US-019-Security-Audit.md): Audit user data access
@@ -100,8 +113,8 @@
     - [ ] Support timed argument voting
     - [ ] Create a cryptographically signed PDF for decisions
     - [ ] Internationalization
-    - [ ] Support dark mode
-    - [ ] UI Overhaul from Figma designs
+    - [x] Support dark mode *(→ v1.6 US-028)*
+    - [x] UI Overhaul from Figma designs *(→ v1.6 US-028 through US-035)*
     - [ ] Theming support (e.g., custom colors)
     - [ ] Support for on premise hosting
     - [ ] Support for self-hosting
