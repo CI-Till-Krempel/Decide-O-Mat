@@ -88,10 +88,7 @@ test.describe('E2EE Auditor Agent', () => {
         const argumentInput = page.getByPlaceholder('Add a Pro...');
         await expect(argumentInput).toBeVisible();
         await argumentInput.fill(argumentText);
-
-        const addButton = page.getByRole('button', { name: 'Add' }).first();
-        await expect(addButton).toBeEnabled();
-        await addButton.click();
+        await argumentInput.press('Enter');
 
         // No name prompt expected now
 
