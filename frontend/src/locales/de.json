@@ -196,6 +196,7 @@
     "confirm": "Best\u00e4tigen",
     "delete": "L\u00f6schen",
     "edit": "Bearbeiten",
-    "back": "Zur\u00fcck"
+    "back": "Zur\u00fcck",
+    "pageNotFound": "Seite nicht gefunden"
   }
 }

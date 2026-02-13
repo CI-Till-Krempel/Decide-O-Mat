@@ -79,8 +79,8 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
                 handleClose();
             }
         }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
     });
 
     const handleSave = async () => {
