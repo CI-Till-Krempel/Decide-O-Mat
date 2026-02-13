@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { subscribeToDecision, subscribeToArguments, voteDecision, addArgument, subscribeToFinalVotes } from '../services/firebase';
+import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes } from '../services/firebase';
 
 import ElectionHero from '../components/ElectionHero';
 import ColumnHeader from '../components/ColumnHeader';
@@ -228,6 +228,14 @@ function Decision() {
                 await performFinalVote(pendingAction.voteType);
             } else if (pendingAction.type === 'argument') {
                 await performSubmitArgument(pendingAction.text, pendingAction.argType);
+            } else if (pendingAction.type === 'argVote') {
+                try {
+                    const nameToSend = encryptionKey ? null : name;
+                    await voteArgument(id, pendingAction.argumentId, nameToSend);
+                } catch (error) {
+                    console.error("Error voting on argument:", error);
+                    setToast({ message: t('argumentItem.errorVoteFailed'), type: 'error' });
+                }
             }
             setPendingAction(null);
         }
@@ -333,7 +341,7 @@ function Decision() {
                                 participantMap={participantMap}
                                 encryptionKey={encryptionKey}
                                 onVoteChange={handleVoteChange}
-                                onNameRequired={() => setShowNamePrompt(true)}
+                                onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
                                 onError={(msg) => setToast({ message: msg, type: 'error' })}
                             />
                         ))
@@ -363,7 +371,7 @@ function Decision() {
                                 participantMap={participantMap}
                                 encryptionKey={encryptionKey}
                                 onVoteChange={handleVoteChange}
-                                onNameRequired={() => setShowNamePrompt(true)}
+                                onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
                                 onError={(msg) => setToast({ message: msg, type: 'error' })}
                             />
                         ))

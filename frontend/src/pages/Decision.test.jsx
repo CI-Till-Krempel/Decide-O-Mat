@@ -58,6 +58,8 @@ import {
     subscribeToDecision as mockSubscribeToDecision,
     subscribeToArguments as mockSubscribeToArguments,
     voteDecision as mockVoteDecision,
+    voteArgument as mockVoteArgument,
+    addArgument as mockAddArgument,
     subscribeToFinalVotes as mockSubscribeToFinalVotes,
 } from '../services/firebase';
 
@@ -103,6 +105,16 @@ vi.mock('../components/Spinner', () => ({
     default: () => <div role="status" aria-label="loading">Loading...</div>
 }));
 
+// Mock NamePrompt
+vi.mock('../components/NamePrompt', () => ({
+    default: ({ onSave, onCancel }) => (
+        <div data-testid="name-prompt">
+            <button data-testid="name-save" onClick={() => onSave('New User')}>Save Name</button>
+            <button data-testid="name-cancel" onClick={onCancel}>Cancel</button>
+        </div>
+    )
+}));
+
 // Mock ElectionHero — lightweight version that exposes the same prop interface
 vi.mock('../components/ElectionHero', () => ({
     default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult }) => (
@@ -120,19 +132,23 @@ vi.mock('../components/ElectionHero', () => ({
 
 // Mock StatementCard — avoids subscribeToArgumentVotes subscriptions
 vi.mock('../components/StatementCard', () => ({
-    default: ({ argument }) => (
-        <div data-testid={`statement-${argument.id}`}>{argument.text}</div>
+    default: ({ argument, onNameRequired }) => (
+        <div data-testid={`statement-${argument.id}`}>
+            {argument.text}
+            <button data-testid={`vote-${argument.id}`} onClick={() => onNameRequired(argument.id)}>Vote</button>
+        </div>
     )
 }));
 
 // Mock FloatingArgumentInput
 vi.mock('../components/FloatingArgumentInput', () => ({
-    default: ({ type, onClose }) => (
+    default: ({ type, onSubmit, onClose }) => (
         <div data-testid="floating-input">
             <input
                 placeholder={type === 'pro' ? 'Add a Pro...' : 'Add a Con...'}
                 data-testid="arg-input"
             />
+            <button onClick={() => onSubmit('Test argument', type)} data-testid="arg-submit">Submit</button>
             <button onClick={onClose} aria-label="Close">Close</button>
         </div>
     )
@@ -509,6 +525,75 @@ describe('Decision Component', () => {
 
             await waitFor(() => {
                 expect(screen.getByPlaceholderText('Add a Con...')).toBeInTheDocument();
+            });
+        });
+    });
+
+    describe('Argument Submission', () => {
+        it('submits argument through FloatingArgumentInput', async () => {
+            const user = userEvent.setup();
+            mockAddArgument.mockResolvedValue({ success: true });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByLabelText('Add pro')).toBeInTheDocument();
+            });
+
+            // Open the floating input
+            await user.click(screen.getByLabelText('Add pro'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('arg-submit')).toBeInTheDocument();
+            });
+
+            // Submit the argument
+            await user.click(screen.getByTestId('arg-submit'));
+
+            await waitFor(() => {
+                expect(mockAddArgument).toHaveBeenCalledWith(
+                    'test-decision-123',
+                    'pro',
+                    'Test argument',
+                    'Test User',
+                    'test-user-id'
+                );
+            });
+        });
+    });
+
+    describe('Name Prompt for Argument Vote', () => {
+        it('shows name prompt and retries argument vote after name save', async () => {
+            const user = userEvent.setup();
+            mockVoteArgument.mockResolvedValue({ success: true });
+
+            // User without displayName
+            useUser.mockReturnValue({
+                user: { userId: 'test-user-id', displayName: '' },
+                setDisplayName: vi.fn()
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByTestId('statement-arg-1')).toBeInTheDocument();
+            });
+
+            // Click vote on an argument — triggers onNameRequired
+            await user.click(screen.getByTestId('vote-arg-1'));
+
+            // Name prompt should appear
+            await waitFor(() => {
+                expect(screen.getByTestId('name-prompt')).toBeInTheDocument();
+            });
+
+            // Save name — should retry the argument vote
+            await user.click(screen.getByTestId('name-save'));
+
+            await waitFor(() => {
+                expect(mockVoteArgument).toHaveBeenCalledWith(
+                    'test-decision-123',
+                    'arg-1',
+                    'New User'
+                );
             });
         });
     });

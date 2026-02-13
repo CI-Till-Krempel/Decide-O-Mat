@@ -44,10 +44,11 @@ export default function FloatingArgumentInput({ type, onSubmit, onClose, isLoadi
         <div className={styles.backdrop} onClick={handleBackdropClick}>
         <div className={styles.overlay}>
             <div className={styles.inputWrapper}>
-                <label className={styles.inputLabel}>
+                <label className={styles.inputLabel} htmlFor="floating-arg-input">
                     {t('decision.argumentLabel')}
                 </label>
                 <input
+                    id="floating-arg-input"
                     ref={inputRef}
                     type="text"
                     className={styles.inputField}

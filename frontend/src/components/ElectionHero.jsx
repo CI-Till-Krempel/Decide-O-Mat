@@ -47,9 +47,9 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
 
     return (
         <div className={styles.hero}>
-            <button className={styles.statsButton} aria-label={t('decision.statistics')} type="button">
+            <span className={styles.statsButton} aria-hidden="true">
                 <StatsIcon />
-            </button>
+            </span>
 
             <h1 className={styles.question}>{question}</h1>
 
