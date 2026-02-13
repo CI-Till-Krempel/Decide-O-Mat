@@ -88,6 +88,9 @@
   --shadow-md: 0 4px 8px -1px rgb(0 0 0 / 0.4);
   --shadow-lg: 0 10px 20px -3px rgb(0 0 0 / 0.5);
 
+  /* --- Layout --- */
+  --header-height: 56px;
+
   /* --- Opacity --- */
   --opacity-nav: 0.85;
 }

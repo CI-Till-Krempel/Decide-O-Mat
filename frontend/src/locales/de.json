@@ -1,12 +1,14 @@
 {
   "home": {
     "title": "Decide-O-Mat",
-    "subtitle": "Einfach entscheiden. Kein Login erforderlich.",
+    "subtitle": "Einfach entscheiden",
+    "description": "Ein Mensch trifft sch\u00e4tzungsweise zwischen 20.000 und 35.000 Entscheidungen pro Tag, wobei die meisten davon automatisch und unbewusst ablaufen. Nur etwa 5 % dieser Entscheidungen sind bewusst und erfordern eine sorgf\u00e4ltige Abw\u00e4gung, w\u00e4hrend die restlichen 95 % als sogenannte \u201eMikroentscheidungen\u201c schnell und oft ohne Nachdenken getroffen werden.",
     "inputPlaceholder": "Gib hier deine Frage ein",
     "inputLabel": "Zur Kl\u00e4rung stehende Frage",
     "buttonStart": "Entscheidung starten",
     "buttonStarting": "Wird erstellt...",
-    "errorCreateFailed": "Entscheidung konnte nicht erstellt werden. Bitte versuche es erneut."
+    "errorCreateFailed": "Entscheidung konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "clearAlt": "L\u00f6schen"
   },
   "decision": {
     "notFound": "Entscheidung nicht gefunden",

@@ -1,47 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useUser } from '../contexts/UserContext';
 import { updateUserDisplayName } from '../services/firebase';
 import ParticipantService from '../services/ParticipantService';
 import MagicLinkData from './MagicLinkData';
-
-const panelStyle = {
-    position: 'fixed',
-    top: '4rem',
-    right: '1rem',
-    padding: '1rem',
-    backgroundColor: 'var(--color-bg-card)',
-    border: '1px solid var(--color-border-card)',
-    borderRadius: 'var(--radius-sm)',
-    boxShadow: 'var(--shadow-lg)',
-    zIndex: 110,
-    minWidth: '280px',
-    maxWidth: '320px',
-    color: 'var(--color-text-on-surface)',
-};
-
-const btnSecondary = {
-    padding: '0.5rem',
-    fontSize: '0.75rem',
-    border: '1px solid var(--color-border-outline)',
-    borderRadius: 'var(--radius-xs)',
-    background: 'transparent',
-    color: 'var(--color-text-on-surface)',
-    cursor: 'pointer',
-};
-
-const btnDanger = {
-    padding: '0.5rem',
-    fontSize: '0.75rem',
-    border: 'none',
-    borderRadius: 'var(--radius-xs)',
-    background: 'var(--color-danger)',
-    color: 'white',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-};
+import styles from './UserSettings.module.css';
 
 function UserSettings({ decisionId, encryptionKey, onClose }) {
+    const { t } = useTranslation();
     const { user, logout, deleteAccount, setDisplayName, resetToInitialName, getInitialName } = useUser();
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
@@ -140,7 +107,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
             setShowDeleteConfirm(false);
             handleClose();
         } catch (error) {
-            setDeleteError("Failed to delete account. Check password.");
+            setDeleteError(t('userSettings.deleteError'));
             console.error(error);
         }
     };
@@ -156,17 +123,17 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     if (showDeleteConfirm) {
         const needsPassword = user.providers && user.providers.includes('password');
         return (
-            <div ref={panelRef} style={panelStyle}>
-                <h4 style={{ marginTop: 0, color: 'var(--color-danger)' }}>Delete Account?</h4>
-                <p style={{ fontSize: '0.85rem' }}>
-                    This action is <strong>irreversible</strong>. Not even we can undo this.
+            <div ref={panelRef} className={styles.panel}>
+                <h4 className={`${styles.sectionTitle} ${styles.dangerColor}`}>{t('userSettings.deleteTitle')}</h4>
+                <p className={styles.infoText}>
+                    <strong>{t('userSettings.deleteWarning')}</strong>
                 </p>
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-                    Your votes will be anonymized to preserve decision integrity.
+                <p className={`${styles.infoText} ${styles.mutedText}`}>
+                    {t('userSettings.deleteVotesWarning')}
                 </p>
                 {needsPassword && (
-                    <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>Confirm Password:</label>
+                    <div className={styles.passwordGroup}>
+                        <label className={styles.inputLabel}>{t('userSettings.deletePasswordLabel')}</label>
                         <input
                             type="password"
                             value={deletePassword}
@@ -175,10 +142,10 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
                         />
                     </div>
                 )}
-                {deleteError && <div style={{ color: 'var(--color-danger)', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{deleteError}</div>}
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button onClick={handleCancel} style={{ ...btnSecondary, flex: 1 }}>Cancel</button>
-                    <button onClick={handleDeleteAccount} style={{ ...btnDanger, flex: 1 }}>Delete</button>
+                {deleteError && <div className={styles.errorText}>{deleteError}</div>}
+                <div className={styles.actionRow}>
+                    <button onClick={handleCancel} className={`${styles.btnSecondary} ${styles.flexOne}`}>{t('userSettings.buttonCancel')}</button>
+                    <button onClick={handleDeleteAccount} className={`${styles.btnDanger} ${styles.flexOne}`}>{t('userSettings.buttonDelete')}</button>
                 </div>
             </div>
         );
@@ -187,22 +154,22 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     // Authenticated (non-anonymous) user
     if (!user.isAnonymous) {
         return (
-            <div ref={panelRef} style={{ ...panelStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 'auto' }}>
+            <div ref={panelRef} className={`${styles.panel} ${styles.panelRow}`}>
                 {user.photoURL && (
                     <img
                         src={user.photoURL}
-                        alt="Avatar"
-                        style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+                        alt={t('userSettings.avatarAlt')}
+                        className={styles.avatar}
                     />
                 )}
-                <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                <span className={styles.displayName}>
                     {user.displayName}
                 </span>
-                <button onClick={handleLogout} style={btnSecondary}>
-                    Logout
+                <button onClick={handleLogout} className={styles.btnSecondary}>
+                    {t('userSettings.buttonLogout')}
                 </button>
-                <button onClick={() => setShowDeleteConfirm(true)} style={btnDanger}>
-                    Delete
+                <button onClick={() => setShowDeleteConfirm(true)} className={styles.btnDanger}>
+                    {t('userSettings.buttonDelete')}
                 </button>
             </div>
         );
@@ -211,10 +178,10 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     // Transfer panel
     if (showTransfer) {
         return (
-            <div ref={panelRef} style={panelStyle}>
+            <div ref={panelRef} className={styles.panel}>
                 <MagicLinkData />
-                <button onClick={() => setShowTransfer(false)} style={{ ...btnSecondary, marginTop: '0.5rem', width: '100%' }}>
-                    Close
+                <button onClick={() => setShowTransfer(false)} className={`${styles.btnSecondary} ${styles.fullWidthBtn}`}>
+                    {t('userSettings.buttonClose')}
                 </button>
             </div>
         );
@@ -224,26 +191,17 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     if (showResetConfirm) {
         const initialName = getInitialName();
         return (
-            <div ref={panelRef} style={panelStyle}>
-                <h4 style={{ marginTop: 0 }}>Reset Name?</h4>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                    This will revert your display name to your original anonymous identity:
+            <div ref={panelRef} className={styles.panel}>
+                <h4 className={styles.sectionTitle}>{t('userSettings.resetTitle')}</h4>
+                <p className={`${styles.smallText} ${styles.mutedText}`}>
+                    {t('userSettings.resetDescription')}
                 </p>
-                <div style={{
-                    padding: '0.5rem',
-                    background: 'var(--color-bg-base)',
-                    border: '1px solid var(--color-border-card)',
-                    borderRadius: 'var(--radius-xs)',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    marginBottom: '1rem',
-                    fontSize: '0.9rem'
-                }}>
-                    {initialName || 'Original Name'}
+                <div className={styles.previewBox}>
+                    {initialName || t('userSettings.resetOriginal')}
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button onClick={() => setShowResetConfirm(false)} style={{ ...btnSecondary, flex: 1 }}>Cancel</button>
-                    <button onClick={confirmReset} style={{ ...btnDanger, flex: 1 }}>Reset</button>
+                <div className={styles.actionRow}>
+                    <button onClick={() => setShowResetConfirm(false)} className={`${styles.btnSecondary} ${styles.flexOne}`}>{t('userSettings.buttonCancel')}</button>
+                    <button onClick={confirmReset} className={`${styles.btnDanger} ${styles.flexOne}`}>{t('userSettings.buttonReset')}</button>
                 </div>
             </div>
         );
@@ -252,18 +210,18 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     // Help panel
     if (showHelp) {
         return (
-            <div ref={panelRef} style={panelStyle}>
-                <h4 style={{ marginTop: 0 }}>Anonymous Identity</h4>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                    You are participating anonymously. Your identity is stored securely on this device.
+            <div ref={panelRef} className={styles.panel}>
+                <h4 className={styles.sectionTitle}>{t('userSettings.helpTitle')}</h4>
+                <p className={`${styles.smallText} ${styles.mutedText}`}>
+                    {t('userSettings.helpDescription')}
                 </p>
-                <ul style={{ fontSize: '0.875rem', paddingLeft: '1.2rem', color: 'var(--color-text-muted)' }}>
-                    <li><strong style={{ color: 'var(--color-text-on-surface)' }}>Cipher</strong>: Your display name is encrypted end-to-end.</li>
-                    <li><strong style={{ color: 'var(--color-text-on-surface)' }}>No Login</strong>: You don&apos;t need an account. We remembered you via a secure ID.</li>
-                    <li><strong style={{ color: 'var(--color-text-on-surface)' }}>Transfer</strong>: Use the transfer button to move your identity to another device.</li>
+                <ul className={styles.helpList}>
+                    <li><strong className={styles.boldLabel}>{t('userSettings.helpCipherLabel')}</strong>: {t('userSettings.helpCipher')}</li>
+                    <li><strong className={styles.boldLabel}>{t('userSettings.helpNoLoginLabel')}</strong>: {t('userSettings.helpNoLogin')}</li>
+                    <li><strong className={styles.boldLabel}>{t('userSettings.helpTransferLabel')}</strong>: {t('userSettings.helpTransfer')}</li>
                 </ul>
-                <button onClick={() => setShowHelp(false)} style={{ ...btnSecondary, marginTop: '0.5rem', width: '100%' }}>
-                    Close
+                <button onClick={() => setShowHelp(false)} className={`${styles.btnSecondary} ${styles.fullWidthBtn}`}>
+                    {t('userSettings.buttonClose')}
                 </button>
             </div>
         );
@@ -272,76 +230,43 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     // Default panel (anonymous user controls)
     if (!isEditing) {
         return (
-            <div ref={panelRef} style={{
-                ...panelStyle,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-                minWidth: '220px'
-            }}>
+            <div ref={panelRef} className={`${styles.panel} ${styles.panelColumn}`}>
                 {/* Identity Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '500', display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>You are</span>
-                        <span title={user.displayName}>{user.displayName || 'Guest'}</span>
+                <div className={styles.identityHeader}>
+                    <div className={styles.identityInfo}>
+                        <span className={styles.youAreLabel}>{t('userSettings.youAre')}</span>
+                        <span title={user.displayName}>{user.displayName || t('userSettings.guestLabel')}</span>
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
-                        style={{
-                            padding: '4px',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '1.1rem',
-                            color: 'var(--color-accent-secondary)'
-                        }}
-                        title="Edit Name"
+                        className={styles.editButton}
+                        title={t('userSettings.editNameButton')}
                     >
                         ✏️
                     </button>
                 </div>
 
                 {/* Actions */}
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button onClick={() => setShowResetConfirm(true)} style={{ ...btnSecondary, flex: 1 }} title="Reset to your initial anonymous name">
-                        Reset
+                <div className={styles.actionRow}>
+                    <button onClick={() => setShowResetConfirm(true)} className={`${styles.btnSecondary} ${styles.flexOne}`} title={t('userSettings.resetDescription')}>
+                        {t('userSettings.buttonReset')}
                     </button>
-                    <button onClick={() => setShowTransfer(true)} style={{ ...btnSecondary, flex: 1 }} title="Transfer Identity">
-                        Transfer
+                    <button onClick={() => setShowTransfer(true)} className={`${styles.btnSecondary} ${styles.flexOne}`} title={t('userSettings.titleTransfer')}>
+                        {t('userSettings.buttonTransfer')}
                     </button>
                 </div>
 
-                <div style={{ height: '1px', background: 'var(--color-border-card)', margin: '0.25rem 0' }} />
+                <div className={styles.divider} />
 
                 {/* Footer Actions */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <button
-                        onClick={handleLogin}
-                        style={{
-                            ...btnSecondary,
-                            border: '1px solid var(--color-accent-primary)',
-                            color: 'var(--color-accent-primary)',
-                            fontWeight: 'bold'
-                        }}
-                    >
-                        Login
+                <div className={styles.footerRow}>
+                    <button onClick={handleLogin} className={styles.loginButton}>
+                        {t('userSettings.buttonLogin')}
                     </button>
                     <button
                         onClick={() => setShowHelp(true)}
-                        style={{
-                            width: '24px',
-                            height: '24px',
-                            borderRadius: '50%',
-                            border: '1px solid var(--color-border-outline)',
-                            background: 'transparent',
-                            color: 'var(--color-text-muted)',
-                            cursor: 'pointer',
-                            fontSize: '0.8rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                        title="Help"
+                        className={styles.helpButton}
+                        title={t('userSettings.buttonHelp')}
                     >
                         ?
                     </button>
@@ -352,34 +277,27 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
 
     // Edit name panel
     return (
-        <div ref={panelRef} style={panelStyle}>
-            <div style={{ marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 'bold' }}>
-                Edit Your Name
+        <div ref={panelRef} className={styles.panel}>
+            <div className={styles.editTitle}>
+                {t('userSettings.editTitle')}
             </div>
             <input
                 type="text"
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
-                placeholder="Enter your name"
+                placeholder={t('userSettings.editPlaceholder')}
                 autoFocus
                 className="input"
                 style={{ marginBottom: '0.5rem' }}
             />
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button onClick={handleCancel} style={btnSecondary}>Cancel</button>
+            <div className={styles.editActions}>
+                <button onClick={handleCancel} className={styles.btnSecondary}>{t('userSettings.buttonCancel')}</button>
                 <button
                     onClick={handleSave}
                     disabled={!editedName.trim()}
-                    style={{
-                        ...btnSecondary,
-                        border: 'none',
-                        backgroundColor: editedName.trim() ? 'var(--color-accent-secondary)' : 'var(--color-border-outline)',
-                        color: editedName.trim() ? 'var(--color-text-on-secondary)' : 'var(--color-text-muted)',
-                        cursor: editedName.trim() ? 'pointer' : 'not-allowed',
-                        fontWeight: 'bold'
-                    }}
+                    className={`${styles.saveButton} ${editedName.trim() ? styles.saveButtonEnabled : styles.saveButtonDisabled}`}
                 >
-                    Save
+                    {t('userSettings.buttonSave')}
                 </button>
             </div>
         </div>

@@ -23,7 +23,7 @@ test.describe('E2EE Auditor Agent', () => {
         page.on('pageerror', err => console.log(`BROWSER ERROR: ${err}`));
 
         await page.goto('/');
-        await page.getByPlaceholder('What do you need to decide?').fill(decisionQuestion);
+        await page.getByPlaceholder('Enter your question here').fill(decisionQuestion);
         await page.getByRole('button', { name: 'Start Deciding' }).click();
 
         // Verify Create Decision Payload
