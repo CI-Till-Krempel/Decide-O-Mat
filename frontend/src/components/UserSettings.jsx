@@ -1,12 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { updateUserDisplayName } from '../services/firebase';
 import ParticipantService from '../services/ParticipantService';
 import MagicLinkData from './MagicLinkData';
-// import NameGenerator from '../utils/NameGenerator'; // Unused
 
-function UserSettings({ decisionId, encryptionKey }) {
+const panelStyle = {
+    position: 'fixed',
+    top: '4rem',
+    right: '1rem',
+    padding: '1rem',
+    backgroundColor: 'var(--color-bg-card)',
+    border: '1px solid var(--color-border-card)',
+    borderRadius: 'var(--radius-sm)',
+    boxShadow: 'var(--shadow-lg)',
+    zIndex: 110,
+    minWidth: '280px',
+    maxWidth: '320px',
+    color: 'var(--color-text-on-surface)',
+};
+
+const btnSecondary = {
+    padding: '0.5rem',
+    fontSize: '0.75rem',
+    border: '1px solid var(--color-border-outline)',
+    borderRadius: 'var(--radius-xs)',
+    background: 'transparent',
+    color: 'var(--color-text-on-surface)',
+    cursor: 'pointer',
+};
+
+const btnDanger = {
+    padding: '0.5rem',
+    fontSize: '0.75rem',
+    border: 'none',
+    borderRadius: 'var(--radius-xs)',
+    background: 'var(--color-danger)',
+    color: 'white',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+};
+
+function UserSettings({ decisionId, encryptionKey, onClose }) {
     const { user, logout, deleteAccount, setDisplayName, resetToInitialName, getInitialName } = useUser();
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
@@ -17,6 +52,18 @@ function UserSettings({ decisionId, encryptionKey }) {
     const [deletePassword, setDeletePassword] = useState('');
     const [deleteError, setDeleteError] = useState('');
     const [editedName, setEditedName] = useState(user?.displayName || '');
+    const panelRef = useRef(null);
+
+    const handleClose = () => {
+        setIsEditing(false);
+        setShowTransfer(false);
+        setShowHelp(false);
+        setShowResetConfirm(false);
+        setShowDeleteConfirm(false);
+        setDeletePassword('');
+        setDeleteError('');
+        if (onClose) onClose();
+    };
 
     useEffect(() => {
         if (user?.displayName && user.displayName !== editedName) {
@@ -24,6 +71,17 @@ function UserSettings({ decisionId, encryptionKey }) {
             setEditedName(user.displayName);
         }
     }, [user?.displayName]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Close on outside click
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (panelRef.current && !panelRef.current.contains(event.target)) {
+                handleClose();
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    });
 
     const handleSave = async () => {
         if (editedName.trim()) {
@@ -33,9 +91,7 @@ function UserSettings({ decisionId, encryptionKey }) {
 
             if (decisionId && user.userId) {
                 try {
-                    // Update global participant map (primary source for chips)
                     await ParticipantService.registerParticipant(decisionId, trimmedName, encryptionKey || null);
-                    // Update legacy fields (optional but safe)
                     await updateUserDisplayName(decisionId, trimmedName);
                 } catch (error) {
                     console.error("Failed to update display name:", error);
@@ -55,17 +111,11 @@ function UserSettings({ decisionId, encryptionKey }) {
         setDeleteError('');
     };
 
-    const handleResetClick = () => {
-        setShowResetConfirm(true);
-    };
-
     const confirmReset = async () => {
         const restoredName = resetToInitialName();
         setShowResetConfirm(false);
-        // Sync with backend if participating in a decision
         if (decisionId && user.userId && restoredName) {
             try {
-                // Update global participant map
                 await ParticipantService.registerParticipant(decisionId, restoredName, encryptionKey || null);
                 await updateUserDisplayName(decisionId, restoredName);
             } catch (error) {
@@ -77,6 +127,7 @@ function UserSettings({ decisionId, encryptionKey }) {
     const handleLogout = async () => {
         try {
             await logout();
+            handleClose();
         } catch (error) {
             console.error("Logout failed", error);
         }
@@ -87,6 +138,7 @@ function UserSettings({ decisionId, encryptionKey }) {
         try {
             await deleteAccount(deletePassword);
             setShowDeleteConfirm(false);
+            handleClose();
         } catch (error) {
             setDeleteError("Failed to delete account. Check password.");
             console.error(error);
@@ -94,67 +146,48 @@ function UserSettings({ decisionId, encryptionKey }) {
     };
 
     const handleLogin = () => {
+        handleClose();
         navigate('/login');
     };
 
     if (!user) return null;
 
+    // Delete confirmation
     if (showDeleteConfirm) {
         const needsPassword = user.providers && user.providers.includes('password');
-
         return (
-            <div style={{
-                position: 'fixed', top: '1rem', right: '1rem', padding: '1rem',
-                backgroundColor: 'white', border: '1px solid #ddd', borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)', zIndex: 110,
-                minWidth: '280px', maxWidth: '300px'
-            }}>
+            <div ref={panelRef} style={panelStyle}>
                 <h4 style={{ marginTop: 0, color: 'var(--color-danger)' }}>Delete Account?</h4>
                 <p style={{ fontSize: '0.85rem' }}>
                     This action is <strong>irreversible</strong>. Not even we can undo this.
                 </p>
-                <p style={{ fontSize: '0.85rem', color: '#666' }}>
-                    Your votes will be anonymized to "Deleted [Animal]" to preserve decision integrity.
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                    Your votes will be anonymized to preserve decision integrity.
                 </p>
-
                 {needsPassword && (
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.25rem' }}>Confim Password:</label>
+                        <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>Confirm Password:</label>
                         <input
                             type="password"
                             value={deletePassword}
                             onChange={(e) => setDeletePassword(e.target.value)}
-                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                            className="input"
                         />
                     </div>
                 )}
-
-                {deleteError && <div style={{ color: 'red', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{deleteError}</div>}
-
+                {deleteError && <div style={{ color: 'var(--color-danger)', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{deleteError}</div>}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button onClick={handleCancel} style={{ flex: 1, padding: '0.5rem', cursor: 'pointer', background: 'white', border: '1px solid #ccc', borderRadius: '4px' }}>Cancel</button>
-                    <button onClick={handleDeleteAccount} style={{ flex: 1, padding: '0.5rem', cursor: 'pointer', background: 'var(--color-danger)', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>Delete</button>
+                    <button onClick={handleCancel} style={{ ...btnSecondary, flex: 1 }}>Cancel</button>
+                    <button onClick={handleDeleteAccount} style={{ ...btnDanger, flex: 1 }}>Delete</button>
                 </div>
             </div>
         );
     }
 
+    // Authenticated (non-anonymous) user
     if (!user.isAnonymous) {
         return (
-            <div style={{
-                position: 'fixed',
-                top: '1rem',
-                right: '1rem',
-                padding: '0.5rem 1rem',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                zIndex: 100
-            }}>
+            <div ref={panelRef} style={{ ...panelStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 'auto' }}>
                 {user.photoURL && (
                     <img
                         src={user.photoURL}
@@ -165,95 +198,42 @@ function UserSettings({ decisionId, encryptionKey }) {
                 <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
                     {user.displayName}
                 </span>
-                <button
-                    onClick={handleLogout}
-                    style={{
-                        padding: '0.25rem 0.5rem',
-                        fontSize: '0.75rem',
-                        border: '1px solid var(--color-danger)',
-                        borderRadius: '4px',
-                        backgroundColor: 'white',
-                        color: 'var(--color-danger)',
-                        cursor: 'pointer'
-                    }}
-                >
+                <button onClick={handleLogout} style={btnSecondary}>
                     Logout
                 </button>
-                <button
-                    onClick={() => setShowDeleteConfirm(true)}
-                    style={{
-                        padding: '0.25rem 0.5rem',
-                        fontSize: '0.75rem',
-                        border: 'none',
-                        borderRadius: '4px',
-                        backgroundColor: 'var(--color-danger)',
-                        color: 'white',
-                        cursor: 'pointer'
-                    }}
-                >
+                <button onClick={() => setShowDeleteConfirm(true)} style={btnDanger}>
                     Delete
                 </button>
             </div>
         );
     }
 
+    // Transfer panel
     if (showTransfer) {
         return (
-            <div style={{
-                position: 'fixed',
-                top: '1rem',
-                right: '1rem',
-                padding: '1rem',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                zIndex: 100,
-                minWidth: '300px'
-            }}>
+            <div ref={panelRef} style={panelStyle}>
                 <MagicLinkData />
-                <button
-                    onClick={() => setShowTransfer(false)}
-                    style={{
-                        marginTop: '0.5rem',
-                        width: '100%',
-                        padding: '0.5rem',
-                        background: 'transparent',
-                        border: '1px solid var(--color-text-muted)',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                    }}
-                >
+                <button onClick={() => setShowTransfer(false)} style={{ ...btnSecondary, marginTop: '0.5rem', width: '100%' }}>
                     Close
                 </button>
             </div>
         );
     }
 
+    // Reset confirmation
     if (showResetConfirm) {
         const initialName = getInitialName();
         return (
-            <div style={{
-                position: 'fixed',
-                top: '1rem',
-                right: '1rem',
-                padding: '1rem',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                zIndex: 100,
-                minWidth: '250px',
-                maxWidth: '300px'
-            }}>
+            <div ref={panelRef} style={panelStyle}>
                 <h4 style={{ marginTop: 0 }}>Reset Name?</h4>
                 <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
                     This will revert your display name to your original anonymous identity:
                 </p>
                 <div style={{
                     padding: '0.5rem',
-                    background: '#f5f5f5',
-                    borderRadius: '4px',
+                    background: 'var(--color-bg-base)',
+                    border: '1px solid var(--color-border-card)',
+                    borderRadius: 'var(--radius-xs)',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     marginBottom: '1rem',
@@ -262,100 +242,42 @@ function UserSettings({ decisionId, encryptionKey }) {
                     {initialName || 'Original Name'}
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button
-                        onClick={() => setShowResetConfirm(false)}
-                        style={{
-                            flex: 1,
-                            padding: '0.5rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            background: 'white',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={confirmReset}
-                        style={{
-                            flex: 1,
-                            padding: '0.5rem',
-                            fontSize: '0.75rem',
-                            border: 'none',
-                            borderRadius: '4px',
-                            background: 'var(--color-danger)',
-                            color: 'white',
-                            cursor: 'pointer',
-                            fontWeight: 'bold'
-                        }}
-                    >
-                        Reset
-                    </button>
+                    <button onClick={() => setShowResetConfirm(false)} style={{ ...btnSecondary, flex: 1 }}>Cancel</button>
+                    <button onClick={confirmReset} style={{ ...btnDanger, flex: 1 }}>Reset</button>
                 </div>
             </div>
         );
     }
 
+    // Help panel
     if (showHelp) {
         return (
-            <div style={{
-                position: 'fixed',
-                top: '1rem',
-                right: '1rem',
-                padding: '1rem',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                zIndex: 100,
-                minWidth: '250px',
-                maxWidth: '300px'
-            }}>
+            <div ref={panelRef} style={panelStyle}>
                 <h4 style={{ marginTop: 0 }}>Anonymous Identity</h4>
                 <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
                     You are participating anonymously. Your identity is stored securely on this device.
                 </p>
                 <ul style={{ fontSize: '0.875rem', paddingLeft: '1.2rem', color: 'var(--color-text-muted)' }}>
-                    <li><strong>Cipher</strong>: Your displayName is encrypted end-to-end. Only people with the link key can see it.</li>
-                    <li><strong>No Login</strong>: You don't need an account. We remembered you via a secure ID.</li>
-                    <li><strong>Transfer</strong>: Use the transfer button to move your identity to another device.</li>
+                    <li><strong style={{ color: 'var(--color-text-on-surface)' }}>Cipher</strong>: Your display name is encrypted end-to-end.</li>
+                    <li><strong style={{ color: 'var(--color-text-on-surface)' }}>No Login</strong>: You don&apos;t need an account. We remembered you via a secure ID.</li>
+                    <li><strong style={{ color: 'var(--color-text-on-surface)' }}>Transfer</strong>: Use the transfer button to move your identity to another device.</li>
                 </ul>
-                <button
-                    onClick={() => setShowHelp(false)}
-                    style={{
-                        marginTop: '0.5rem',
-                        width: '100%',
-                        padding: '0.5rem',
-                        background: 'transparent',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                    }}
-                >
+                <button onClick={() => setShowHelp(false)} style={{ ...btnSecondary, marginTop: '0.5rem', width: '100%' }}>
                     Close
                 </button>
             </div>
         );
     }
 
+    // Default panel (anonymous user controls)
     if (!isEditing) {
         return (
-            <div style={{
-                position: 'fixed',
-                top: '1rem',
-                right: '1rem',
-                padding: '0.75rem',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            <div ref={panelRef} style={{
+                ...panelStyle,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'stretch',
                 gap: '0.75rem',
-                zIndex: 100,
-                minWidth: '200px'
+                minWidth: '220px'
             }}>
                 {/* Identity Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
@@ -363,72 +285,42 @@ function UserSettings({ decisionId, encryptionKey }) {
                         <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>You are</span>
                         <span title={user.displayName}>{user.displayName || 'Guest'}</span>
                     </div>
-                    <div>
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            style={{
-                                padding: '4px',
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontSize: '1.1rem',
-                                color: 'var(--color-primary)'
-                            }}
-                            title="Same Name"
-                        >
-                            ✏️
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        style={{
+                            padding: '4px',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '1.1rem',
+                            color: 'var(--color-accent-secondary)'
+                        }}
+                        title="Edit Name"
+                    >
+                        ✏️
+                    </button>
                 </div>
 
-                {/* Actions Group */}
+                {/* Actions */}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button
-                        onClick={handleResetClick}
-                        style={{
-                            flex: 1,
-                            padding: '0.4rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            background: 'white',
-                            cursor: 'pointer'
-                        }}
-                        title="Reset to your initial anonymous name"
-                    >
-                        🔄 Reset
+                    <button onClick={() => setShowResetConfirm(true)} style={{ ...btnSecondary, flex: 1 }} title="Reset to your initial anonymous name">
+                        Reset
                     </button>
-                    <button
-                        onClick={() => setShowTransfer(true)}
-                        style={{
-                            flex: 1,
-                            padding: '0.4rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            background: 'white',
-                            cursor: 'pointer'
-                        }}
-                        title="Transfer Identity"
-                    >
-                        ↔ Transfer
+                    <button onClick={() => setShowTransfer(true)} style={{ ...btnSecondary, flex: 1 }} title="Transfer Identity">
+                        Transfer
                     </button>
                 </div>
 
-                <div style={{ height: '1px', background: '#eee', margin: '0.25rem 0' }}></div>
+                <div style={{ height: '1px', background: 'var(--color-border-card)', margin: '0.25rem 0' }} />
 
                 {/* Footer Actions */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <button
                         onClick={handleLogin}
                         style={{
-                            padding: '0.4rem 0.8rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid var(--color-success)',
-                            borderRadius: '4px',
-                            backgroundColor: 'white',
-                            color: 'var(--color-success)',
-                            cursor: 'pointer',
+                            ...btnSecondary,
+                            border: '1px solid var(--color-accent-primary)',
+                            color: 'var(--color-accent-primary)',
                             fontWeight: 'bold'
                         }}
                     >
@@ -440,9 +332,9 @@ function UserSettings({ decisionId, encryptionKey }) {
                             width: '24px',
                             height: '24px',
                             borderRadius: '50%',
-                            border: '1px solid #ccc',
-                            background: 'white',
-                            color: '#666',
+                            border: '1px solid var(--color-border-outline)',
+                            background: 'transparent',
+                            color: 'var(--color-text-muted)',
                             cursor: 'pointer',
                             fontSize: '0.8rem',
                             display: 'flex',
@@ -458,19 +350,9 @@ function UserSettings({ decisionId, encryptionKey }) {
         );
     }
 
+    // Edit name panel
     return (
-        <div style={{
-            position: 'fixed',
-            top: '1rem',
-            right: '1rem',
-            padding: '1rem',
-            backgroundColor: 'white',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            zIndex: 100,
-            minWidth: '250px'
-        }}>
+        <div ref={panelRef} style={panelStyle}>
             <div style={{ marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 'bold' }}>
                 Edit Your Name
             </div>
@@ -480,41 +362,21 @@ function UserSettings({ decisionId, encryptionKey }) {
                 onChange={(e) => setEditedName(e.target.value)}
                 placeholder="Enter your name"
                 autoFocus
-                style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    fontSize: '0.875rem',
-                    marginBottom: '0.5rem',
-                    boxSizing: 'border-box'
-                }}
+                className="input"
+                style={{ marginBottom: '0.5rem' }}
             />
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button
-                    onClick={handleCancel}
-                    style={{
-                        padding: '0.5rem 1rem',
-                        fontSize: '0.75rem',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        backgroundColor: 'white',
-                        cursor: 'pointer'
-                    }}
-                >
-                    Cancel
-                </button>
+                <button onClick={handleCancel} style={btnSecondary}>Cancel</button>
                 <button
                     onClick={handleSave}
                     disabled={!editedName.trim()}
                     style={{
-                        padding: '0.5rem 1rem',
-                        fontSize: '0.75rem',
+                        ...btnSecondary,
                         border: 'none',
-                        borderRadius: '4px',
-                        backgroundColor: editedName.trim() ? 'var(--color-primary)' : '#ccc',
-                        color: 'white',
-                        cursor: editedName.trim() ? 'pointer' : 'not-allowed'
+                        backgroundColor: editedName.trim() ? 'var(--color-accent-secondary)' : 'var(--color-border-outline)',
+                        color: editedName.trim() ? 'var(--color-text-on-secondary)' : 'var(--color-text-muted)',
+                        cursor: editedName.trim() ? 'pointer' : 'not-allowed',
+                        fontWeight: 'bold'
                     }}
                 >
                     Save

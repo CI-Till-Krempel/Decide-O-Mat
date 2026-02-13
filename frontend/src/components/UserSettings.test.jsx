@@ -81,7 +81,7 @@ describe('UserSettings Integration', () => {
 
         render(<UserSettings />);
         fireEvent.click(screen.getByText('Delete'));
-        expect(screen.getByText('Confim Password:')).toBeInTheDocument();
+        expect(screen.getByText('Confirm Password:')).toBeInTheDocument();
     });
 
     it('does NOT show password input for Google participants', () => {
@@ -94,7 +94,7 @@ describe('UserSettings Integration', () => {
 
         render(<UserSettings />);
         fireEvent.click(screen.getByText('Delete'));
-        expect(screen.queryByText('Confim Password:')).not.toBeInTheDocument();
+        expect(screen.queryByText('Confirm Password:')).not.toBeInTheDocument();
     });
 
     it('calls deleteAccount when confirmed', async () => {
