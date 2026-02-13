@@ -27,7 +27,13 @@ export default function FloatingArgumentInput({ type, onSubmit, onClose, isLoadi
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') handleSubmit();
-        if (e.key === 'Escape') onClose();
+        if (e.key === 'Escape') {
+            if (text) {
+                setText('');
+            } else {
+                onClose();
+            }
+        }
     };
 
     const handleBackdropClick = (e) => {
