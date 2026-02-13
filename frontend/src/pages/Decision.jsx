@@ -144,23 +144,11 @@ function Decision() {
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
     };
 
-    const handleFinalVote = async (voteType) => {
-        if (votingTarget || decision.status === 'closed') return;
-
-        if (!user.displayName) {
-            setPendingAction({ type: 'vote', voteType });
-            setShowNamePrompt(true);
-            return;
-        }
-
-        await performFinalVote(voteType);
-    };
-
     const performFinalVote = async (voteType) => {
         setVotingTarget(voteType);
 
         try {
-            if (user.displayName && encryptionKey && (!participantMap || !participantMap.get(user.userId))) {
+            if (user.displayName && encryptionKey && !participantMap.has(user.userId)) {
                 try {
                     await ParticipantService.registerParticipant(id, user.displayName, encryptionKey);
                 } catch (e) {
@@ -179,6 +167,18 @@ function Decision() {
         } finally {
             setVotingTarget(null);
         }
+    };
+
+    const handleFinalVote = async (voteType) => {
+        if (votingTarget || decision.status === 'closed') return;
+
+        if (!user.displayName) {
+            setPendingAction({ type: 'vote', voteType });
+            setShowNamePrompt(true);
+            return;
+        }
+
+        await performFinalVote(voteType);
     };
 
     const handleSubmitArgument = async (text, type) => {

@@ -53,7 +53,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
 
         setVoting(true);
         try {
-            if (user.displayName && (!participantMap || !participantMap.has(user.userId))) {
+            if (user.displayName && !participantMap.has(user.userId)) {
                 try {
                     await ParticipantService.registerParticipant(decisionId, user.displayName, encryptionKey || null);
                 } catch (e) {
