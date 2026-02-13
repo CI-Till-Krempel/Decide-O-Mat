@@ -58,6 +58,11 @@ test.describe('E2EE Auditor Agent', () => {
 
         // Explicitly set the name to ensure we are testing Encryption of the specific string
         // The app auto-generates a name, so we must edit it.
+        // First open the settings panel via the header toggle button
+        const settingsToggle = page.getByTestId('settings-toggle');
+        await expect(settingsToggle).toBeVisible();
+        await settingsToggle.click();
+
         const editButton = page.getByRole('button', { name: '✏️' });
         await expect(editButton).toBeVisible();
         await editButton.click();

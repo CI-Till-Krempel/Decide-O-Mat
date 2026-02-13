@@ -12,11 +12,21 @@ export default function LegalPage() {
     const { section } = useParams();
     const { t } = useTranslation();
     const titleKey = sectionKeys[section];
-    const title = titleKey ? t(titleKey) : section;
+
+    if (!titleKey) {
+        return (
+            <div className="container">
+                <h1>{t('common.pageNotFound')}</h1>
+                <Link to="/" style={{ marginTop: 'var(--space-lg)', display: 'inline-block' }}>
+                    {t('common.back')}
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="container">
-            <h1>{title}</h1>
+            <h1>{t(titleKey)}</h1>
             <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-lg)' }}>
                 {t('legal.placeholder')}
             </p>

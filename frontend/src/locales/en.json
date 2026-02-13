@@ -197,6 +197,7 @@
     "confirm": "Confirm",
     "delete": "Delete",
     "edit": "Edit",
-    "back": "Back"
+    "back": "Back",
+    "pageNotFound": "Page Not Found"
   }
 }
