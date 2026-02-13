@@ -22,6 +22,10 @@ vi.mock('react-i18next', () => {
         'decision.resultRejected': 'Rejected',
         'decision.resultNoVotes': 'No Votes',
         'decision.errors.voteFailed': 'Failed to cast vote.',
+        'decision.participantsButton': 'Participants',
+        'decision.notifications.enableButton': 'Enable Notifications',
+        'decision.notifications.enabled': 'Notifications enabled!',
+        'decision.notifications.failed': 'Could not enable notifications.',
         'argumentList.addPro': 'Add pro',
         'argumentList.addCon': 'Add contra',
         'addArgumentForm.placeholderPro': 'Add a Pro...',
@@ -94,6 +98,14 @@ vi.mock('../services/ParticipantService', () => ({
     }
 }));
 import ParticipantService from '../services/ParticipantService';
+
+// Mock NotificationService
+vi.mock('../services/NotificationService', () => ({
+    default: {
+        requestPermission: vi.fn(),
+        onMessageListener: vi.fn(() => Promise.resolve(null)),
+    }
+}));
 
 // Mock ParticipantList component
 vi.mock('../components/ParticipantList', () => ({

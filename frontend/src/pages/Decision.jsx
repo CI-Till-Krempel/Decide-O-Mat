@@ -16,6 +16,7 @@ import Toast from '../components/Toast';
 import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
 import ParticipantService from '../services/ParticipantService';
+import NotificationService from '../services/NotificationService';
 
 import styles from './Decision.module.css';
 
@@ -41,6 +42,7 @@ function Decision() {
     const [activeColumn, setActiveColumn] = useState(null); // null | 'pro' | 'con'
     const [submittingArgument, setSubmittingArgument] = useState(false);
     const [votedArgIds, setVotedArgIds] = useState(new Set());
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
     // Parse key from URL hash
     useEffect(() => {
@@ -142,6 +144,22 @@ function Decision() {
         navigator.clipboard.writeText(window.location.href);
         setCopied(true);
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
+    };
+
+    const handleToggleNotifications = async () => {
+        if (notificationsEnabled) return;
+        try {
+            const success = await NotificationService.requestPermission(id, user.userId);
+            if (success) {
+                setNotificationsEnabled(true);
+                setToast({ message: t('decision.notifications.enabled'), type: 'success' });
+            } else {
+                setToast({ message: t('decision.notifications.failed'), type: 'error' });
+            }
+        } catch (error) {
+            console.error('Error enabling notifications:', error);
+            setToast({ message: t('decision.notifications.failed'), type: 'error' });
+        }
     };
 
     const performFinalVote = async (voteType) => {
@@ -316,6 +334,30 @@ function Decision() {
                 finalVotesList={finalVotesList}
                 participantMap={participantMap}
             />
+
+            <div className={styles.toolbar}>
+                <button
+                    className={styles.toolbarBtn}
+                    onClick={() => setShowParticipants(true)}
+                    type="button"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                    </svg>
+                    {t('decision.participantsButton')}
+                </button>
+                <button
+                    className={`${styles.toolbarBtn} ${notificationsEnabled ? styles.toolbarBtnActive : ''}`}
+                    onClick={handleToggleNotifications}
+                    disabled={notificationsEnabled}
+                    type="button"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                    </svg>
+                    {notificationsEnabled ? t('decision.notifications.enabled') : t('decision.notifications.enableButton')}
+                </button>
+            </div>
 
             <div className={styles.columns}>
                 <div className={styles.column}>
