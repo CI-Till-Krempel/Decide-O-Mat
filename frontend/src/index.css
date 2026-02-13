@@ -1,47 +1,117 @@
+/* ===================================================================
+   Design System Foundation — Figma Design Tokens (Dark Theme)
+   Figma file: ac7nNE0NZCX5iJy25dxDkY
+   =================================================================== */
+
 :root {
-  --color-primary: #6366f1;
-  /* Indigo 500 */
-  --color-primary-hover: #4f46e5;
-  /* Indigo 600 */
-  --color-secondary: #ec4899;
-  /* Pink 500 */
-  --color-background: #f8fafc;
-  /* Slate 50 */
-  --color-surface: #ffffff;
-  --color-text-main: #1e293b;
-  /* Slate 800 */
-  --color-text-muted: #64748b;
-  /* Slate 500 */
-  --color-border: #e2e8f0;
-  /* Slate 200 */
-  --color-success: #22c55e;
-  /* Green 500 */
-  --color-danger: #ef4444;
-  /* Red 500 */
+  /* --- Colors: Core Palette (from Figma) --- */
+  --color-bg-base: #050509;
+  --color-bg-card: #1d1d34;
+  --color-accent-primary: #b9dd8b;       /* Lime green — CTAs */
+  --color-accent-secondary: #c4c3fe;     /* Lavender — interactive elements */
+  --color-accent-orange: #ffc9ad;        /* Orange — own statement highlight */
+  --color-text-on-bg: #ffffff;
+  --color-text-on-surface: #ffffff;
+  --color-text-muted-alt: #aeaec6;       /* Labels, placeholders */
+  --color-border-outline: #6f6f8e;       /* Input borders, prominent outlines */
+  --color-border-card: #272745;          /* Subtle card borders */
+  --color-icon-on-primary: #384f19;      /* Icons on lime green buttons */
+  --color-text-on-secondary: #2c2b89;   /* Text on lavender buttons */
 
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* --- Colors: Semantic Aliases (backward-compatible) --- */
+  --color-primary: #c4c3fe;
+  --color-primary-hover: #b0afef;
+  --color-secondary: #b9dd8b;
+  --color-background: #050509;
+  --color-surface: #1d1d34;
+  --color-text-main: #ffffff;
+  --color-text: #ffffff;
+  --color-text-muted: #aeaec6;
+  --color-border: #272745;
+  --color-success: #b9dd8b;
+  --color-danger: #f87171;
+  --color-warning: #ffc9ad;
+  --color-bg-secondary: #1d1d34;
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* --- Typography --- */
+  --font-display: 'Alfa Slab One', serif;
+  --font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
 
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  /* Font sizes */
+  --text-display: 1.75rem;        /* 28px */
+  --text-headline-lg: 2rem;       /* 32px */
+  --text-headline-sm: 1.125rem;   /* 18px */
+  --text-label-lg: 1rem;          /* 16px */
+  --text-label-sm: 0.75rem;       /* 12px */
+  --text-body-md: 1rem;           /* 16px */
+  --text-body-sm: 0.75rem;        /* 12px */
+  --text-chip: 0.875rem;          /* 14px */
+
+  /* Line heights */
+  --leading-display: 2.375rem;       /* 38px */
+  --leading-headline-lg: 2.625rem;   /* 42px */
+  --leading-headline-sm: 1.75rem;    /* 28px */
+  --leading-label-lg: 1.375rem;      /* 22px */
+  --leading-label-sm: 1rem;          /* 16px */
+  --leading-body-md: 1.5rem;         /* 24px */
+  --leading-body-sm: 1.125rem;       /* 18px */
+  --leading-chip: 1.25rem;           /* 20px */
+
+  /* Letter spacing */
+  --tracking-sm: 0.1px;
+  --tracking-md: 0.25px;
+
+  /* --- Spacing Scale --- */
+  --space-xxs: 0px;
+  --space-xs: 0.5rem;     /* 8px */
+  --space-sm: 0.75rem;    /* 12px */
+  --space-md: 1rem;        /* 16px */
+  --space-lg: 1.5rem;      /* 24px */
+  --space-xl: 2rem;        /* 32px */
+  --space-2xl: 2.5rem;     /* 40px */
+
+  /* --- Border Radii --- */
+  --radius-none: 0;
+  --radius-xs: 0.25rem;   /* 4px — inputs */
+  --radius-sm: 0.5rem;    /* 8px — cards */
+  --radius-md: 0.5rem;    /* 8px — backward compat */
+  --radius-lg: 0.5rem;    /* 8px — backward compat */
+  --radius-xl: 0.75rem;   /* 12px */
+  --radius-full: 100px;   /* pills, circular buttons */
+
+  /* --- Stroke --- */
+  --stroke-xs: 1px;
+  --stroke-sm: 2px;
+
+  /* --- Shadows (dark theme — subtle) --- */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 8px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 20px -3px rgb(0 0 0 / 0.5);
+
+  /* --- Opacity --- */
+  --opacity-nav: 0.85;
+}
+
+/* ===================================================================
+   Global Reset & Base Styles
+   =================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   font-family: var(--font-family);
-  background-color: var(--color-background);
-  color: var(--color-text-main);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-on-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
-}
-
-* {
-  box-sizing: border-box;
+  font-size: var(--text-body-md);
+  line-height: var(--leading-body-md);
+  letter-spacing: var(--tracking-sm);
 }
 
 h1,
@@ -53,6 +123,11 @@ h6 {
   margin: 0;
   font-weight: 600;
   line-height: 1.2;
+  color: var(--color-text-on-bg);
+}
+
+a {
+  color: var(--color-accent-secondary);
 }
 
 button {
@@ -60,34 +135,48 @@ button {
   font-family: inherit;
 }
 
+input,
+textarea,
+select {
+  font-family: inherit;
+  color: var(--color-text-on-bg);
+}
+
+/* ===================================================================
+   Utility / Legacy Classes
+   =================================================================== */
+
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: var(--space-2xl) var(--space-md);
 }
 
 .card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
-  padding: 1.5rem;
-  border: 1px solid var(--color-border);
+  padding: var(--space-lg);
+  border: var(--stroke-sm) solid var(--color-border-card);
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 500;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-weight: 600;
   border: none;
   transition: all 0.2s;
+  font-size: var(--text-label-lg);
+  line-height: var(--leading-label-lg);
+  letter-spacing: var(--tracking-sm);
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: var(--color-accent-secondary);
+  color: var(--color-text-on-secondary);
 }
 
 .btn-primary:hover {
@@ -96,30 +185,40 @@ button {
 
 .input {
   width: 100%;
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  font-size: 1rem;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-xs);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  font-size: var(--text-body-md);
+  line-height: var(--leading-body-md);
+  background: transparent;
+  color: var(--color-text-on-bg);
   transition: border-color 0.2s;
+}
+
+.input::placeholder {
+  color: var(--color-text-muted-alt);
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: var(--color-accent-secondary);
+  box-shadow: 0 0 0 2px rgba(196, 195, 254, 0.2);
 }
 
-/* Participant List */
+/* ===================================================================
+   Participant List Overlay
+   =================================================================== */
+
 .participant-list-overlay {
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: 300px;
-  background-color: var(--color-surface);
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-bg-card);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.4);
   z-index: 1000;
-  padding: 2rem 1rem;
+  padding: var(--space-2xl) var(--space-md);
   overflow-y: auto;
   transition: transform 0.3s ease-in-out;
 }
@@ -136,7 +235,7 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-lg);
 }
 
 .participant-close-btn {
@@ -144,17 +243,17 @@ button {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--color-text-main);
+  color: var(--color-text-on-bg);
 }
 
 .participant-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-base);
+  border: var(--stroke-xs) solid var(--color-border-card);
 }
 
 .participant-avatar {
@@ -168,20 +267,24 @@ button {
   object-fit: cover;
 }
 
-/* Toast Notifications */
+/* ===================================================================
+   Toast Notifications
+   =================================================================== */
+
 .toast-container {
   position: fixed;
-  bottom: 2rem;
+  bottom: var(--space-2xl);
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--color-text-main);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
+  background-color: var(--color-bg-card);
+  color: var(--color-text-on-bg);
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
+  border: var(--stroke-xs) solid var(--color-border-card);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-xs);
   z-index: 2000;
   animation: slideUpFade 0.3s ease-out;
 }

@@ -1,0 +1,213 @@
+{
+  "home": {
+    "title": "Decide-O-Mat",
+    "subtitle": "Einfach entscheiden",
+    "description": "Ein Mensch trifft sch\u00e4tzungsweise zwischen 20.000 und 35.000 Entscheidungen pro Tag, wobei die meisten davon automatisch und unbewusst ablaufen. Nur etwa 5 % dieser Entscheidungen sind bewusst und erfordern eine sorgf\u00e4ltige Abw\u00e4gung, w\u00e4hrend die restlichen 95 % als sogenannte \u201eMikroentscheidungen\u201c schnell und oft ohne Nachdenken getroffen werden.",
+    "inputPlaceholder": "Gib hier deine Frage ein",
+    "inputLabel": "Zur Kl\u00e4rung stehende Frage",
+    "buttonStart": "Entscheidung starten",
+    "buttonStarting": "Wird erstellt...",
+    "errorCreateFailed": "Entscheidung konnte nicht erstellt werden. Bitte versuche es erneut."
+  },
+  "decision": {
+    "notFound": "Entscheidung nicht gefunden",
+    "decryptionFailed": "[Entschl\u00fcsselung fehlgeschlagen]",
+    "participantsButton": "Teilnehmer",
+    "votingTitle": "Finale Abstimmung",
+    "voteYes": "Ja",
+    "voteNo": "Nein",
+    "votedLabel": "Abgestimmt",
+    "voteLabel": "Abstimmen",
+    "anonymous": "Anonym",
+    "copyLinkButton": "Link kopieren",
+    "copyLinkSuccess": "Link kopiert!",
+    "closeDecisionButton": "Entscheidung schlie\u00dfen",
+    "reopenDecisionButton": "Entscheidung \u00f6ffnen",
+    "exportButton": "Als Bild exportieren",
+    "decisionClosed": "Entscheidung geschlossen: {{result}}",
+    "resultApproved": "Angenommen",
+    "resultRejected": "Abgelehnt",
+    "resultNoVotes": "Keine Stimmen",
+    "statistics": "Statistiken",
+    "argumentLabel": "Argument",
+    "voteBalance": "Stimmenverh\u00e4ltnis",
+    "argumentScore": "Argument-Score",
+    "notifications": {
+      "enableButton": "Benachrichtigungen aktivieren",
+      "enabled": "Benachrichtigungen aktiviert!",
+      "failed": "Benachrichtigungen konnten nicht aktiviert werden. Bitte pr\u00fcfe deine Browser-Einstellungen."
+    },
+    "errors": {
+      "statusUpdateFailed": "Status konnte nicht aktualisiert werden.",
+      "voteFailed": "Abstimmung fehlgeschlagen.",
+      "exportFailed": "Export fehlgeschlagen."
+    }
+  },
+  "myDecisions": {
+    "title": "Meine Entscheidungen",
+    "runningTitle": "Welche Entscheidungen laufen gerade?",
+    "archiveTitle": "Alle Aktivit\u00e4ten",
+    "loading": "Wird geladen...",
+    "loginPrompt": "Bitte melde dich an, um deine Entscheidungen zu sehen.",
+    "empty": "Du hast noch keine Entscheidungen erstellt oder daran teilgenommen.",
+    "error": "Entscheidungen konnten nicht geladen werden.",
+    "roleOwner": "Ersteller",
+    "roleInvitee": "Teilnehmer",
+    "statusOpen": "Offen",
+    "statusClosed": "Geschlossen",
+    "timeAgo": "Seit {{time}}"
+  },
+  "login": {
+    "titleWelcome": "Willkommen zur\u00fcck",
+    "titleRegister": "Konto erstellen",
+    "titleReset": "Passwort zur\u00fccksetzen",
+    "tabSignIn": "Anmelden",
+    "tabRegister": "Registrieren",
+    "labelEmail": "E-Mail",
+    "labelPassword": "Passwort",
+    "placeholderEmail": "du@beispiel.de",
+    "placeholderPassword": "Passwort eingeben",
+    "linkAccountCheckbox": "Mit meinem aktuellen Gastkonto verkn\u00fcpfen",
+    "buttonSignIn": "Anmelden",
+    "buttonCreateAccount": "Konto erstellen",
+    "buttonSendReset": "Link zum Zur\u00fccksetzen senden",
+    "buttonProcessing": "Wird verarbeitet...",
+    "forgotPassword": "Passwort vergessen?",
+    "backToLogin": "Zur\u00fcck zur Anmeldung",
+    "dividerOr": "ODER",
+    "googleSignIn": "Mit Google anmelden",
+    "googleSignUp": "Mit Google registrieren",
+    "resetMessage": "Pr\u00fcfe deine E-Mail f\u00fcr weitere Anweisungen.",
+    "errors": {
+      "genericFailed": "Aktion fehlgeschlagen.",
+      "wrongPassword": "Falsches Passwort.",
+      "userNotFound": "Kein Konto mit dieser E-Mail gefunden.",
+      "emailInUse": "E-Mail wird bereits verwendet.",
+      "weakPassword": "Passwort ist zu schwach.",
+      "invalidEmail": "Ung\u00fcltige E-Mail-Adresse.",
+      "googleFailed": "Anmeldung mit Google fehlgeschlagen."
+    }
+  },
+  "magicHandler": {
+    "processing": "Wird verarbeitet...",
+    "confirmTitle": "Konto wechseln?",
+    "confirmCurrentUser": "Du bist derzeit angemeldet als:",
+    "confirmWarning": "Dieser Link \u00fcberschreibt deine aktuelle Sitzung auf diesem Ger\u00e4t.",
+    "buttonCancel": "Abbrechen",
+    "buttonConfirm": "Ja, wechseln",
+    "successTitle": "Transfer erfolgreich!",
+    "successMessage": "Du bist jetzt mit deiner urspr\u00fcnglichen Identit\u00e4t angemeldet.",
+    "redirecting": "Weiterleitung...",
+    "errorTitle": "Transfer fehlgeschlagen",
+    "errorMessage": "Der Link ist m\u00f6glicherweise ung\u00fcltig oder abgelaufen.",
+    "buttonGoHome": "Zur Startseite"
+  },
+  "header": {
+    "appName": "Decide-O-Mat",
+    "navDecision": "Entscheidung",
+    "navActivities": "Aktivit\u00e4ten",
+    "navLogin": "Anmelden"
+  },
+  "footer": {
+    "encrypted": "Ende-zu-Ende-verschl\u00fcsselt",
+    "unencrypted": "Unverschl\u00fcsselt ({{env}})",
+    "termsOfService": "AGB",
+    "privacyPolicy": "Datenschutz",
+    "imprint": "Impressum"
+  },
+  "legal": {
+    "placeholder": "Diese Seite befindet sich im Aufbau. Inhalte werden in K\u00fcrze verf\u00fcgbar sein."
+  },
+  "addArgumentForm": {
+    "placeholderPro": "Pro hinzuf\u00fcgen...",
+    "placeholderCon": "Kontra hinzuf\u00fcgen...",
+    "buttonAdd": "Hinzuf\u00fcgen",
+    "clearLabel": "L\u00f6schen",
+    "errorFailed": "Argument konnte nicht hinzugef\u00fcgt werden. Bitte versuche es erneut."
+  },
+  "argumentItem": {
+    "statementBy": "Statement von {{name}}",
+    "yourStatement": "Dein Statement",
+    "approvalFrom": "Zustimmung von",
+    "addedBy": "Hinzugef\u00fcgt von {{name}}",
+    "errorVoteFailed": "Abstimmung fehlgeschlagen. Bitte versuche es erneut."
+  },
+  "argumentList": {
+    "titlePros": "Pro",
+    "titleCons": "Kontra",
+    "addPro": "Pro hinzuf\u00fcgen",
+    "addCon": "Kontra hinzuf\u00fcgen",
+    "noPros": "Noch keine Pro-Argumente. Sei der Erste!",
+    "noCons": "Noch keine Kontra-Argumente. Sei der Erste!"
+  },
+  "namePrompt": {
+    "title": "Wie hei\u00dft du?",
+    "description": "Dein Name wird bei deinen Beitr\u00e4gen angezeigt, damit andere dich erkennen k\u00f6nnen.",
+    "placeholder": "Deinen Namen eingeben",
+    "buttonCancel": "Abbrechen",
+    "buttonSave": "Speichern"
+  },
+  "participantList": {
+    "title": "Teilnehmer ({{count}})",
+    "empty": "Noch keine Teilnehmer.",
+    "unknown": "Unbekannt",
+    "statusAnonymous": "Anonym",
+    "statusVerified": "Verifiziert",
+    "helpAnonymous": "Anonyme Konten sind tempor\u00e4r.",
+    "helpVerified": "Verifizierte Konten sind dauerhaft."
+  },
+  "userSettings": {
+    "guestLabel": "Gast",
+    "youAre": "Du bist",
+    "buttonLogin": "Anmelden",
+    "buttonLogout": "Abmelden",
+    "buttonDelete": "L\u00f6schen",
+    "buttonClose": "Schlie\u00dfen",
+    "editTitle": "Namen bearbeiten",
+    "editPlaceholder": "Deinen Namen eingeben",
+    "buttonCancel": "Abbrechen",
+    "buttonSave": "Speichern",
+    "resetTitle": "Name zur\u00fccksetzen?",
+    "resetDescription": "Dein Anzeigename wird auf deine urspr\u00fcngliche anonyme Identit\u00e4t zur\u00fcckgesetzt:",
+    "resetOriginal": "Urspr\u00fcnglicher Name",
+    "deleteTitle": "Konto l\u00f6schen?",
+    "deleteWarning": "Diese Aktion ist unwiderruflich. Auch wir k\u00f6nnen sie nicht r\u00fcckg\u00e4ngig machen.",
+    "deleteVotesWarning": "Deine Stimmen werden anonymisiert, um die Entscheidungsintegrit\u00e4t zu wahren.",
+    "deletePasswordLabel": "Passwort best\u00e4tigen:",
+    "deleteError": "Konto konnte nicht gel\u00f6scht werden. Passwort pr\u00fcfen.",
+    "helpTitle": "Anonyme Identit\u00e4t",
+    "helpDescription": "Du nimmst anonym teil. Deine Identit\u00e4t ist sicher auf diesem Ger\u00e4t gespeichert.",
+    "helpCipher": "Dein Anzeigename ist Ende-zu-Ende-verschl\u00fcsselt. Nur Personen mit dem Link-Schl\u00fcssel k\u00f6nnen ihn sehen.",
+    "helpNoLogin": "Du brauchst kein Konto. Wir haben dich \u00fcber eine sichere ID gespeichert.",
+    "helpTransfer": "Verwende den Transfer-Button, um deine Identit\u00e4t auf ein anderes Ger\u00e4t zu \u00fcbertragen.",
+    "titleTransfer": "Identit\u00e4t \u00fcbertragen",
+    "buttonReset": "Zur\u00fccksetzen",
+    "buttonTransfer": "\u00dcbertragen",
+    "buttonHelp": "Hilfe",
+    "editNameButton": "Name bearbeiten",
+    "avatarAlt": "Profilbild",
+    "helpCipherLabel": "Verschl\u00fcsselung",
+    "helpNoLoginLabel": "Kein Login",
+    "helpTransferLabel": "\u00dcbertragen"
+  },
+  "magicLinkData": {
+    "title": "Identit\u00e4t \u00fcbertragen",
+    "description": "Deine anonyme Identit\u00e4t und Stimmen auf ein anderes Ger\u00e4t \u00fcbertragen.",
+    "buttonGenerate": "Magic Link erstellen",
+    "buttonCopy": "Link kopieren",
+    "buttonCopied": "Kopiert!",
+    "warning": "ACHTUNG: Teile diesen Link nicht. Er gew\u00e4hrt vollen Zugriff auf dein Konto.",
+    "errorFailed": "Link konnte nicht erstellt werden. Bitte versuche es erneut."
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten.",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "close": "Schlie\u00dfen",
+    "confirm": "Best\u00e4tigen",
+    "delete": "L\u00f6schen",
+    "edit": "Bearbeiten",
+    "back": "Zur\u00fcck"
+  }
+}

@@ -1,0 +1,111 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--color-bg-base);
+  opacity: var(--opacity-nav);
+  width: 100%;
+  gap: var(--space-2xl);
+  min-height: 56px;
+}
+
+/* Left section: logo + nav links */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  flex: 1;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-md);
+  color: var(--color-text-on-bg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.navLink {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-label-lg);
+  line-height: var(--leading-label-lg);
+  letter-spacing: var(--tracking-sm);
+  color: var(--color-text-on-surface);
+  text-decoration: none;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  transition: color 0.2s;
+}
+
+.navLink:hover {
+  color: var(--color-accent-secondary);
+}
+
+.navLinkActive {
+  color: var(--color-accent-secondary);
+}
+
+/* Right section: user area */
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.userIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-on-surface);
+}
+
+.userName {
+  white-space: nowrap;
+}
+
+.textButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-label-lg);
+  line-height: var(--leading-label-lg);
+  letter-spacing: var(--tracking-sm);
+  color: var(--color-text-on-surface);
+  text-decoration: none;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.textButton:hover {
+  color: var(--color-accent-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    gap: var(--space-md);
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .userName {
+    display: none;
+  }
+}

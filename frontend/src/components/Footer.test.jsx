@@ -1,52 +1,49 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, useLocation } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import Footer from './Footer';
-import EncryptionService from '../services/EncryptionService';
 
-// Mock EncryptionService
-vi.mock('../services/EncryptionService', () => ({
-    default: {
-        isEnabled: vi.fn(),
-    }
+// Mock i18next
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => {
+            const translations = {
+                'footer.termsOfService': 'Terms of Service',
+                'footer.privacyPolicy': 'Privacy Policy',
+                'footer.imprint': 'Imprint',
+                'header.appName': 'Decide-O-Mat',
+            };
+            return translations[key] || key;
+        },
+    }),
 }));
 
-// Mock useLocation
-vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual('react-router-dom');
-    return {
-        ...actual,
-        useLocation: vi.fn(),
-    };
-});
+function renderFooter() {
+    return render(
+        <MemoryRouter>
+            <Footer />
+        </MemoryRouter>
+    );
+}
 
 describe('Footer Component', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        // Default: Encryption enabled, no key
-        EncryptionService.isEnabled.mockReturnValue(true);
-        useLocation.mockReturnValue({ hash: '' });
+    it('renders legal links', () => {
+        renderFooter();
+        expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+        expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
+        expect(screen.getByText('Imprint')).toBeInTheDocument();
     });
 
-    it('renders closed lock when encrypted and no key present', () => {
-        render(<Footer />);
-        expect(screen.getByText(/End-to-End Encrypted/i)).toBeInTheDocument();
-        expect(screen.getByTestId('lock-closed')).toBeInTheDocument();
+    it('renders legal links with correct routes', () => {
+        renderFooter();
+        expect(screen.getByText('Terms of Service').closest('a')).toHaveAttribute('href', '/legal/terms');
+        expect(screen.getByText('Privacy Policy').closest('a')).toHaveAttribute('href', '/legal/privacy');
+        expect(screen.getByText('Imprint').closest('a')).toHaveAttribute('href', '/legal/imprint');
     });
 
-    it('renders open lock when encrypted and key IS present', () => {
-        useLocation.mockReturnValue({ hash: '#key=some-key' });
-        render(<Footer />);
-        expect(screen.getByText(/End-to-End Encrypted/i)).toBeInTheDocument();
-        expect(screen.getByTestId('lock-open')).toBeInTheDocument();
-        expect(screen.queryByTestId('lock-closed')).not.toBeInTheDocument();
-    });
-
-    it('renders unencrypted status when encryption is disabled', () => {
-        EncryptionService.isEnabled.mockReturnValue(false);
-        render(<Footer />);
-        // Assuming default in test environment might need setup, but checking for "Unencrypted" is safe
-        expect(screen.getByText(/Unencrypted/i)).toBeInTheDocument();
-        expect(screen.getByTestId('lock-open')).toBeInTheDocument();
+    it('renders app name and version', () => {
+        renderFooter();
+        expect(screen.getByText('Decide-O-Mat')).toBeInTheDocument();
+        expect(screen.getByText('v0.0.0')).toBeInTheDocument();
     });
 });

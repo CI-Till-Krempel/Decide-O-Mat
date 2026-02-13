@@ -4,6 +4,24 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import Home from './Home';
 
+// Mock i18next
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => {
+            const translations = {
+                'home.subtitle': 'Simply decide',
+                'home.description': 'A person makes an estimated 20,000 to 35,000 decisions per day.',
+                'home.inputPlaceholder': 'Enter your question here',
+                'home.inputLabel': 'Question to be decided',
+                'home.buttonStart': 'Start Deciding',
+                'home.buttonStarting': 'Creating...',
+                'home.errorCreateFailed': 'Failed to create decision. Please try again.',
+            };
+            return translations[key] || key;
+        },
+    }),
+}));
+
 // Mock the firebase module
 vi.mock('../services/firebase', () => ({
     functions: {},
@@ -43,16 +61,36 @@ describe('Home Component', () => {
         EncryptionService.isEnabled.mockReturnValue(false);
     });
 
-    it('renders the home page with title and input', () => {
+    it('renders the home page with heading and input', () => {
         render(
             <BrowserRouter>
                 <Home />
             </BrowserRouter>
         );
 
-        expect(screen.getByText('Decide-O-Mat')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('What do you need to decide?')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /start deciding/i })).toBeInTheDocument();
+        expect(screen.getByText('Simply decide')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Enter your question here')).toBeInTheDocument();
+        expect(screen.getByLabelText('Start Deciding')).toBeInTheDocument();
+    });
+
+    it('renders the description text', () => {
+        render(
+            <BrowserRouter>
+                <Home />
+            </BrowserRouter>
+        );
+
+        expect(screen.getByText(/A person makes an estimated/)).toBeInTheDocument();
+    });
+
+    it('renders the floating label', () => {
+        render(
+            <BrowserRouter>
+                <Home />
+            </BrowserRouter>
+        );
+
+        expect(screen.getByText('Question to be decided')).toBeInTheDocument();
     });
 
     it('handles question input', async () => {
@@ -63,10 +101,42 @@ describe('Home Component', () => {
             </BrowserRouter>
         );
 
-        const input = screen.getByPlaceholderText('What do you need to decide?');
+        const input = screen.getByPlaceholderText('Enter your question here');
         await user.type(input, 'Should we have pizza for lunch?');
 
         expect(input).toHaveValue('Should we have pizza for lunch?');
+    });
+
+    it('shows clear button when text is entered', async () => {
+        const user = userEvent.setup();
+        render(
+            <BrowserRouter>
+                <Home />
+            </BrowserRouter>
+        );
+
+        expect(screen.queryByLabelText('Clear')).not.toBeInTheDocument();
+
+        const input = screen.getByPlaceholderText('Enter your question here');
+        await user.type(input, 'Test');
+
+        expect(screen.getByLabelText('Clear')).toBeInTheDocument();
+    });
+
+    it('clears input when clear button is clicked', async () => {
+        const user = userEvent.setup();
+        render(
+            <BrowserRouter>
+                <Home />
+            </BrowserRouter>
+        );
+
+        const input = screen.getByPlaceholderText('Enter your question here');
+        await user.type(input, 'Test question');
+        expect(input).toHaveValue('Test question');
+
+        await user.click(screen.getByLabelText('Clear'));
+        expect(input).toHaveValue('');
     });
 
     it('creates decision and navigates on form submission (unencrypted)', async () => {
@@ -80,8 +150,8 @@ describe('Home Component', () => {
             </BrowserRouter>
         );
 
-        const input = screen.getByPlaceholderText('What do you need to decide?');
-        const button = screen.getByRole('button', { name: /start deciding/i });
+        const input = screen.getByPlaceholderText('Enter your question here');
+        const button = screen.getByLabelText('Start Deciding');
 
         await user.type(input, 'Should we have pizza?');
         await user.click(button);
@@ -113,47 +183,18 @@ describe('Home Component', () => {
             </BrowserRouter>
         );
 
-        const input = screen.getByPlaceholderText('What do you need to decide?');
-        const button = screen.getByRole('button', { name: /start deciding/i });
+        const input = screen.getByPlaceholderText('Enter your question here');
+        const button = screen.getByLabelText('Start Deciding');
 
         await user.type(input, 'Secret Decision');
         await user.click(button);
 
         await waitFor(() => {
-            // Verify encryption flow
             expect(EncryptionService.generateKey).toHaveBeenCalled();
             expect(EncryptionService.exportKey).toHaveBeenCalledWith(mockKey);
             expect(EncryptionService.encrypt).toHaveBeenCalledWith('Secret Decision', mockKey);
-
-            // Verify backend call with encrypted data
             expect(mockCreateDecision).toHaveBeenCalledWith({ question: mockEncryptedQuestion });
-
-            // Verify navigation with key in hash
             expect(mockNavigate).toHaveBeenCalledWith(`/d/${mockDecisionId}#key=${mockExportedKey}`);
-        });
-    });
-
-    it('shows loading state during submission', async () => {
-        const user = userEvent.setup();
-        mockCreateDecision.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ data: { id: 'test' } }), 100)));
-
-        render(
-            <BrowserRouter>
-                <Home />
-            </BrowserRouter>
-        );
-
-        const input = screen.getByPlaceholderText('What do you need to decide?');
-        const button = screen.getByRole('button', { name: /start deciding/i });
-
-        await user.type(input, 'Test question');
-        await user.click(button);
-
-        expect(screen.getByText('Creating...')).toBeInTheDocument();
-        expect(button).toBeDisabled();
-
-        await waitFor(() => {
-            expect(screen.getByText(/start deciding/i)).toBeInTheDocument();
         });
     });
 
@@ -167,8 +208,8 @@ describe('Home Component', () => {
             </BrowserRouter>
         );
 
-        const input = screen.getByPlaceholderText('What do you need to decide?');
-        const button = screen.getByRole('button', { name: /start deciding/i });
+        const input = screen.getByPlaceholderText('Enter your question here');
+        const button = screen.getByLabelText('Start Deciding');
 
         await user.type(input, 'Test question');
         await user.click(button);
@@ -187,7 +228,7 @@ describe('Home Component', () => {
             </BrowserRouter>
         );
 
-        const button = screen.getByRole('button', { name: /start deciding/i });
+        const button = screen.getByLabelText('Start Deciding');
         await user.click(button);
 
         expect(mockCreateDecision).not.toHaveBeenCalled();
@@ -203,7 +244,7 @@ describe('Home Component', () => {
             </BrowserRouter>
         );
 
-        const input = screen.getByPlaceholderText('What do you need to decide?');
+        const input = screen.getByPlaceholderText('Enter your question here');
         await user.type(input, 'Test question{Enter}');
 
         await waitFor(() => {

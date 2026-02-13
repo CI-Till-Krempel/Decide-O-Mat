@@ -1,0 +1,39 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.label {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-label-lg);
+  line-height: var(--leading-label-lg);
+  letter-spacing: var(--tracking-sm);
+  color: var(--color-text-on-surface);
+}
+
+.addButton {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-secondary);
+  border: none;
+  color: var(--color-text-on-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: opacity 0.2s;
+}
+
+.addButton:hover {
+  opacity: 0.9;
+}
+
+.addButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
