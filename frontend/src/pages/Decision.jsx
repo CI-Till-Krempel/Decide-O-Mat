@@ -31,8 +31,6 @@ function Decision() {
     const [copied, setCopied] = useState(false);
     const [finalVote, setFinalVote] = useState(null);
     const [votingTarget, setVotingTarget] = useState(null);
-    // finalVotesList kept for future stats view (US-033)
-    // eslint-disable-next-line no-unused-vars
     const [finalVotesList, setFinalVotesList] = useState([]);
     const [participantMap, setParticipantMap] = useState(new Map());
     const [showNamePrompt, setShowNamePrompt] = useState(false);
@@ -305,6 +303,8 @@ function Decision() {
                 userVote={finalVote}
                 votingTarget={votingTarget}
                 finalResult={finalResult}
+                finalVotesList={finalVotesList}
+                participantMap={participantMap}
             />
 
             <div className={styles.columns}>

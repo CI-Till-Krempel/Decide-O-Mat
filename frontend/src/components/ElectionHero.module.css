@@ -43,8 +43,15 @@
 
 .voteButtons {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-xl);
+  align-items: flex-start;
+}
+
+.voteColumn {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: var(--space-sm);
 }
 
 .voteButton {
@@ -92,4 +99,22 @@
 .rejected {
   background: var(--color-danger);
   color: white;
+}
+
+.voterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  justify-content: center;
+  max-width: 200px;
+}
+
+.chip {
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-body-sm);
+  padding: 4px var(--space-sm);
+  border-radius: var(--radius-full);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  color: var(--color-text-on-surface);
+  background: transparent;
 }
