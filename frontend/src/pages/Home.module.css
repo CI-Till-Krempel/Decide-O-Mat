@@ -1,6 +1,6 @@
 .page {
   position: relative;
-  min-height: calc(100vh - 56px);
+  min-height: calc(100vh - var(--header-height));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -119,7 +119,7 @@
 }
 
 .inputField::placeholder {
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
 }
 
 .inputField:focus {
@@ -136,7 +136,7 @@
   font-size: var(--text-body-sm);
   line-height: var(--leading-body-sm);
   letter-spacing: var(--tracking-sm);
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
   background: var(--color-bg-base);
   pointer-events: none;
 }
@@ -154,7 +154,7 @@
   background: none;
   border: none;
   border-radius: var(--radius-full);
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
   cursor: pointer;
   font-size: 1.25rem;
   transition: color 0.2s;

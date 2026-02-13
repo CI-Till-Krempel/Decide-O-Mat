@@ -10,6 +10,22 @@ vi.mock('../contexts/UserContext');
 vi.mock('react-router-dom', () => ({
     useNavigate: vi.fn()
 }));
+vi.mock('react-i18next', () => {
+    const translations = {
+        'userSettings.deleteTitle': 'Delete Account?',
+        'userSettings.deleteWarning': 'This action is irreversible. Not even we can undo this.',
+        'userSettings.deleteVotesWarning': 'Your votes will be anonymized to preserve decision integrity.',
+        'userSettings.deletePasswordLabel': 'Confirm Password:',
+        'userSettings.deleteError': 'Failed to delete account. Check password.',
+        'userSettings.buttonCancel': 'Cancel',
+        'userSettings.buttonDelete': 'Delete',
+        'userSettings.buttonLogout': 'Logout',
+        'userSettings.buttonClose': 'Close',
+        'userSettings.avatarAlt': 'Avatar',
+    };
+    const t = (key) => translations[key] || key;
+    return { useTranslation: () => ({ t }) };
+});
 vi.mock('../services/firebase', () => ({
     updateUserDisplayName: vi.fn()
 }));

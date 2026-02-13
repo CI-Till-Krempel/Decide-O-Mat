@@ -1,0 +1,229 @@
+.panel {
+  position: fixed;
+  top: 4rem;
+  right: 1rem;
+  padding: 1rem;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 110;
+  min-width: 280px;
+  max-width: 320px;
+  color: var(--color-text-on-surface);
+}
+
+.panelRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: auto;
+}
+
+.panelColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 220px;
+}
+
+.btnSecondary {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--color-border-outline);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--color-text-on-surface);
+  cursor: pointer;
+}
+
+.btnDanger {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: var(--color-danger);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.flexOne {
+  flex: 1;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.displayName {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.sectionTitle {
+  margin-top: 0;
+}
+
+.dangerColor {
+  color: var(--color-danger);
+}
+
+.infoText {
+  font-size: 0.85rem;
+}
+
+.mutedText {
+  color: var(--color-text-muted);
+}
+
+.smallText {
+  font-size: 0.875rem;
+}
+
+.passwordGroup {
+  margin-bottom: 1rem;
+}
+
+.inputLabel {
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--color-text-muted);
+}
+
+.errorText {
+  color: var(--color-danger);
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.actionRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.identityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.identityInfo {
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+}
+
+.youAreLabel {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.editButton {
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--color-accent-secondary);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border-card);
+  margin: 0.25rem 0;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loginButton {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--color-accent-primary);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--color-accent-primary);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.helpButton {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewBox {
+  padding: 0.5rem;
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-xs);
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.editTitle {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.editActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.saveButtonEnabled {
+  background-color: var(--color-accent-secondary);
+  color: var(--color-text-on-secondary);
+}
+
+.saveButtonDisabled {
+  background-color: var(--color-border-outline);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.fullWidthBtn {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.helpList {
+  font-size: 0.875rem;
+  padding-left: 1.2rem;
+  color: var(--color-text-muted);
+}
+
+.boldLabel {
+  color: var(--color-text-on-surface);
+}
