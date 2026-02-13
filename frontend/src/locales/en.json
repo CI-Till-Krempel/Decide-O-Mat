@@ -112,6 +112,9 @@
     "privacyPolicy": "Privacy Policy",
     "imprint": "Imprint"
   },
+  "legal": {
+    "placeholder": "This page is under construction. Content will be available soon."
+  },
   "addArgumentForm": {
     "placeholderPro": "Add a Pro...",
     "placeholderCon": "Add a Con...",
@@ -193,6 +196,7 @@
     "confirm": "Confirm",
     "delete": "Delete",
     "edit": "Edit",
-    "back": "Back"
+    "back": "Back",
+    "pageNotFound": "Page Not Found"
   }
 }

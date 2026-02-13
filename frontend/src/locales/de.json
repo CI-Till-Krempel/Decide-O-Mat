@@ -112,6 +112,9 @@
     "privacyPolicy": "Datenschutz",
     "imprint": "Impressum"
   },
+  "legal": {
+    "placeholder": "Diese Seite befindet sich im Aufbau. Inhalte werden in K\u00fcrze verf\u00fcgbar sein."
+  },
   "addArgumentForm": {
     "placeholderPro": "Pro hinzuf\u00fcgen...",
     "placeholderCon": "Kontra hinzuf\u00fcgen...",
@@ -193,6 +196,7 @@
     "confirm": "Best\u00e4tigen",
     "delete": "L\u00f6schen",
     "edit": "Bearbeiten",
-    "back": "Zur\u00fcck"
+    "back": "Zur\u00fcck",
+    "pageNotFound": "Seite nicht gefunden"
   }
 }
