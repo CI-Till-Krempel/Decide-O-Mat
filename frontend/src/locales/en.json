@@ -1,0 +1,198 @@
+{
+  "home": {
+    "title": "Decide-O-Mat",
+    "subtitle": "The easiest way to make group decisions. No login required.",
+    "inputPlaceholder": "What do you need to decide?",
+    "inputLabel": "Question to be decided",
+    "buttonStart": "Start Deciding",
+    "buttonStarting": "Creating...",
+    "errorCreateFailed": "Failed to create decision. Please try again."
+  },
+  "decision": {
+    "notFound": "Decision not found",
+    "decryptionFailed": "[Decryption Failed]",
+    "participantsButton": "Participants",
+    "votingTitle": "Final Vote",
+    "voteYes": "Yes",
+    "voteNo": "No",
+    "votedLabel": "Voted",
+    "voteLabel": "Vote",
+    "anonymous": "Anonymous",
+    "copyLinkButton": "Copy Link",
+    "copyLinkSuccess": "Link Copied!",
+    "closeDecisionButton": "Close Decision",
+    "reopenDecisionButton": "Re-open Decision",
+    "exportButton": "Export as Image",
+    "decisionClosed": "Decision Closed: {{result}}",
+    "resultApproved": "Approved",
+    "resultRejected": "Rejected",
+    "resultNoVotes": "No Votes",
+    "voteBalance": "Vote Balance",
+    "argumentScore": "Argument Score",
+    "notifications": {
+      "enableButton": "Enable Notifications",
+      "enabled": "Notifications enabled!",
+      "failed": "Could not enable notifications. Please check your browser settings."
+    },
+    "errors": {
+      "statusUpdateFailed": "Failed to update decision status.",
+      "voteFailed": "Failed to cast vote.",
+      "exportFailed": "Failed to export image."
+    }
+  },
+  "myDecisions": {
+    "title": "My Decisions",
+    "runningTitle": "Which decisions are currently running?",
+    "archiveTitle": "All activities",
+    "loading": "Loading...",
+    "loginPrompt": "Please log in to view your decisions.",
+    "empty": "You haven't created or participated in any decisions yet.",
+    "error": "Failed to load your decisions.",
+    "roleOwner": "Owner",
+    "roleInvitee": "Invitee",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "timeAgo": "{{time}} ago"
+  },
+  "login": {
+    "titleWelcome": "Welcome Back",
+    "titleRegister": "Create Account",
+    "titleReset": "Reset Password",
+    "tabSignIn": "Sign In",
+    "tabRegister": "Register",
+    "labelEmail": "Email",
+    "labelPassword": "Password",
+    "placeholderEmail": "you@example.com",
+    "placeholderPassword": "Enter your password",
+    "linkAccountCheckbox": "Link to my current guest account",
+    "buttonSignIn": "Sign In",
+    "buttonCreateAccount": "Create Account",
+    "buttonSendReset": "Send Reset Link",
+    "buttonProcessing": "Processing...",
+    "forgotPassword": "Forgot Password?",
+    "backToLogin": "Back to Login",
+    "dividerOr": "OR",
+    "googleSignIn": "Sign in with Google",
+    "googleSignUp": "Sign up with Google",
+    "resetMessage": "Check your email for instructions.",
+    "errors": {
+      "genericFailed": "Failed to perform action.",
+      "wrongPassword": "Incorrect password.",
+      "userNotFound": "No account found with this email.",
+      "emailInUse": "Email already in use.",
+      "weakPassword": "Password is too weak.",
+      "invalidEmail": "Invalid email address.",
+      "googleFailed": "Failed to sign in with Google."
+    }
+  },
+  "magicHandler": {
+    "processing": "Processing...",
+    "confirmTitle": "Switch Account?",
+    "confirmCurrentUser": "You are currently logged in as:",
+    "confirmWarning": "Using this link will overwrite your current session on this device.",
+    "buttonCancel": "Cancel",
+    "buttonConfirm": "Yes, Switch",
+    "successTitle": "Transfer Successful!",
+    "successMessage": "You are now logged in with your original identity.",
+    "redirecting": "Redirecting...",
+    "errorTitle": "Transfer Failed",
+    "errorMessage": "The link may be invalid or expired.",
+    "buttonGoHome": "Go Home"
+  },
+  "header": {
+    "appName": "Decide-O-Mat",
+    "navDecision": "Decision",
+    "navActivities": "Activities",
+    "navLogin": "Log in"
+  },
+  "footer": {
+    "encrypted": "End-to-End Encrypted",
+    "unencrypted": "Unencrypted ({{env}})",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "imprint": "Imprint"
+  },
+  "addArgumentForm": {
+    "placeholderPro": "Add a Pro...",
+    "placeholderCon": "Add a Con...",
+    "buttonAdd": "Add",
+    "errorFailed": "Failed to add argument. Please try again."
+  },
+  "argumentItem": {
+    "statementBy": "Statement by {{name}}",
+    "yourStatement": "Your Statement",
+    "approvalFrom": "Approval from",
+    "addedBy": "Added by {{name}}",
+    "errorVoteFailed": "Failed to vote. Please try again."
+  },
+  "argumentList": {
+    "titlePros": "Pros",
+    "titleCons": "Cons",
+    "addPro": "Add pro",
+    "addCon": "Add contra",
+    "noPros": "No pros yet. Be the first to add one!",
+    "noCons": "No cons yet. Be the first to add one!"
+  },
+  "namePrompt": {
+    "title": "What's your name?",
+    "description": "Your name will be shown with your contributions to help others identify you.",
+    "placeholder": "Enter your name",
+    "buttonCancel": "Cancel",
+    "buttonSave": "Save"
+  },
+  "participantList": {
+    "title": "Participants ({{count}})",
+    "empty": "No participants yet.",
+    "unknown": "Unknown",
+    "statusAnonymous": "Anonymous",
+    "statusVerified": "Verified",
+    "helpAnonymous": "Anonymous accounts are temporary.",
+    "helpVerified": "Verified accounts are permanent."
+  },
+  "userSettings": {
+    "guestLabel": "Guest",
+    "youAre": "You are",
+    "buttonLogin": "Login",
+    "buttonLogout": "Logout",
+    "buttonDelete": "Delete",
+    "buttonClose": "Close",
+    "editTitle": "Edit Your Name",
+    "editPlaceholder": "Enter your name",
+    "buttonCancel": "Cancel",
+    "buttonSave": "Save",
+    "resetTitle": "Reset Name?",
+    "resetDescription": "This will revert your display name to your original anonymous identity:",
+    "resetOriginal": "Original Name",
+    "deleteTitle": "Delete Account?",
+    "deleteWarning": "This action is irreversible. Not even we can undo this.",
+    "deleteVotesWarning": "Your votes will be anonymized to preserve decision integrity.",
+    "deletePasswordLabel": "Confirm Password:",
+    "deleteError": "Failed to delete account. Check password.",
+    "helpTitle": "Anonymous Identity",
+    "helpDescription": "You are participating anonymously. Your identity is stored securely on this device.",
+    "helpCipher": "Your display name is encrypted end-to-end. Only people with the link key can see it.",
+    "helpNoLogin": "You don't need an account. We remembered you via a secure ID.",
+    "helpTransfer": "Use the transfer button to move your identity to another device.",
+    "titleTransfer": "Transfer Identity"
+  },
+  "magicLinkData": {
+    "title": "Transfer Identity",
+    "description": "Transfer your anonymous identity and votes to another device.",
+    "buttonGenerate": "Generate Magic Link",
+    "buttonCopy": "Copy Link",
+    "buttonCopied": "Copied!",
+    "warning": "CAUTION: Do not share this link. It provides full access to your account.",
+    "errorFailed": "Failed to generate link. Please try again."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back"
+  }
+}
