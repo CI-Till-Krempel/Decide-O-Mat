@@ -97,6 +97,7 @@ export default function Header() {
                             className={styles.textButton}
                             onClick={() => setShowSettings(!showSettings)}
                             type="button"
+                            data-testid="settings-toggle"
                         >
                             <PersonIcon />
                             <span className={styles.userName}>
