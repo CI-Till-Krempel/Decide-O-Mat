@@ -99,6 +99,7 @@ export default function Header() {
                             type="button"
                             aria-haspopup="true"
                             aria-expanded={showSettings}
+                            data-testid="settings-toggle"
                         >
                             <PersonIcon />
                             <span className={styles.userName}>

@@ -6,7 +6,7 @@
   opacity: var(--opacity-nav);
   width: 100%;
   gap: var(--space-2xl);
-  min-height: 56px;
+  min-height: var(--header-height);
 }
 
 /* Left section: logo + nav links */

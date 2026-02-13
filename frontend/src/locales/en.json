@@ -7,7 +7,8 @@
     "inputLabel": "Question to be decided",
     "buttonStart": "Start Deciding",
     "buttonStarting": "Creating...",
-    "errorCreateFailed": "Failed to create decision. Please try again."
+    "errorCreateFailed": "Failed to create decision. Please try again.",
+    "clearAlt": "Clear"
   },
   "decision": {
     "notFound": "Decision not found",
@@ -208,6 +209,7 @@
     "confirm": "Confirm",
     "delete": "Delete",
     "edit": "Edit",
-    "back": "Back"
+    "back": "Back",
+    "pageNotFound": "Page Not Found"
   }
 }

@@ -7,7 +7,8 @@
     "inputLabel": "Zur Kl\u00e4rung stehende Frage",
     "buttonStart": "Entscheidung starten",
     "buttonStarting": "Wird erstellt...",
-    "errorCreateFailed": "Entscheidung konnte nicht erstellt werden. Bitte versuche es erneut."
+    "errorCreateFailed": "Entscheidung konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "clearAlt": "L\u00f6schen"
   },
   "decision": {
     "notFound": "Entscheidung nicht gefunden",
@@ -208,6 +209,7 @@
     "confirm": "Best\u00e4tigen",
     "delete": "L\u00f6schen",
     "edit": "Bearbeiten",
-    "back": "Zur\u00fcck"
+    "back": "Zur\u00fcck",
+    "pageNotFound": "Seite nicht gefunden"
   }
 }

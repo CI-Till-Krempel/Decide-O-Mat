@@ -12,7 +12,7 @@
   --color-accent-orange: #ffc9ad;        /* Orange — own statement highlight */
   --color-text-on-bg: #ffffff;
   --color-text-on-surface: #ffffff;
-  --color-text-muted-alt: #aeaec6;       /* Labels, placeholders */
+  --color-text-muted-alt: #aeaec6;       /* Labels, placeholders (alias) */
   --color-border-outline: #6f6f8e;       /* Input borders, prominent outlines */
   --color-border-card: #272745;          /* Subtle card borders */
   --color-icon-on-primary: #384f19;      /* Icons on lime green buttons */
@@ -87,6 +87,9 @@
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 8px -1px rgb(0 0 0 / 0.4);
   --shadow-lg: 0 10px 20px -3px rgb(0 0 0 / 0.5);
+
+  /* --- Layout --- */
+  --header-height: 56px;
 
   /* --- Opacity --- */
   --opacity-nav: 0.85;

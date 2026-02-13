@@ -80,15 +80,19 @@
   color: var(--color-text-muted);
 }
 
+.smallText {
+  font-size: 0.875rem;
+}
+
+.passwordGroup {
+  margin-bottom: 1rem;
+}
+
 .inputLabel {
   font-size: 0.8rem;
   display: block;
   margin-bottom: 0.25rem;
   color: var(--color-text-muted);
-}
-
-.passwordGroup {
-  margin-bottom: 1rem;
 }
 
 .errorText {
@@ -215,10 +219,6 @@
   width: 100%;
 }
 
-.inputMargin {
-  margin-bottom: 0.5rem;
-}
-
 .helpList {
   font-size: 0.875rem;
   padding-left: 1.2rem;
@@ -227,8 +227,4 @@
 
 .boldLabel {
   color: var(--color-text-on-surface);
-}
-
-.smallText {
-  font-size: 0.875rem;
 }

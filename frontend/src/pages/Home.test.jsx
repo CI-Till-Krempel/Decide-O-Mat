@@ -16,6 +16,7 @@ vi.mock('react-i18next', () => ({
                 'home.buttonStart': 'Start Deciding',
                 'home.buttonStarting': 'Creating...',
                 'home.errorCreateFailed': 'Failed to create decision. Please try again.',
+                'home.clearAlt': 'Clear',
             };
             return translations[key] || key;
         },
