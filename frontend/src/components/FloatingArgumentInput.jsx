@@ -5,7 +5,7 @@ import styles from './FloatingArgumentInput.module.css';
 function SendIcon() {
     return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
         </svg>
     );
 }
@@ -39,7 +39,7 @@ export default function FloatingArgumentInput({ type, onSubmit, onClose, isLoadi
         <div className={styles.overlay}>
             <div className={styles.inputWrapper}>
                 <label className={styles.inputLabel}>
-                    {t('decision.argumentLabel', { defaultValue: 'Argument' })}
+                    {t('decision.argumentLabel')}
                 </label>
                 <input
                     ref={inputRef}
@@ -56,7 +56,7 @@ export default function FloatingArgumentInput({ type, onSubmit, onClose, isLoadi
                         type="button"
                         className={styles.clearButton}
                         onClick={() => setText('')}
-                        aria-label="Clear"
+                        aria-label={t('addArgumentForm.clearLabel')}
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />

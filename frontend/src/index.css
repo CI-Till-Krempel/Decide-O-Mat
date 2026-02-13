@@ -12,7 +12,7 @@
   --color-accent-orange: #ffc9ad;        /* Orange — own statement highlight */
   --color-text-on-bg: #ffffff;
   --color-text-on-surface: #ffffff;
-  --color-text-muted-figma: #aeaec6;     /* Labels, placeholders */
+  --color-text-muted-alt: #aeaec6;       /* Labels, placeholders */
   --color-border-outline: #6f6f8e;       /* Input borders, prominent outlines */
   --color-border-card: #272745;          /* Subtle card borders */
   --color-icon-on-primary: #384f19;      /* Icons on lime green buttons */
@@ -196,7 +196,7 @@ select {
 }
 
 .input::placeholder {
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
 }
 
 .input:focus {

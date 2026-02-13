@@ -50,6 +50,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
                     await ParticipantService.registerParticipant(decisionId, user.displayName, encryptionKey || null);
                 } catch (e) {
                     console.warn("Auto-registration failed", e);
+                    if (onError) onError(t('argumentItem.errorVoteFailed'));
                 }
             }
             const nameToSend = encryptionKey ? null : user.displayName;

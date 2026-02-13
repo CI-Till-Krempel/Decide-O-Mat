@@ -60,7 +60,7 @@
 }
 
 .inputField::placeholder {
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
 }
 
 .inputLabel {
@@ -87,7 +87,7 @@
   justify-content: center;
   background: none;
   border: none;
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
   cursor: pointer;
   border-radius: var(--radius-full);
   transition: color 0.2s;

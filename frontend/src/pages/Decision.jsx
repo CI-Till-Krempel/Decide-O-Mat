@@ -261,6 +261,8 @@ function Decision() {
         else finalResult = "NoVotes";
     }
 
+    // Dot-voting: each participant may vote on at most half (rounded up) of all arguments.
+    // This forces prioritisation rather than blanket approval.
     const allArgs = [...pros, ...cons];
     const voteLimit = allArgs.length > 0 ? Math.ceil(allArgs.length / 2) : 0;
     const canVote = votedArgIds.size < voteLimit;

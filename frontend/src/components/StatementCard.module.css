@@ -21,7 +21,7 @@
 .authorLabel {
   font-size: var(--text-body-sm);
   line-height: var(--leading-body-sm);
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
   letter-spacing: var(--tracking-sm);
 }
 
@@ -49,7 +49,7 @@
   border-radius: var(--radius-full);
   border: var(--stroke-xs) solid var(--color-border-outline);
   background: transparent;
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -83,7 +83,7 @@
 .voterLabel {
   font-size: var(--text-body-sm);
   line-height: var(--leading-body-sm);
-  color: var(--color-text-muted-figma);
+  color: var(--color-text-muted-alt);
   font-style: italic;
 }
 
