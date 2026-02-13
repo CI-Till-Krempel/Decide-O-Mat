@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../contexts/UserContext';
@@ -21,7 +21,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     const [editedName, setEditedName] = useState(user?.displayName || '');
     const panelRef = useRef(null);
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setIsEditing(false);
         setShowTransfer(false);
         setShowHelp(false);
@@ -30,7 +30,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
         setDeletePassword('');
         setDeleteError('');
         if (onClose) onClose();
-    };
+    }, [onClose]);
 
     useEffect(() => {
         if (user?.displayName && user.displayName !== editedName) {
@@ -48,7 +48,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
         }
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    });
+    }, [handleClose]);
 
     const handleSave = async () => {
         if (editedName.trim()) {
