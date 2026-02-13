@@ -80,13 +80,15 @@ test.describe('E2EE Auditor Agent', () => {
         expect(firstRegData.data.encryptedDisplayName).toBeDefined();
         expect(firstRegData.data.encryptedDisplayName).not.toContain(displayName);
 
+        // Open the FloatingArgumentInput modal via the ColumnHeader "+" button
+        const addProButton = page.getByRole('button', { name: 'Add pro' });
+        await expect(addProButton).toBeVisible();
+        await addProButton.click();
+
         const argumentInput = page.getByPlaceholder('Add a Pro...');
         await expect(argumentInput).toBeVisible();
         await argumentInput.fill(argumentText);
-
-        const addButton = page.getByRole('button', { name: 'Add' }).first();
-        await expect(addButton).toBeEnabled();
-        await addButton.click();
+        await argumentInput.press('Enter');
 
         // No name prompt expected now
 

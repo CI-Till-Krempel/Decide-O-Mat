@@ -199,7 +199,7 @@ select {
 }
 
 .input::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-text-muted-alt);
 }
 
 .input:focus {

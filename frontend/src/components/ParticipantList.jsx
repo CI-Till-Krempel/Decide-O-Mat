@@ -47,8 +47,9 @@ const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
                             <div style={{ fontWeight: '500' }}>
                                 {p.name || 'Unknown'}
                             </div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                                {p.isAnonymous ? 'Anonymous' : 'Verified'}
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <span>{p.isAnonymous ? '👤' : '🟢'}</span>
+                                <span>{p.isAnonymous ? 'Anonymous' : 'Verified'}</span>
                             </div>
                         </div>
                     </div>

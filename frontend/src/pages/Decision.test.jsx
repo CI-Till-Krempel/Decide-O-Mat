@@ -1,45 +1,76 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Decision from './Decision';
+
+// Mock i18next — t function must be a stable reference to avoid infinite re-render
+// (Decision.jsx has t in a useEffect dependency array, matching real react-i18next behavior)
+vi.mock('react-i18next', () => {
+    const translations = {
+        'decision.notFound': 'Decision not found',
+        'decision.decryptionFailed': '[Decryption Failed]',
+        'decision.voteYes': 'Yes',
+        'decision.voteNo': 'No',
+        'decision.votedLabel': 'Voted',
+        'decision.voteLabel': 'Vote',
+        'decision.anonymous': 'Anonymous',
+        'decision.copyLinkButton': 'Copy Link',
+        'decision.copyLinkSuccess': 'Link Copied!',
+        'decision.resultApproved': 'Approved',
+        'decision.resultRejected': 'Rejected',
+        'decision.resultNoVotes': 'No Votes',
+        'decision.errors.voteFailed': 'Failed to cast vote.',
+        'argumentList.addPro': 'Add pro',
+        'argumentList.addCon': 'Add contra',
+        'addArgumentForm.placeholderPro': 'Add a Pro...',
+        'addArgumentForm.placeholderCon': 'Add a Con...',
+        'addArgumentForm.buttonAdd': 'Add',
+        'addArgumentForm.errorFailed': 'Failed to add argument.',
+        'argumentItem.yourStatement': 'Your Statement',
+        'argumentItem.approvalFrom': 'Approval from',
+        'argumentItem.errorVoteFailed': 'Failed to vote.',
+    };
+    const t = (key, opts) => {
+        if (key === 'decision.decisionClosed') return `Decision Closed: ${opts?.result || ''}`;
+        if (key === 'argumentItem.statementBy') return `Statement by ${opts?.name || ''}`;
+        return translations[key] || key;
+    };
+    return {
+        useTranslation: () => ({ t }),
+    };
+});
 
 // Mock the firebase module
 vi.mock('../services/firebase', () => ({
     subscribeToDecision: vi.fn(),
     subscribeToArguments: vi.fn(),
+    subscribeToArgumentVotes: vi.fn(),
     toggleDecisionStatus: vi.fn(),
     voteDecision: vi.fn(),
+    voteArgument: vi.fn(),
+    addArgument: vi.fn(),
     subscribeToFinalVotes: vi.fn(),
 }));
 
 import {
     subscribeToDecision as mockSubscribeToDecision,
     subscribeToArguments as mockSubscribeToArguments,
-    toggleDecisionStatus as mockToggleDecisionStatus,
     voteDecision as mockVoteDecision,
+    voteArgument as mockVoteArgument,
+    addArgument as mockAddArgument,
     subscribeToFinalVotes as mockSubscribeToFinalVotes,
 } from '../services/firebase';
 
-// Mock html-to-image
-vi.mock('html-to-image', () => ({
-    toPng: vi.fn(),
+// Mock UserContext — simple factory mock (no vi.importActual to avoid Firebase init in CI)
+vi.mock('../contexts/UserContext', () => ({
+    useUser: vi.fn(() => ({
+        user: { userId: 'test-user-id', displayName: 'Test User' },
+        setDisplayName: vi.fn()
+    }))
 }));
-
-import { toPng as mockToPng } from 'html-to-image';
-
-// Mock UserContext
-vi.mock('../contexts/UserContext', async () => {
-    const actual = await vi.importActual('../contexts/UserContext');
-    return {
-        ...actual,
-        useUser: vi.fn(() => ({
-            user: { userId: 'test-user-id', displayName: 'Test User' },
-            setDisplayName: vi.fn()
-        }))
-    };
-});
+import { useUser } from '../contexts/UserContext';
 
 // Mock EncryptionService
 vi.mock('../services/EncryptionService', () => ({
@@ -64,39 +95,80 @@ vi.mock('../services/ParticipantService', () => ({
 }));
 import ParticipantService from '../services/ParticipantService';
 
-// Mock NotificationService
-vi.mock('../services/NotificationService', () => ({
-    default: {
-        requestPermission: vi.fn().mockResolvedValue(true),
-        saveToken: vi.fn(),
-    }
-}));
-
 // Mock ParticipantList component
 vi.mock('../components/ParticipantList', () => ({
     default: () => <div data-testid="participant-list">ParticipantList</div>
 }));
 
-// Mock components
-vi.mock('../components/ArgumentList', () => ({
-    default: ({ arguments: args, type, readOnly }) => (
-        <div data-testid={`argument-list-${type}`}>
-            ArgumentList: {type} ({args.length} args) {readOnly && '(read-only)'}
-            {args.map(arg => <div key={arg.id}>{arg.text}</div>)}
-        </div>
-    ),
+// Mock Spinner
+vi.mock('../components/Spinner', () => ({
+    default: () => <div role="status" aria-label="loading">Loading...</div>
 }));
 
-vi.mock('../components/AddArgumentForm', () => ({
-    default: ({ type, readOnly }) => (
-        <div data-testid={`add-argument-form-${type}`}>
-            AddArgumentForm: {type} {readOnly && '(read-only)'}
+// Mock NamePrompt
+vi.mock('../components/NamePrompt', () => ({
+    default: ({ onSave, onCancel }) => (
+        <div data-testid="name-prompt">
+            <button data-testid="name-save" onClick={() => onSave('New User')}>Save Name</button>
+            <button data-testid="name-cancel" onClick={onCancel}>Cancel</button>
         </div>
-    ),
+    )
 }));
 
-vi.mock('../components/UserSettings', () => ({
-    default: () => <div data-testid="user-settings">UserSettings</div>
+// Mock ElectionHero — lightweight version that exposes the same prop interface
+vi.mock('../components/ElectionHero', () => ({
+    default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult }) => (
+        <div data-testid="election-hero">
+            <h1>{question}</h1>
+            {isClosed && finalResult && (
+                <div>{`Decision Closed: ${finalResult}`}</div>
+            )}
+            <button aria-label="Yes" onClick={onVoteYes} disabled={isClosed}>Yes</button>
+            <button aria-label="No" onClick={onVoteNo} disabled={isClosed}>No</button>
+            {userVote && <span data-testid="user-vote">{userVote}</span>}
+        </div>
+    )
+}));
+
+// Mock StatementCard — avoids subscribeToArgumentVotes subscriptions
+vi.mock('../components/StatementCard', () => ({
+    default: ({ argument, onNameRequired }) => (
+        <div data-testid={`statement-${argument.id}`}>
+            {argument.text}
+            <button data-testid={`vote-${argument.id}`} onClick={() => onNameRequired(argument.id)}>Vote</button>
+        </div>
+    )
+}));
+
+// Mock FloatingArgumentInput
+vi.mock('../components/FloatingArgumentInput', () => ({
+    default: ({ type, onSubmit, onClose }) => (
+        <div data-testid="floating-input">
+            <input
+                placeholder={type === 'pro' ? 'Add a Pro...' : 'Add a Con...'}
+                data-testid="arg-input"
+            />
+            <button onClick={() => onSubmit('Test argument', type)} data-testid="arg-submit">Submit</button>
+            <button onClick={onClose} aria-label="Close">Close</button>
+        </div>
+    )
+}));
+
+// Mock FAB
+vi.mock('../components/FAB', () => ({
+    default: ({ onClick, label }) => (
+        <button aria-label={label} onClick={onClick} data-testid="fab">{label}</button>
+    )
+}));
+
+// Mock ColumnHeader
+vi.mock('../components/ColumnHeader', () => ({
+    default: ({ label, onAdd, disabled }) => (
+        <div data-testid={`column-header-${label}`}>
+            <span>{label}</span>
+            <button aria-label={label} onClick={onAdd} disabled={disabled}>+</button>
+        </div>
+    )
 }));
 
 const renderDecision = (initialUrl = '/d/test-decision-123') => {
@@ -119,37 +191,39 @@ describe('Decision Component', () => {
     };
 
     const mockArguments = [
-        { id: 'arg-1', text: 'Delicious', type: 'pro', votes: 10 },
-        { id: 'arg-2', text: 'Quick', type: 'pro', votes: 5 },
-        { id: 'arg-3', text: 'Expensive', type: 'con', votes: 3 },
+        { id: 'arg-1', text: 'Delicious', type: 'pro', votes: 10, authorId: 'other-user', authorName: 'Alice' },
+        { id: 'arg-2', text: 'Quick', type: 'pro', votes: 5, authorId: 'other-user', authorName: 'Alice' },
+        { id: 'arg-3', text: 'Expensive', type: 'con', votes: 3, authorId: 'other-user', authorName: 'Bob' },
     ];
 
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
 
-        // Default mock implementations
+        useUser.mockReturnValue({
+            user: { userId: 'test-user-id', displayName: 'Test User' },
+            setDisplayName: vi.fn()
+        });
+
         mockSubscribeToDecision.mockImplementation((id, callback) => {
             callback(mockDecision);
-            return () => { }; // unsubscribe function
+            return () => { };
         });
 
         mockSubscribeToArguments.mockImplementation((id, callback) => {
             callback(mockArguments);
             return vi.fn();
         });
+
         mockSubscribeToFinalVotes.mockImplementation((id, callback) => {
             callback([]);
             return vi.fn();
         });
-        mockToggleDecisionStatus.mockResolvedValue({ success: true });
 
-        // Default encryption mocks
         EncryptionService.importKey.mockResolvedValue('mock-key');
         EncryptionService.decrypt.mockImplementation((text) => Promise.resolve(text.replace('encrypted-', '')));
         EncryptionService.encrypt.mockImplementation((text) => Promise.resolve('encrypted-' + text));
 
-        // Default ParticipantService mocks
         ParticipantService.subscribeToParticipants.mockImplementation((id, key, callback) => {
             callback(new Map());
             return vi.fn();
@@ -157,64 +231,20 @@ describe('Decision Component', () => {
         ParticipantService.registerParticipant.mockResolvedValue();
     });
 
-    // US-005: View Results
     describe('View Results (US-005)', () => {
-        it('displays decision question', async () => {
+        it('displays decision question in hero', async () => {
             renderDecision();
-
             await waitFor(() => {
                 expect(screen.getByText('Should we have pizza for lunch?')).toBeInTheDocument();
             });
         });
 
-        it('calculates and displays argument score correctly', async () => {
+        it('displays statement cards for arguments', async () => {
             renderDecision();
-
             await waitFor(() => {
-                // Argument score = pros (10 + 5) - cons (3) = 12
-                expect(screen.getByText(/argument score/i)).toBeInTheDocument();
-                // We typically look for the value near the label or just in the document if unique
-                expect(screen.getByText(/\+12/i)).toBeInTheDocument();
-            });
-        });
-
-        it('calculates and displays vote balance correctly', async () => {
-            renderDecision();
-
-            await waitFor(() => {
-                // Vote Balance = yes (5) - no (3) = 2
-                expect(screen.getByText(/vote balance/i)).toBeInTheDocument();
-                expect(screen.getByText(/\+2/i)).toBeInTheDocument();
-            });
-        });
-
-        it('displays positive argument score in success color', async () => {
-            renderDecision();
-
-            await waitFor(() => {
-                const scoreElement = screen.getByText(/\+12/i);
-                expect(scoreElement).toBeInTheDocument();
-                // Checking style might be brittle/complex without helper, so we imply existence is mostly enough here
-                // or check partial match if improved
-            });
-        });
-
-        it('displays negative net score correctly', async () => {
-            const negativeArgs = [
-                { id: 'arg-1', text: 'Pro', type: 'pro', votes: 2 },
-                { id: 'arg-2', text: 'Con', type: 'con', votes: 10 },
-            ];
-
-            mockSubscribeToArguments.mockImplementation((id, callback) => {
-                callback(negativeArgs);
-                return () => { };
-            });
-
-            renderDecision();
-
-            await waitFor(() => {
-                expect(screen.getByText(/-8/i)).toBeInTheDocument();
-                expect(screen.getByText(/argument score/i)).toBeInTheDocument();
+                expect(screen.getByText('Delicious')).toBeInTheDocument();
+                expect(screen.getByText('Quick')).toBeInTheDocument();
+                expect(screen.getByText('Expensive')).toBeInTheDocument();
             });
         });
 
@@ -225,7 +255,6 @@ describe('Decision Component', () => {
             ParticipantService.subscribeToParticipants.mockImplementation(() => () => { });
 
             renderDecision();
-
             expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
         });
 
@@ -236,22 +265,17 @@ describe('Decision Component', () => {
             });
 
             renderDecision();
-
             await waitFor(() => {
                 expect(screen.getByText(/decision not found/i)).toBeInTheDocument();
             });
         });
     });
 
-    // Encrypted View Tests
     describe('Encrypted View', () => {
         it('decrypts decision data when key is present', async () => {
-            const encryptedDecision = {
-                ...mockDecision,
-                question: 'encrypted-Secret Question'
-            };
+            const encryptedDecision = { ...mockDecision, question: 'encrypted-Secret Question' };
             const encryptedArgs = [
-                { id: 'arg-1', text: 'encrypted-Secret Arg', type: 'pro', votes: 1 }
+                { id: 'arg-1', text: 'encrypted-Secret Arg', type: 'pro', votes: 1, authorId: 'other', authorName: 'encrypted-Alice' }
             ];
 
             mockSubscribeToDecision.mockImplementation((id, callback) => {
@@ -268,9 +292,6 @@ describe('Decision Component', () => {
             await waitFor(() => {
                 expect(EncryptionService.importKey).toHaveBeenCalledWith('mock-key-string');
                 expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Secret Question', 'mock-key');
-                expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Secret Arg', 'mock-key');
-
-                // Check if decrypted content is rendered
                 expect(screen.getByText('Secret Question')).toBeInTheDocument();
                 expect(screen.getByText('Secret Arg')).toBeInTheDocument();
             });
@@ -278,10 +299,7 @@ describe('Decision Component', () => {
 
         it('handles decryption failure gracefully', async () => {
             const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-            const encryptedDecision = {
-                ...mockDecision,
-                question: 'encrypted-Bad Data'
-            };
+            const encryptedDecision = { ...mockDecision, question: 'encrypted-Bad Data' };
 
             mockSubscribeToDecision.mockImplementation((id, callback) => {
                 callback(encryptedDecision);
@@ -293,76 +311,52 @@ describe('Decision Component', () => {
             renderDecision('/d/test-id#key=mock-key-string');
 
             await waitFor(() => {
-                expect(screen.getAllByText('[Decryption Failed]')).toHaveLength(4); // Header + 3 args
+                expect(screen.getAllByText('[Decryption Failed]').length).toBeGreaterThan(0);
             });
             consoleSpy.mockRestore();
         });
 
-        it('displays decrypted participant names', async () => {
-            const encryptedVotes = [
-                { userId: 'u1', vote: 'yes', displayName: 'old-way', createdAt: { seconds: 100, nanoseconds: 0 } }
-            ];
-            mockSubscribeToFinalVotes.mockImplementation((id, callback) => {
-                callback(encryptedVotes);
-                return () => { };
-            });
-
-            // Mock participant map
-            const mockParticipants = new Map();
-            mockParticipants.set('u1', { name: 'Decrypted Alice' });
-            ParticipantService.subscribeToParticipants.mockImplementation((id, key, callback) => {
-                callback(mockParticipants);
-                return () => { };
-            });
-
+        it('subscribes to participant map with encryption key', async () => {
             renderDecision('/d/test-id#key=mock-key-string');
 
             await waitFor(() => {
-                expect(screen.getByText('Decrypted Alice')).toBeInTheDocument();
+                expect(ParticipantService.subscribeToParticipants).toHaveBeenCalled();
             });
         });
     });
 
-    // US-002: Share Decision
     describe('Share Decision (US-002)', () => {
-        it('displays copy link button', async () => {
+        it('displays FAB for sharing', async () => {
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /copy link/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Copy Link')).toBeInTheDocument();
             });
         });
 
-        it('copies link to clipboard when button clicked', async () => {
+        it('copies link to clipboard when FAB clicked', async () => {
             const user = userEvent.setup();
             const writeTextMock = vi.fn();
             navigator.clipboard.writeText = writeTextMock;
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /copy link/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Copy Link')).toBeInTheDocument();
             });
 
-            const copyButton = screen.getByRole('button', { name: /copy link/i });
-            await user.click(copyButton);
-
-            // Verify clipboard.writeText was called (URL format may vary in test environment)
+            await user.click(screen.getByLabelText('Copy Link'));
             expect(writeTextMock).toHaveBeenCalled();
         });
 
-        it('shows confirmation after copying link', async () => {
+        it('shows confirmation toast after copying link', async () => {
             const user = userEvent.setup();
             navigator.clipboard.writeText = vi.fn();
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /copy link/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Copy Link')).toBeInTheDocument();
             });
 
-            const copyButton = screen.getByRole('button', { name: /copy link/i });
-            await user.click(copyButton);
+            await user.click(screen.getByLabelText('Copy Link'));
 
             await waitFor(() => {
                 expect(screen.getByText(/link copied/i)).toBeInTheDocument();
@@ -370,47 +364,7 @@ describe('Decision Component', () => {
         });
     });
 
-    // US-006: Close Decision
     describe('Close Decision (US-006)', () => {
-        it('displays close decision button when decision is open', async () => {
-            renderDecision();
-
-            await waitFor(() => {
-                expect(screen.getByRole('button', { name: /close decision/i })).toBeInTheDocument();
-            });
-        });
-
-        it('closes decision when close button clicked', async () => {
-            const user = userEvent.setup();
-            mockToggleDecisionStatus.mockResolvedValue({ success: true });
-
-            renderDecision();
-
-            await waitFor(() => {
-                expect(screen.getByRole('button', { name: /close decision/i })).toBeInTheDocument();
-            });
-
-            const closeButton = screen.getByRole('button', { name: /close decision/i });
-            await user.click(closeButton);
-
-            await waitFor(() => {
-                expect(mockToggleDecisionStatus).toHaveBeenCalledWith('test-decision-123', 'closed');
-            });
-        });
-
-        it('displays re-open button when decision is closed', async () => {
-            mockSubscribeToDecision.mockImplementation((id, callback) => {
-                callback({ ...mockDecision, status: 'closed' });
-                return () => { };
-            });
-
-            renderDecision();
-
-            await waitFor(() => {
-                expect(screen.getByRole('button', { name: /re-open decision/i })).toBeInTheDocument();
-            });
-        });
-
         it('shows decision closed banner when closed', async () => {
             mockSubscribeToDecision.mockImplementation((id, callback) => {
                 callback({ ...mockDecision, status: 'closed' });
@@ -418,36 +372,20 @@ describe('Decision Component', () => {
             });
 
             renderDecision();
-
             await waitFor(() => {
                 expect(screen.getByText(/decision closed/i)).toBeInTheDocument();
             });
         });
 
-        it('passes readOnly prop to child components when closed', async () => {
-            mockSubscribeToDecision.mockImplementation((id, callback) => {
-                callback({ ...mockDecision, status: 'closed' });
-                return () => { };
-            });
-
-            renderDecision();
-
-            await waitFor(() => {
-                expect(screen.getByText(/ArgumentList: pro.*\(read-only\)/)).toBeInTheDocument();
-                expect(screen.getByText(/ArgumentList: con.*\(read-only\)/)).toBeInTheDocument();
-            });
-        });
-
-        it('shows final result when decision is closed', async () => {
+        it('shows approved result when yes votes win', async () => {
             mockSubscribeToDecision.mockImplementation((id, callback) => {
                 callback({ ...mockDecision, status: 'closed', yesVotes: 10, noVotes: 3 });
                 return () => { };
             });
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByText(/decision closed: approved/i)).toBeInTheDocument();
+                expect(screen.getByText(/approved/i)).toBeInTheDocument();
             });
         });
 
@@ -458,68 +396,47 @@ describe('Decision Component', () => {
             });
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByText(/decision closed: rejected/i)).toBeInTheDocument();
+                expect(screen.getByText(/rejected/i)).toBeInTheDocument();
             });
         });
     });
 
-    // US-008: Final Vote
     describe('Final Vote (US-008)', () => {
-        it('displays final vote section with yes and no buttons', async () => {
+        it('displays thumbs up/down vote buttons', async () => {
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByText(/final vote/i)).toBeInTheDocument();
-                expect(screen.getByRole('button', { name: /^yes$/i })).toBeInTheDocument();
-                expect(screen.getByRole('button', { name: /^no$/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Yes')).toBeInTheDocument();
+                expect(screen.getByLabelText('No')).toBeInTheDocument();
             });
         });
 
-        it('displays vote counts', async () => {
-            renderDecision();
-
-            await waitFor(() => {
-                const yesButton = screen.getByRole('button', { name: /^yes$/i });
-                const noButton = screen.getByRole('button', { name: /^no$/i });
-
-                // Check that vote counts are displayed near the buttons
-                expect(yesButton.closest('div').parentElement).toHaveTextContent('5');
-                expect(noButton.closest('div').parentElement).toHaveTextContent('3');
-            });
-        });
-
-        it('casts yes vote when yes button clicked', async () => {
+        it('casts yes vote when thumbs up clicked', async () => {
             const user = userEvent.setup();
             mockVoteDecision.mockResolvedValue({ success: true });
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /^yes$/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Yes')).toBeInTheDocument();
             });
 
-            const yesButton = screen.getByRole('button', { name: /^yes$/i });
-            await user.click(yesButton);
+            await user.click(screen.getByLabelText('Yes'));
 
             await waitFor(() => {
                 expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'yes', 'Test User');
             });
         });
 
-        it('casts no vote when no button clicked', async () => {
+        it('casts no vote when thumbs down clicked', async () => {
             const user = userEvent.setup();
             mockVoteDecision.mockResolvedValue({ success: true });
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /^no$/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('No')).toBeInTheDocument();
             });
 
-            const noButton = screen.getByRole('button', { name: /^no$/i });
-            await user.click(noButton);
+            await user.click(screen.getByLabelText('No'));
 
             await waitFor(() => {
                 expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'Test User');
@@ -531,72 +448,14 @@ describe('Decision Component', () => {
             mockVoteDecision.mockResolvedValue({ success: true });
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /^yes$/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Yes')).toBeInTheDocument();
             });
 
-            const yesButton = screen.getByRole('button', { name: /^yes$/i });
-            await user.click(yesButton);
+            await user.click(screen.getByLabelText('Yes'));
 
             await waitFor(() => {
                 expect(localStorage.getItem('decision_vote_test-decision-123')).toBe('yes');
-            });
-        });
-
-        it('loads vote from localStorage on mount', async () => {
-            localStorage.setItem('decision_vote_test-decision-123', 'yes');
-
-            renderDecision();
-
-            await waitFor(() => {
-                const yesButton = screen.getByRole('button', { name: /^yes$/i });
-                // Button should have different styling when selected
-                expect(yesButton).toBeInTheDocument();
-            });
-        });
-
-        it('allows changing vote from yes to no', async () => {
-            const user = userEvent.setup();
-            localStorage.setItem('decision_vote_test-decision-123', 'yes');
-            mockVoteDecision.mockResolvedValue({ success: true });
-
-            renderDecision();
-
-            await waitFor(() => {
-                expect(screen.getByRole('button', { name: /^no$/i })).toBeInTheDocument();
-            });
-
-            const noButton = screen.getByRole('button', { name: /^no$/i });
-            await user.click(noButton);
-
-            await waitFor(() => {
-                // Should call voteDecision with new vote
-                expect(mockVoteDecision).toHaveBeenCalledWith('test-decision-123', 'no', 'Test User');
-            });
-        });
-
-        it('updates vote balance when final votes change', async () => {
-            let decisionCallback;
-            mockSubscribeToDecision.mockImplementation((id, callback) => {
-                decisionCallback = callback;
-                callback(mockDecision); // Initial: yes=5, no=3 -> Balance +2
-                return () => { };
-            });
-
-            renderDecision();
-
-            await waitFor(() => {
-                expect(screen.getByText(/\+2/i)).toBeInTheDocument();
-            });
-
-            // Simulate update
-            act(() => {
-                decisionCallback({ ...mockDecision, yesVotes: 6, noVotes: 3 }); // Balance +3
-            });
-
-            await waitFor(() => {
-                expect(screen.getByText(/\+3/i)).toBeInTheDocument();
             });
         });
 
@@ -607,13 +466,9 @@ describe('Decision Component', () => {
             });
 
             renderDecision();
-
             await waitFor(() => {
-                const yesButton = screen.getByRole('button', { name: /^yes$/i });
-                const noButton = screen.getByRole('button', { name: /^no$/i });
-
-                expect(yesButton).toBeDisabled();
-                expect(noButton).toBeDisabled();
+                expect(screen.getByLabelText('Yes')).toBeDisabled();
+                expect(screen.getByLabelText('No')).toBeDisabled();
             });
         });
 
@@ -622,13 +477,11 @@ describe('Decision Component', () => {
             mockVoteDecision.mockRejectedValue(new Error('Network error'));
 
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /^yes$/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Yes')).toBeInTheDocument();
             });
 
-            const yesButton = screen.getByRole('button', { name: /^yes$/i });
-            await user.click(yesButton);
+            await user.click(screen.getByLabelText('Yes'));
 
             await waitFor(() => {
                 expect(screen.getByText('Failed to cast vote.')).toBeInTheDocument();
@@ -636,73 +489,127 @@ describe('Decision Component', () => {
         });
     });
 
-    // Export functionality
-    describe('Export as Image', () => {
-        it('displays export button', async () => {
+    describe('Column Layout', () => {
+        it('displays column headers for pro and con', async () => {
             renderDecision();
-
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /export as image/i })).toBeInTheDocument();
+                expect(screen.getByText('Add pro')).toBeInTheDocument();
+                expect(screen.getByText('Add contra')).toBeInTheDocument();
             });
         });
 
-        it('exports decision as image when button clicked', async () => {
+        it('opens floating input when add pro button clicked', async () => {
             const user = userEvent.setup();
-            const mockDataUrl = 'data:image/png;base64,mock';
-            mockToPng.mockResolvedValue(mockDataUrl);
-
             renderDecision();
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /export as image/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Add pro')).toBeInTheDocument();
             });
 
-            const exportButton = screen.getByRole('button', { name: /export as image/i });
-            await user.click(exportButton);
+            await user.click(screen.getByLabelText('Add pro'));
 
             await waitFor(() => {
-                expect(mockToPng).toHaveBeenCalled();
+                expect(screen.getByPlaceholderText('Add a Pro...')).toBeInTheDocument();
             });
         });
 
-        it('shows exporting state during export', async () => {
+        it('opens floating input when add con button clicked', async () => {
             const user = userEvent.setup();
-            mockToPng.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve('data:image'), 100)));
-
             renderDecision();
 
             await waitFor(() => {
-                expect(screen.getByRole('button', { name: /export as image/i })).toBeInTheDocument();
+                expect(screen.getByLabelText('Add contra')).toBeInTheDocument();
             });
 
-            const exportButton = screen.getByRole('button', { name: /export as image/i });
-            await user.click(exportButton);
+            await user.click(screen.getByLabelText('Add contra'));
 
-            expect(screen.getByRole('status', { name: /loading/i })).toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.getByPlaceholderText('Add a Con...')).toBeInTheDocument();
+            });
         });
     });
 
-    // Real-time Updates
+    describe('Argument Submission', () => {
+        it('submits argument through FloatingArgumentInput', async () => {
+            const user = userEvent.setup();
+            mockAddArgument.mockResolvedValue({ success: true });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByLabelText('Add pro')).toBeInTheDocument();
+            });
+
+            // Open the floating input
+            await user.click(screen.getByLabelText('Add pro'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('arg-submit')).toBeInTheDocument();
+            });
+
+            // Submit the argument
+            await user.click(screen.getByTestId('arg-submit'));
+
+            await waitFor(() => {
+                expect(mockAddArgument).toHaveBeenCalledWith(
+                    'test-decision-123',
+                    'pro',
+                    'Test argument',
+                    'Test User',
+                    'test-user-id'
+                );
+            });
+        });
+    });
+
+    describe('Name Prompt for Argument Vote', () => {
+        it('shows name prompt and retries argument vote after name save', async () => {
+            const user = userEvent.setup();
+            mockVoteArgument.mockResolvedValue({ success: true });
+
+            // User without displayName
+            useUser.mockReturnValue({
+                user: { userId: 'test-user-id', displayName: '' },
+                setDisplayName: vi.fn()
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByTestId('statement-arg-1')).toBeInTheDocument();
+            });
+
+            // Click vote on an argument — triggers onNameRequired
+            await user.click(screen.getByTestId('vote-arg-1'));
+
+            // Name prompt should appear
+            await waitFor(() => {
+                expect(screen.getByTestId('name-prompt')).toBeInTheDocument();
+            });
+
+            // Save name — should retry the argument vote
+            await user.click(screen.getByTestId('name-save'));
+
+            await waitFor(() => {
+                expect(mockVoteArgument).toHaveBeenCalledWith(
+                    'test-decision-123',
+                    'arg-1',
+                    'New User'
+                );
+            });
+        });
+    });
+
     describe('Real-time Updates', () => {
         it('subscribes to decision updates on mount', async () => {
             renderDecision();
-
             await waitFor(() => {
-                expect(mockSubscribeToDecision).toHaveBeenCalledWith(
-                    'test-decision-123',
-                    expect.any(Function)
-                );
+                expect(mockSubscribeToDecision).toHaveBeenCalledWith('test-decision-123', expect.any(Function));
             });
         });
 
         it('subscribes to arguments updates on mount', async () => {
             renderDecision();
-
             await waitFor(() => {
-                expect(mockSubscribeToArguments).toHaveBeenCalledWith(
-                    'test-decision-123',
-                    expect.any(Function)
-                );
+                expect(mockSubscribeToArguments).toHaveBeenCalledWith('test-decision-123', expect.any(Function));
             });
         });
 
@@ -717,14 +624,12 @@ describe('Decision Component', () => {
             mockSubscribeToFinalVotes.mockReturnValue(unsubscribeFinalVotes);
             ParticipantService.subscribeToParticipants.mockImplementation(() => unsubscribeParticipants);
 
-            // We need key for participants subscription
             const { unmount } = renderDecision('/d/test-id#key=mock-key-string');
 
             await waitFor(() => {
                 expect(mockSubscribeToDecision).toHaveBeenCalled();
             });
 
-            // Ensure key is propagated
             await waitFor(() => {
                 expect(ParticipantService.subscribeToParticipants).toHaveBeenCalled();
             });

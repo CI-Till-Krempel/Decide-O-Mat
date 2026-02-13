@@ -29,6 +29,8 @@
     "resultApproved": "Approved",
     "resultRejected": "Rejected",
     "resultNoVotes": "No Votes",
+    "statistics": "Statistics",
+    "argumentLabel": "Argument",
     "voteBalance": "Vote Balance",
     "argumentScore": "Argument Score",
     "notifications": {
@@ -121,6 +123,7 @@
     "placeholderPro": "Add a Pro...",
     "placeholderCon": "Add a Con...",
     "buttonAdd": "Add",
+    "clearLabel": "Clear",
     "errorFailed": "Failed to add argument. Please try again."
   },
   "argumentItem": {
@@ -178,7 +181,15 @@
     "helpCipher": "Your display name is encrypted end-to-end. Only people with the link key can see it.",
     "helpNoLogin": "You don't need an account. We remembered you via a secure ID.",
     "helpTransfer": "Use the transfer button to move your identity to another device.",
-    "titleTransfer": "Transfer Identity"
+    "titleTransfer": "Transfer Identity",
+    "buttonReset": "Reset",
+    "buttonTransfer": "Transfer",
+    "buttonHelp": "Help",
+    "editNameButton": "Edit Name",
+    "avatarAlt": "Avatar",
+    "helpCipherLabel": "Cipher",
+    "helpNoLoginLabel": "No Login",
+    "helpTransferLabel": "Transfer"
   },
   "magicLinkData": {
     "title": "Transfer Identity",

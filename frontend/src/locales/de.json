@@ -29,6 +29,8 @@
     "resultApproved": "Angenommen",
     "resultRejected": "Abgelehnt",
     "resultNoVotes": "Keine Stimmen",
+    "statistics": "Statistiken",
+    "argumentLabel": "Argument",
     "voteBalance": "Stimmenverh\u00e4ltnis",
     "argumentScore": "Argument-Score",
     "notifications": {
@@ -121,6 +123,7 @@
     "placeholderPro": "Pro hinzuf\u00fcgen...",
     "placeholderCon": "Kontra hinzuf\u00fcgen...",
     "buttonAdd": "Hinzuf\u00fcgen",
+    "clearLabel": "L\u00f6schen",
     "errorFailed": "Argument konnte nicht hinzugef\u00fcgt werden. Bitte versuche es erneut."
   },
   "argumentItem": {
@@ -178,7 +181,15 @@
     "helpCipher": "Dein Anzeigename ist Ende-zu-Ende-verschl\u00fcsselt. Nur Personen mit dem Link-Schl\u00fcssel k\u00f6nnen ihn sehen.",
     "helpNoLogin": "Du brauchst kein Konto. Wir haben dich \u00fcber eine sichere ID gespeichert.",
     "helpTransfer": "Verwende den Transfer-Button, um deine Identit\u00e4t auf ein anderes Ger\u00e4t zu \u00fcbertragen.",
-    "titleTransfer": "Identit\u00e4t \u00fcbertragen"
+    "titleTransfer": "Identit\u00e4t \u00fcbertragen",
+    "buttonReset": "Zur\u00fccksetzen",
+    "buttonTransfer": "\u00dcbertragen",
+    "buttonHelp": "Hilfe",
+    "editNameButton": "Name bearbeiten",
+    "avatarAlt": "Profilbild",
+    "helpCipherLabel": "Verschl\u00fcsselung",
+    "helpNoLoginLabel": "Kein Login",
+    "helpTransferLabel": "\u00dcbertragen"
   },
   "magicLinkData": {
     "title": "Identit\u00e4t \u00fcbertragen",

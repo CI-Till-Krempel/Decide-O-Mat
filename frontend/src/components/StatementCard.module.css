@@ -1,0 +1,104 @@
+.card {
+  background: var(--color-bg-card);
+  border: var(--stroke-sm) solid var(--color-border-card);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.ownCard {
+  border-color: var(--color-accent-orange);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.authorLabel {
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-body-sm);
+  color: var(--color-text-muted-alt);
+  letter-spacing: var(--tracking-sm);
+}
+
+.ownLabel {
+  color: var(--color-accent-orange);
+  font-weight: 600;
+}
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.text {
+  flex: 1;
+  font-size: var(--text-body-md);
+  line-height: var(--leading-body-md);
+  color: var(--color-text-on-surface);
+}
+
+.voteButton {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-muted-alt);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.voteButton:hover:not(:disabled) {
+  border-color: var(--color-accent-secondary);
+  color: var(--color-accent-secondary);
+}
+
+.voteButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.voteButtonActive {
+  background: var(--color-accent-secondary);
+  border-color: var(--color-accent-secondary);
+  color: var(--color-text-on-secondary);
+}
+
+.voterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.voterLabel {
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-body-sm);
+  color: var(--color-text-muted-alt);
+  font-style: italic;
+}
+
+.voterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.chip {
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-body-sm);
+  padding: 4px var(--space-sm);
+  border-radius: var(--radius-full);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  color: var(--color-text-on-surface);
+  background: transparent;
+}

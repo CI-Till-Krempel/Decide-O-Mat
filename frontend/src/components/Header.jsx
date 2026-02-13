@@ -97,6 +97,8 @@ export default function Header() {
                             className={styles.textButton}
                             onClick={() => setShowSettings(!showSettings)}
                             type="button"
+                            aria-haspopup="true"
+                            aria-expanded={showSettings}
                             data-testid="settings-toggle"
                         >
                             <PersonIcon />

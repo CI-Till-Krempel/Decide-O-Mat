@@ -1,21 +1,26 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { subscribeToDecision, subscribeToArguments, toggleDecisionStatus, voteDecision, subscribeToFinalVotes } from '../services/firebase';
-import ArgumentList from '../components/ArgumentList';
-import AddArgumentForm from '../components/AddArgumentForm';
+import { useTranslation } from 'react-i18next';
+import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes } from '../services/firebase';
 
+import ElectionHero from '../components/ElectionHero';
+import ColumnHeader from '../components/ColumnHeader';
+import StatementCard from '../components/StatementCard';
+import FloatingArgumentInput from '../components/FloatingArgumentInput';
+import FAB from '../components/FAB';
 import NamePrompt from '../components/NamePrompt';
 import Spinner from '../components/Spinner';
-import { useUser } from '../contexts/UserContext';
-import { toPng } from 'html-to-image';
-import EncryptionService from '../services/EncryptionService';
-import ParticipantService from '../services/ParticipantService';
 import ParticipantList from '../components/ParticipantList';
-import NotificationService from '../services/NotificationService';
-
 import Toast from '../components/Toast';
 
+import { useUser } from '../contexts/UserContext';
+import EncryptionService from '../services/EncryptionService';
+import ParticipantService from '../services/ParticipantService';
+
+import styles from './Decision.module.css';
+
 function Decision() {
+    const { t } = useTranslation();
     const { id } = useParams();
     const location = useLocation();
     const { user, setDisplayName } = useUser();
@@ -26,16 +31,16 @@ function Decision() {
     const [copied, setCopied] = useState(false);
     const [finalVote, setFinalVote] = useState(null);
     const [votingTarget, setVotingTarget] = useState(null);
-    const [exporting, setExporting] = useState(false);
     const [finalVotesList, setFinalVotesList] = useState([]);
     const [participantMap, setParticipantMap] = useState(new Map());
     const [showNamePrompt, setShowNamePrompt] = useState(false);
-    const [pendingVoteType, setPendingVoteType] = useState(null);
+    const [pendingAction, setPendingAction] = useState(null); // { type: 'vote', voteType } or { type: 'argument', argType, text }
     const [encryptionKey, setEncryptionKey] = useState(null);
     const [showParticipants, setShowParticipants] = useState(false);
-    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-    const [toast, setToast] = useState(null); // { message, type }
-    const decisionRef = useRef(null);
+    const [toast, setToast] = useState(null);
+    const [activeColumn, setActiveColumn] = useState(null); // null | 'pro' | 'con'
+    const [submittingArgument, setSubmittingArgument] = useState(false);
+    const [votedArgIds, setVotedArgIds] = useState(new Set());
 
     // Parse key from URL hash
     useEffect(() => {
@@ -57,9 +62,8 @@ function Decision() {
         let unsubscribeFinalVotes = () => { };
         let unsubscribeParticipants = () => { };
 
-        // We need to wait for key parsing (or determination that there is no key)
         const setupSubscriptions = async () => {
-            const currentKey = encryptionKey; // Closure capture
+            const currentKey = encryptionKey;
 
             unsubscribeDecision = subscribeToDecision(id, async (data) => {
                 if (data && currentKey && data.question) {
@@ -67,7 +71,7 @@ function Decision() {
                         data.question = await EncryptionService.decrypt(data.question, currentKey);
                     } catch (e) {
                         console.error("Failed to decrypt question", e);
-                        data.question = "[Decryption Failed]";
+                        data.question = t('decision.decryptionFailed');
                     }
                 }
                 setDecision(data);
@@ -82,7 +86,7 @@ function Decision() {
                             if (arg.authorName) arg.authorName = await EncryptionService.decrypt(arg.authorName, currentKey);
                         } catch (e) {
                             console.error("Failed to decrypt argument", e);
-                            arg.text = "[Decryption Failed]";
+                            arg.text = t('decision.decryptionFailed');
                         }
                     }
                     return arg;
@@ -107,7 +111,6 @@ function Decision() {
                 setFinalVotesList(decryptedVotes);
             });
 
-            // Always subscribe to participants (for both encrypted and unencrypted names)
             unsubscribeParticipants = ParticipantService.subscribeToParticipants(id, currentKey, (map) => {
                 setParticipantMap(map);
             });
@@ -115,7 +118,6 @@ function Decision() {
 
         setupSubscriptions();
 
-        // Load local vote state
         const storedVote = localStorage.getItem(`decision_vote_${id}`);
         if (storedVote) {
             setFinalVote(storedVote);
@@ -127,7 +129,7 @@ function Decision() {
             unsubscribeFinalVotes();
             unsubscribeParticipants();
         };
-    }, [id, encryptionKey]);
+    }, [id, encryptionKey, t]);
 
     useEffect(() => {
         if (copied) {
@@ -139,49 +141,14 @@ function Decision() {
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
         setCopied(true);
-    };
-
-    const handleToggleStatus = async () => {
-        if (!decision) return;
-        const newStatus = decision.status === 'closed' ? 'open' : 'closed';
-        try {
-            await toggleDecisionStatus(id, newStatus);
-        } catch (error) {
-            console.error("Error toggling status:", error);
-            setToast({ message: "Failed to update decision status.", type: 'error' });
-        }
-    };
-
-    const handleToggleNotifications = async () => {
-        if (!user.userId) return;
-        const granted = await NotificationService.requestPermission(id, user.userId);
-        if (granted) {
-            setNotificationsEnabled(true);
-            setToast({ message: "Notifications enabled!", type: 'success' });
-        } else {
-            setToast({ message: "Could not enable notifications. Please check your browser settings.", type: 'error' });
-        }
-    };
-
-    const handleFinalVote = async (voteType) => {
-        if (votingTarget || decision.status === 'closed') return;
-
-        // Check if user has a display name
-        if (!user.displayName) {
-            setPendingVoteType(voteType);
-            setShowNamePrompt(true);
-            return;
-        }
-
-        await performFinalVote(voteType);
+        setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
     };
 
     const performFinalVote = async (voteType) => {
         setVotingTarget(voteType);
 
         try {
-            // Auto-register name if needed
-            if (user.displayName && encryptionKey && (!participantMap || !participantMap.get(user.userId))) {
+            if (user.displayName && encryptionKey && !participantMap.has(user.userId)) {
                 try {
                     await ParticipantService.registerParticipant(id, user.displayName, encryptionKey);
                 } catch (e) {
@@ -189,20 +156,59 @@ function Decision() {
                 }
             }
 
-            // If we have a key, we rely on participant mapping (registered above).
-            // If we don't have a key (unencrypted decision), we send the display name in plaintext.
-            // This restores support for non-E2E decisions while preserving privacy for E2E ones.
             const nameToSend = encryptionKey ? null : user.displayName;
             await voteDecision(id, voteType, nameToSend);
 
-            // Update local state
             setFinalVote(voteType);
             localStorage.setItem(`decision_vote_${id}`, voteType);
         } catch (error) {
             console.error("Error voting:", error);
-            setToast({ message: "Failed to cast vote.", type: 'error' });
+            setToast({ message: t('decision.errors.voteFailed'), type: 'error' });
         } finally {
             setVotingTarget(null);
+        }
+    };
+
+    const handleFinalVote = async (voteType) => {
+        if (votingTarget || decision.status === 'closed') return;
+
+        if (!user.displayName) {
+            setPendingAction({ type: 'vote', voteType });
+            setShowNamePrompt(true);
+            return;
+        }
+
+        await performFinalVote(voteType);
+    };
+
+    const handleSubmitArgument = async (text, type) => {
+        if (!user.displayName) {
+            setPendingAction({ type: 'argument', argType: type, text });
+            setShowNamePrompt(true);
+            return;
+        }
+
+        await performSubmitArgument(text, type);
+    };
+
+    const performSubmitArgument = async (text, type) => {
+        setSubmittingArgument(true);
+        try {
+            let textToSubmit = text;
+            let nameToSubmit = user.displayName;
+
+            if (encryptionKey) {
+                textToSubmit = await EncryptionService.encrypt(text, encryptionKey);
+                nameToSubmit = await EncryptionService.encrypt(nameToSubmit, encryptionKey);
+            }
+
+            await addArgument(id, type, textToSubmit, nameToSubmit, user.userId);
+            setActiveColumn(null);
+        } catch (error) {
+            console.error("Error adding argument:", error);
+            setToast({ message: t('addArgumentForm.errorFailed'), type: 'error' });
+        } finally {
+            setSubmittingArgument(false);
         }
     };
 
@@ -210,62 +216,48 @@ function Decision() {
         setDisplayName(name);
         if (encryptionKey) {
             try {
-                // Register participant ID <-> Encrypted Name
                 await ParticipantService.registerParticipant(id, name, encryptionKey);
             } catch (error) {
                 console.error("Failed to register participant name", error);
-                // Non-blocking? User can still vote, just name won't be visible to others.
             }
         }
         setShowNamePrompt(false);
-        // Perform the vote after saving the name
-        if (pendingVoteType) {
-            await performFinalVote(pendingVoteType);
-            setPendingVoteType(null);
+
+        if (pendingAction) {
+            if (pendingAction.type === 'vote') {
+                await performFinalVote(pendingAction.voteType);
+            } else if (pendingAction.type === 'argument') {
+                await performSubmitArgument(pendingAction.text, pendingAction.argType);
+            } else if (pendingAction.type === 'argVote') {
+                try {
+                    const nameToSend = encryptionKey ? null : name;
+                    await voteArgument(id, pendingAction.argumentId, nameToSend);
+                } catch (error) {
+                    console.error("Error voting on argument:", error);
+                    setToast({ message: t('argumentItem.errorVoteFailed'), type: 'error' });
+                }
+            }
+            setPendingAction(null);
         }
     };
 
-    const handleExport = useCallback(async () => {
-        if (decisionRef.current === null) {
-            return;
-        }
-        setExporting(true);
-        try {
-            // Ensure the element is fully visible/sized before capture
-            const dataUrl = await toPng(decisionRef.current, {
-                cacheBust: true,
-                backgroundColor: 'white',
-                style: {
-                    padding: '20px',
-                    width: 'auto', // Allow it to expand
-                    height: 'auto'
-                },
-                // Explicitly set dimensions to include scrollable content if any
-                width: decisionRef.current.scrollWidth + 40, // + padding
-                height: decisionRef.current.scrollHeight + 40
-            });
-            const link = document.createElement('a');
-            link.download = `decision-${id}.png`;
-            link.href = dataUrl;
-            link.click();
-        } catch (err) {
-            console.error('Error exporting image:', err);
-            setToast({ message: 'Failed to export image.', type: 'error' });
-        } finally {
-            setExporting(false);
-        }
-    }, [id]);
+    const handleVoteChange = useCallback((argId, isVoted) => {
+        setVotedArgIds(prev => {
+            const newSet = new Set(prev);
+            if (isVoted) newSet.add(argId);
+            else newSet.delete(argId);
+            return newSet;
+        });
+    }, []);
 
     if (loading) return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div className={styles.loading}>
             <Spinner size="lg" color="var(--color-primary)" />
         </div>
     );
-    if (!decision) return <div className="container">Decision not found</div>;
+    if (!decision) return <div className={styles.notFound}>{t('decision.notFound')}</div>;
 
     const isClosed = decision.status === 'closed';
-    const argumentScore = pros.reduce((sum, arg) => sum + (arg.votes || 0), 0) - cons.reduce((sum, arg) => sum + (arg.votes || 0), 0);
-
     const yesVotes = decision.yesVotes || 0;
     const noVotes = decision.noVotes || 0;
     const totalVotes = yesVotes + noVotes;
@@ -274,11 +266,20 @@ function Decision() {
     if (isClosed) {
         if (yesVotes > noVotes) finalResult = "Approved";
         else if (noVotes >= yesVotes && totalVotes > 0) finalResult = "Rejected";
-        else finalResult = "No Votes";
+        else finalResult = "NoVotes";
     }
 
+    // Dot-voting: each participant may vote on at most half (rounded up) of all arguments.
+    // This forces prioritisation rather than blanket approval.
+    const allArgs = [...pros, ...cons];
+    const voteLimit = allArgs.length > 0 ? Math.ceil(allArgs.length / 2) : 0;
+    const canVote = votedArgIds.size < voteLimit;
+
+    const sortedPros = [...pros].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    const sortedCons = [...cons].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+
     return (
-        <div className="container">
+        <div className={styles.page}>
             {toast && (
                 <Toast
                     message={toast.message}
@@ -299,234 +300,98 @@ function Decision() {
                     onSave={handleNameSave}
                     onCancel={() => {
                         setShowNamePrompt(false);
-                        setPendingVoteType(null);
+                        setPendingAction(null);
                     }}
                 />
             )}
 
-            <div ref={decisionRef} style={{ backgroundColor: 'white', minWidth: '600px', overflow: 'visible' }}>
-                <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '0.5rem', gap: '0.5rem' }}>
-                        <button
-                            onClick={handleToggleNotifications}
-                            className="btn"
-                            title="Enable Notifications"
-                            style={{ background: 'transparent', color: notificationsEnabled ? 'var(--color-primary)' : 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
-                        >
-                            {notificationsEnabled ? '🔔' : '🔕'}
-                        </button>
-                        <button
-                            onClick={() => setShowParticipants(true)}
-                            className="btn"
-                            style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)' }}
-                        >
-                            👥 Participants
-                        </button>
-                    </div>
+            <ElectionHero
+                question={decision.question || decision.text}
+                onVoteYes={() => handleFinalVote('yes')}
+                onVoteNo={() => handleFinalVote('no')}
+                isClosed={isClosed}
+                userVote={finalVote}
+                votingTarget={votingTarget}
+                finalResult={finalResult}
+                finalVotesList={finalVotesList}
+                participantMap={participantMap}
+            />
 
-                    <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{decision.question || decision.text}</h1>
-
-                    {isClosed && (
-                        <div style={{
-                            background: finalResult === 'Approved' ? 'var(--color-success)' : 'var(--color-danger)',
-                            color: 'white',
-                            padding: '1rem',
-                            borderRadius: '8px',
-                            marginBottom: '1rem',
-                            fontWeight: 'bold',
-                            fontSize: '1.5rem'
-                        }}>
-                            Decision Closed: {finalResult}
+            <div className={styles.columns}>
+                <div className={styles.column}>
+                    <ColumnHeader
+                        label={t('argumentList.addPro')}
+                        onAdd={() => setActiveColumn('pro')}
+                        disabled={isClosed}
+                    />
+                    {sortedPros.length === 0 ? (
+                        <div className={styles.emptyCard}>
+                            <svg className={styles.emptyIcon} viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                            </svg>
                         </div>
+                    ) : (
+                        sortedPros.map(arg => (
+                            <StatementCard
+                                key={arg.id}
+                                argument={arg}
+                                decisionId={id}
+                                readOnly={isClosed}
+                                canVote={canVote}
+                                participantMap={participantMap}
+                                encryptionKey={encryptionKey}
+                                onVoteChange={handleVoteChange}
+                                onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
+                                onError={(msg) => setToast({ message: msg, type: 'error' })}
+                            />
+                        ))
                     )}
-
-                    {/* Metrics Display */}
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', margin: '1rem 0' }}>
-                        {/* Vote Balance */}
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Vote Balance</div>
-                            <div style={{
-                                fontSize: '1.5rem',
-                                fontWeight: 'bold',
-                                color: (yesVotes - noVotes) > 0
-                                    ? 'var(--color-success)'
-                                    : (yesVotes - noVotes) < 0
-                                        ? 'var(--color-danger)'
-                                        : 'var(--color-text-muted)'
-                            }}>
-                                {(yesVotes - noVotes) > 0 ? '+' : ''}{yesVotes - noVotes}
-                            </div>
-                        </div>
-
-                        {/* Argument Score */}
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Argument Score</div>
-                            <div style={{
-                                fontSize: '1.5rem',
-                                fontWeight: 'bold',
-                                color: argumentScore > 0
-                                    ? 'var(--color-success)'
-                                    : argumentScore < 0
-                                        ? 'var(--color-danger)'
-                                        : 'var(--color-text-muted)'
-                            }}>
-                                {argumentScore > 0 ? '+' : ''}{argumentScore}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Final Voting Section */}
-                    <div style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid var(--color-border)', borderRadius: '8px', backgroundColor: 'var(--color-bg-secondary)' }}>
-                        <h3 style={{ marginBottom: '1rem' }}>Final Vote</h3>
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '2rem', alignItems: 'flex-start' }}>
-                            <div style={{ textAlign: 'center', flex: 1 }}>
-                                <button
-                                    onClick={() => handleFinalVote('yes')}
-                                    disabled={isClosed || !!votingTarget}
-                                    style={{
-                                        background: finalVote === 'yes' ? 'var(--color-success)' : 'white',
-                                        color: finalVote === 'yes' ? 'white' : 'var(--color-success)',
-                                        border: '2px solid var(--color-success)',
-                                        padding: '0.5rem 1.5rem',
-                                        borderRadius: '20px',
-                                        fontSize: '1.2rem',
-                                        cursor: (isClosed || !!votingTarget) ? 'not-allowed' : 'pointer',
-                                        opacity: (isClosed && finalVote !== 'yes') ? 0.5 : 1,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}
-                                >
-                                    {votingTarget === 'yes' ? <Spinner size="sm" color={finalVote === 'yes' ? 'white' : 'var(--color-success)'} /> : 'Yes'}
-                                </button>
-                                <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{yesVotes}</div>
-                                {finalVotesList.filter(v => v.vote === 'yes').length > 0 && (
-                                    <div style={{ marginTop: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-                                        {finalVotesList.filter(v => v.vote === 'yes').map(vote => (
-                                            <span key={vote.userId} style={{
-                                                fontSize: '0.75rem',
-                                                background: 'white',
-                                                padding: '0.25rem 0.75rem',
-                                                borderRadius: '12px',
-                                                color: 'var(--color-text)',
-                                                border: '1px solid var(--color-border)'
-                                            }}>
-                                                {participantMap.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                            <div style={{ textAlign: 'center', flex: 1 }}>
-                                <button
-                                    onClick={() => handleFinalVote('no')}
-                                    disabled={isClosed || !!votingTarget}
-                                    style={{
-                                        background: finalVote === 'no' ? 'var(--color-danger)' : 'white',
-                                        color: finalVote === 'no' ? 'white' : 'var(--color-danger)',
-                                        border: '2px solid var(--color-danger)',
-                                        padding: '0.5rem 1.5rem',
-                                        borderRadius: '20px',
-                                        fontSize: '1.2rem',
-                                        cursor: (isClosed || !!votingTarget) ? 'not-allowed' : 'pointer',
-                                        opacity: (isClosed && finalVote !== 'no') ? 0.5 : 1,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}
-                                >
-                                    {votingTarget === 'no' ? <Spinner size="sm" color={finalVote === 'no' ? 'white' : 'var(--color-danger)'} /> : 'No'}
-                                </button>
-                                <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{noVotes}</div>
-                                {finalVotesList.filter(v => v.vote === 'no').length > 0 && (
-                                    <div style={{ marginTop: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-                                        {finalVotesList.filter(v => v.vote === 'no').map(vote => (
-                                            <span key={vote.userId} style={{
-                                                fontSize: '0.75rem',
-                                                background: 'white',
-                                                padding: '0.25rem 0.75rem',
-                                                borderRadius: '12px',
-                                                color: 'var(--color-text)',
-                                                border: '1px solid var(--color-border)'
-                                            }}>
-                                                {participantMap.get(vote.userId)?.name || vote.displayName || 'Anonymous'}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <div className="arguments-container" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
-                    <div className="pros-column" style={{ flex: 1 }}>
-                        <ArgumentList
-                            arguments={pros}
-                            type="pro"
-                            decisionId={id}
-                            readOnly={isClosed || exporting}
-                            participantMap={participantMap}
-                            encryptionKey={encryptionKey}
-                            onError={(msg) => setToast({ message: msg, type: 'error' })}
-                        />
-                        {!exporting && <AddArgumentForm decisionId={id} type="pro" readOnly={isClosed} encryptionKey={encryptionKey} />}
-                    </div>
-                    <div className="cons-column" style={{ flex: 1 }}>
-                        <ArgumentList
-                            arguments={cons}
-                            type="con"
-                            decisionId={id}
-                            readOnly={isClosed || exporting}
-                            participantMap={participantMap}
-                            encryptionKey={encryptionKey}
-                            onError={(msg) => setToast({ message: msg, type: 'error' })}
-                        />
-                        {!exporting && <AddArgumentForm decisionId={id} type="con" readOnly={isClosed} encryptionKey={encryptionKey} />}
-                    </div>
+                <div className={styles.column}>
+                    <ColumnHeader
+                        label={t('argumentList.addCon')}
+                        onAdd={() => setActiveColumn('con')}
+                        disabled={isClosed}
+                    />
+                    {sortedCons.length === 0 ? (
+                        <div className={styles.emptyCard}>
+                            <svg className={styles.emptyIcon} viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                            </svg>
+                        </div>
+                    ) : (
+                        sortedCons.map(arg => (
+                            <StatementCard
+                                key={arg.id}
+                                argument={arg}
+                                decisionId={id}
+                                readOnly={isClosed}
+                                canVote={canVote}
+                                participantMap={participantMap}
+                                encryptionKey={encryptionKey}
+                                onVoteChange={handleVoteChange}
+                                onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
+                                onError={(msg) => setToast({ message: msg, type: 'error' })}
+                            />
+                        ))
+                    )}
                 </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', paddingBottom: '2rem' }}>
-                <button
-                    onClick={handleCopyLink}
-                    className="btn"
-                    style={{
-                        background: copied ? 'var(--color-success)' : 'var(--color-secondary)',
-                        color: 'white',
-                        fontSize: '0.875rem',
-                        padding: '0.25rem 0.75rem'
-                    }}
-                >
-                    {copied ? 'Link Copied!' : 'Copy Link'}
-                </button>
-                <button
-                    onClick={handleToggleStatus}
-                    className="btn"
-                    style={{
-                        background: isClosed ? 'var(--color-primary)' : 'var(--color-danger)',
-                        color: 'white',
-                        fontSize: '0.875rem',
-                        padding: '0.25rem 0.75rem'
-                    }}
-                >
-                    {isClosed ? 'Re-open Decision' : 'Close Decision'}
-                </button>
-                <button
-                    onClick={handleExport}
-                    className="btn"
-                    disabled={exporting}
-                    style={{
-                        background: 'var(--color-primary)',
-                        color: 'white',
-                        fontSize: '0.875rem',
-                        padding: '0.25rem 0.75rem',
-                        cursor: exporting ? 'wait' : 'pointer'
-                    }}
-                >
-                    {exporting ? <Spinner size="sm" color="white" /> : 'Export as Image'}
-                </button>
-            </div>
+            {activeColumn && (
+                <FloatingArgumentInput
+                    type={activeColumn}
+                    onSubmit={handleSubmitArgument}
+                    onClose={() => setActiveColumn(null)}
+                    isLoading={submittingArgument}
+                />
+            )}
+
+            <FAB
+                onClick={handleCopyLink}
+                label={t('decision.copyLinkButton')}
+            />
         </div>
     );
 }

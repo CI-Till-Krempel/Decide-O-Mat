@@ -1,0 +1,120 @@
+.hero {
+  background: var(--color-bg-card);
+  border: var(--stroke-sm) solid var(--color-border-card);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2xl) var(--space-lg);
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.statsButton {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-on-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+
+.statsButton:hover {
+  border-color: var(--color-accent-secondary);
+}
+
+.question {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-headline-sm);
+  line-height: var(--leading-headline-sm);
+  color: var(--color-text-on-surface);
+  max-width: 600px;
+}
+
+.voteButtons {
+  display: flex;
+  gap: var(--space-xl);
+  align-items: flex-start;
+}
+
+.voteColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.voteButton {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: var(--stroke-sm) solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-on-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.voteButton:hover:not(:disabled) {
+  border-color: var(--color-accent-secondary);
+  color: var(--color-accent-secondary);
+}
+
+.voteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voteButtonActive {
+  background: var(--color-accent-secondary);
+  border-color: var(--color-accent-secondary);
+  color: var(--color-text-on-secondary);
+}
+
+.closedBanner {
+  font-size: var(--text-label-lg);
+  font-weight: 600;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+}
+
+.approved {
+  background: var(--color-success);
+  color: var(--color-icon-on-primary);
+}
+
+.rejected {
+  background: var(--color-danger);
+  color: white;
+}
+
+.voterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  justify-content: center;
+  max-width: 200px;
+}
+
+.chip {
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-body-sm);
+  padding: 4px var(--space-sm);
+  border-radius: var(--radius-full);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  color: var(--color-text-on-surface);
+  background: transparent;
+}

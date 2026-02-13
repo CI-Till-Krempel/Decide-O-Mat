@@ -1,0 +1,22 @@
+.fab {
+  position: fixed;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-xl);
+  background: var(--color-accent-primary);
+  border: none;
+  color: var(--color-icon-on-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  transition: opacity 0.2s;
+}
+
+.fab:hover {
+  opacity: 0.9;
+}

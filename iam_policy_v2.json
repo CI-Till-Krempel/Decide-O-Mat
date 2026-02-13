@@ -1,0 +1,241 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/artifactregistry.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+      ],
+      "role": "roles/artifactregistry.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/browser"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-cloudaicompanion.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudaicompanion.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:624578019448@cloudbuild.gserviceaccount.com"
+      ],
+      "role": "roles/cloudbuild.builds.builder"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudbuild.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudfunctions.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcf-admin-robot.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudfunctions.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@containerregistry.iam.gserviceaccount.com"
+      ],
+      "role": "roles/containerregistry.ServiceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/datastore.indexAdmin"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/developerconnect.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:firebase-app-hosting-compute@decide-o-mat-staging.iam.gserviceaccount.com",
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/developerconnect.readTokenAccessor"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-devconnect.iam.gserviceaccount.com"
+      ],
+      "role": "roles/developerconnect.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:624578019448-compute@developer.gserviceaccount.com",
+        "serviceAccount:624578019448@cloudservices.gserviceaccount.com",
+        "serviceAccount:decide-o-mat-staging@appspot.gserviceaccount.com"
+      ],
+      "role": "roles/editor"
+    },
+    {
+      "members": [
+        "serviceAccount:624578019448-compute@developer.gserviceaccount.com"
+      ],
+      "role": "roles/eventarc.eventReceiver"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-firebase.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebase.managementServiceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:firebase-adminsdk-fbsvc@decide-o-mat-staging.iam.gserviceaccount.com",
+        "serviceAccount:firebase-app-hosting-compute@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebase.sdkAdminServiceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:firebase-adminsdk-fbsvc@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseappcheck.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-firebaseappcheck.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseappcheck.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseappdistro.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseapphosting.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:firebase-app-hosting-compute@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseapphosting.computeRunner"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-firebaseapphosting.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseapphosting.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:firebase-adminsdk-fbsvc@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseauth.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaseextensions.viewer"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebasehosting.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-firebasemods.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebasemods.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaserules.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@firebase-rules.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaserules.system"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-firestore.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firestore.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:firebase-adminsdk-fbsvc@decide-o-mat-staging.iam.gserviceaccount.com",
+        "serviceAccount:service-624578019448@gcp-sa-pubsub.iam.gserviceaccount.com"
+      ],
+      "role": "roles/iam.serviceAccountTokenCreator"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/iam.serviceAccountUser"
+    },
+    {
+      "members": [
+        "user:cimm.tkr@gmail.com"
+      ],
+      "role": "roles/owner"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-firebaseappcheck.iam.gserviceaccount.com"
+      ],
+      "role": "roles/recaptchaenterprise.agent"
+    },
+    {
+      "members": [
+        "serviceAccount:624578019448-compute@developer.gserviceaccount.com"
+      ],
+      "role": "roles/run.invoker"
+    },
+    {
+      "members": [
+        "serviceAccount:service-624578019448@serverless-robot-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/run.serviceAgent"
+    },
+    {
+      "condition": {
+        "expression": "request.time < timestamp(\"2025-12-31T14:00:05.091Z\")",
+        "title": "developer-connect-connection-setup"
+      },
+      "members": [
+        "serviceAccount:service-624578019448@gcp-sa-devconnect.iam.gserviceaccount.com"
+      ],
+      "role": "roles/secretmanager.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:github-actions-deploy@decide-o-mat-staging.iam.gserviceaccount.com"
+      ],
+      "role": "roles/serviceusage.serviceUsageConsumer"
+    }
+  ]
+}
