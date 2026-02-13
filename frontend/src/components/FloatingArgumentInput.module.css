@@ -1,23 +1,35 @@
-.overlay {
+.backdrop {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   z-index: 100;
-  background: var(--color-bg-card);
-  border-top: var(--stroke-xs) solid var(--color-border-card);
-  padding: var(--space-md) var(--space-lg);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  animation: slideUp 0.2s ease-out;
+  justify-content: center;
 }
 
-@keyframes slideUp {
+.overlay {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg) var(--space-md);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-xl);
+  width: 100%;
+  max-width: 848px;
+  box-shadow:
+    1px 3px 8px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
   from {
-    transform: translateY(100%);
+    opacity: 0;
+    transform: translateY(12px);
   }
   to {
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -58,7 +70,7 @@
   padding: 0 4px;
   font-size: var(--text-body-sm);
   line-height: var(--leading-body-sm);
-  color: var(--color-text-muted-figma);
+  color: var(--color-accent-secondary);
   background: var(--color-bg-card);
   pointer-events: none;
 }

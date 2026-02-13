@@ -30,7 +30,12 @@ export default function FloatingArgumentInput({ type, onSubmit, onClose, isLoadi
         if (e.key === 'Escape') onClose();
     };
 
+    const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) onClose();
+    };
+
     return (
+        <div className={styles.backdrop} onClick={handleBackdropClick}>
         <div className={styles.overlay}>
             <div className={styles.inputWrapper}>
                 <label className={styles.inputLabel}>
@@ -68,6 +73,7 @@ export default function FloatingArgumentInput({ type, onSubmit, onClose, isLoadi
             >
                 <SendIcon />
             </button>
+        </div>
         </div>
     );
 }
