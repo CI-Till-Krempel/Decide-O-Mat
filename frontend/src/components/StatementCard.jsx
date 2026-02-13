@@ -77,17 +77,15 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
 
             <div className={styles.body}>
                 <span className={styles.text}>{argument.text}</span>
-                {!isOwn && (
-                    <button
-                        className={`${styles.voteButton} ${hasVoted ? styles.voteButtonActive : ''}`}
-                        onClick={handleVote}
-                        disabled={readOnly || voting || (!hasVoted && !canVote)}
-                        aria-label={hasVoted ? t('decision.votedLabel') : t('decision.voteLabel')}
-                        type="button"
-                    >
-                        <HeartIcon />
-                    </button>
-                )}
+                <button
+                    className={`${styles.voteButton} ${hasVoted ? styles.voteButtonActive : ''}`}
+                    onClick={handleVote}
+                    disabled={readOnly || voting || (!hasVoted && !canVote)}
+                    aria-label={hasVoted ? t('decision.votedLabel') : t('decision.voteLabel')}
+                    type="button"
+                >
+                    <HeartIcon />
+                </button>
             </div>
 
             {votes.length > 0 && (
