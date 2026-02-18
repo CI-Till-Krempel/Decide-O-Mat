@@ -41,8 +41,14 @@ function Decision() {
     const [toast, setToast] = useState(null);
     const [activeColumn, setActiveColumn] = useState(null); // null | 'pro' | 'con'
     const [submittingArgument, setSubmittingArgument] = useState(false);
-    const [votedArgIds, setVotedArgIds] = useState(new Set());
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [notificationsRequesting, setNotificationsRequesting] = useState(false);
+
+    useEffect(() => {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            setNotificationsEnabled(true);
+        }
+    }, []);
     const [notificationsRequesting, setNotificationsRequesting] = useState(false);
 
     // Parse key from URL hash
