@@ -21,6 +21,9 @@ vi.mock('react-i18next', () => {
         'decision.resultApproved': 'Approved',
         'decision.resultRejected': 'Rejected',
         'decision.resultNoVotes': 'No Votes',
+        'decision.closeDecisionButton': 'Close Decision',
+        'decision.reopenDecisionButton': 'Re-open Decision',
+        'decision.errors.statusUpdateFailed': 'Failed to update decision status.',
         'decision.errors.voteFailed': 'Failed to cast vote.',
         'decision.participantsButton': 'Participants',
         'decision.notifications.enableButton': 'Enable Notifications',
@@ -61,6 +64,7 @@ vi.mock('../services/firebase', () => ({
 import {
     subscribeToDecision as mockSubscribeToDecision,
     subscribeToArguments as mockSubscribeToArguments,
+    toggleDecisionStatus as mockToggleDecisionStatus,
     voteDecision as mockVoteDecision,
     voteArgument as mockVoteArgument,
     addArgument as mockAddArgument,
@@ -422,6 +426,54 @@ describe('Decision Component', () => {
             await waitFor(() => {
                 expect(screen.getByTestId('result-display')).toHaveTextContent('Rejected');
             });
+        });
+
+        it('renders close button when decision is open', async () => {
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Close Decision')).toBeInTheDocument();
+            });
+        });
+
+        it('renders reopen button when decision is closed', async () => {
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback({ ...mockDecision, status: 'closed' });
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Re-open Decision')).toBeInTheDocument();
+            });
+        });
+
+        it('calls toggleDecisionStatus with closed when closing', async () => {
+            mockToggleDecisionStatus.mockResolvedValue({});
+            const user = userEvent.setup();
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Close Decision')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Close Decision'));
+            expect(mockToggleDecisionStatus).toHaveBeenCalledWith('test-decision-123', 'closed');
+        });
+
+        it('calls toggleDecisionStatus with open when reopening', async () => {
+            mockToggleDecisionStatus.mockResolvedValue({});
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback({ ...mockDecision, status: 'closed' });
+                return () => { };
+            });
+
+            const user = userEvent.setup();
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Re-open Decision')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Re-open Decision'));
+            expect(mockToggleDecisionStatus).toHaveBeenCalledWith('test-decision-123', 'open');
         });
     });
 
