@@ -1,0 +1,98 @@
+.card {
+  background: var(--color-bg-card);
+  border: var(--stroke-sm) solid var(--color-border-card);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  position: relative;
+}
+
+.card:hover {
+  border-color: var(--color-border-outline);
+}
+
+.cardRunning {
+  border-color: var(--color-accent-primary);
+}
+
+.cardRunning:hover {
+  border-color: var(--color-accent-primary);
+}
+
+.cardArchived {
+  border-color: var(--color-border-card);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.question {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-body-lg);
+  line-height: var(--leading-body-lg);
+  color: var(--color-text-on-surface);
+  margin: 0;
+  flex: 1;
+}
+
+.menuTrigger {
+  background: none;
+  border: none;
+  color: var(--color-text-muted-alt);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.menuTrigger:hover {
+  color: var(--color-text-on-surface);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted-alt);
+}
+
+.badge {
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+}
+
+.badgeOwner {
+  background: var(--color-accent-primary);
+  color: var(--color-text-on-primary);
+}
+
+.badgeInvitee {
+  background: var(--color-accent-secondary);
+  color: var(--color-text-on-secondary);
+}
+
+.separator {
+  color: var(--color-border-outline);
+}
+
+.status {
+  color: var(--color-text-muted-alt);
+}
+
+.date {
+  color: var(--color-text-muted-alt);
+}

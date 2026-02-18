@@ -1,0 +1,38 @@
+.menu {
+  position: absolute;
+  z-index: 100;
+  min-width: 160px;
+  background: var(--color-bg-card);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.item {
+  display: block;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  color: var(--color-text-on-surface);
+  font-family: var(--font-family);
+  font-size: var(--text-body-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.item:hover {
+  background: var(--color-border-card);
+}
+
+.itemDanger {
+  color: var(--color-danger);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border-card);
+  margin: var(--space-xs) 0;
+}
