@@ -101,14 +101,12 @@ const MyDecisions = () => {
         }
     }, [t]);
 
-    const handleEdit = useCallback((decision) => {
+    const handleEdit = useCallback(() => {
         // Placeholder for US-035
-        console.log('Edit decision:', decision.id);
     }, []);
 
-    const handleDelete = useCallback((decision) => {
+    const handleDelete = useCallback(() => {
         // Placeholder for US-035
-        console.log('Delete decision:', decision.id);
     }, []);
 
     const getContextMenuItems = useCallback((decision) => {

@@ -31,9 +31,6 @@ export default function DecisionCard({ decision, variant = 'archived', onClick, 
                 e.preventDefault();
                 onContextMenu?.(e);
             }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter') onClick?.(); }}
         >
             <div className={styles.header}>
                 <h3 className={styles.question}>{decision.question}</h3>
