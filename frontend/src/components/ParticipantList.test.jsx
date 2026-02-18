@@ -133,6 +133,38 @@ describe('ParticipantList', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
+    it('closes on Escape key press', async () => {
+        const user = userEvent.setup();
+        const onClose = vi.fn();
+
+        render(
+            <ParticipantList
+                participantMap={new Map()}
+                isOpen={true}
+                onClose={onClose}
+                ownerId="owner-1"
+            />
+        );
+
+        await user.keyboard('{Escape}');
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('has dialog role and aria-labelledby', () => {
+        render(
+            <ParticipantList
+                participantMap={new Map()}
+                isOpen={true}
+                onClose={mockClose}
+                ownerId="owner-1"
+            />
+        );
+
+        const dialog = screen.getByRole('dialog');
+        expect(dialog).toHaveAttribute('aria-modal', 'true');
+        expect(dialog).toHaveAttribute('aria-labelledby', 'participant-list-title');
+    });
+
     it('renders help text', () => {
         render(
             <ParticipantList
