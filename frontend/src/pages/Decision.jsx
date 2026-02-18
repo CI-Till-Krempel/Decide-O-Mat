@@ -343,6 +343,7 @@ function Decision() {
                 finalResult={finalResult}
                 finalVotesList={finalVotesList}
                 participantMap={participantMap}
+                mode={isClosed ? 'results' : 'voting'}
             />
 
             <div className={styles.toolbar}>

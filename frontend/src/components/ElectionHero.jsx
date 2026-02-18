@@ -26,7 +26,15 @@ function StatsIcon() {
     );
 }
 
-export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, userVote, votingTarget, finalResult, finalVotesList, participantMap }) {
+function BallotIcon() {
+    return (
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 9.5h5v-2h-5v2zm0 7h5v-2h-5v2zm6 4.5H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2zM6 11h5V6H6v5zm1-4h3v3H7V7zM6 18h5v-5H6v5zm1-4h3v3H7v-3z" />
+        </svg>
+    );
+}
+
+export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, userVote, votingTarget, finalResult, finalVotesList, participantMap, mode = 'voting' }) {
     const { t } = useTranslation();
 
     const yesVoters = (finalVotesList || []).filter(v => v.vote === 'yes');
@@ -45,6 +53,18 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
         );
     };
 
+    const getResultLabel = () => {
+        if (finalResult === 'Approved') return t('decision.resultApproved');
+        if (finalResult === 'Rejected') return t('decision.resultRejected');
+        return t('decision.resultNoVotes');
+    };
+
+    const getResultClass = () => {
+        if (finalResult === 'Approved') return styles.resultApproved;
+        if (finalResult === 'Rejected') return styles.resultRejected;
+        return '';
+    };
+
     return (
         <div className={styles.hero}>
             <span className={styles.statsButton} aria-hidden="true">
@@ -53,38 +73,54 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
 
             <h1 className={styles.question}>{question}</h1>
 
-            {isClosed && finalResult && (
-                <div className={`${styles.closedBanner} ${finalResult === 'Approved' ? styles.approved : styles.rejected}`}>
-                    {t('decision.decisionClosed', { result: t(`decision.result${finalResult}`) })}
+            {mode === 'results' && finalResult && (
+                <div className={styles.resultsSection}>
+                    <span className={styles.resultIcon}><BallotIcon /></span>
+                    <span className={`${styles.resultText} ${getResultClass()}`}>
+                        {getResultLabel()}
+                    </span>
                 </div>
             )}
 
-            <div className={styles.voteButtons}>
-                <div className={styles.voteColumn}>
-                    <button
-                        className={`${styles.voteButton} ${userVote === 'yes' ? styles.voteButtonActive : ''}`}
-                        onClick={onVoteYes}
-                        disabled={isClosed || !!votingTarget}
-                        aria-label={t('decision.voteYes')}
-                        type="button"
-                    >
-                        <ThumbsUpIcon />
-                    </button>
-                    {renderVoterChips(yesVoters)}
+            {mode === 'voting' && (
+                <div className={styles.voteButtons}>
+                    <div className={styles.voteColumn}>
+                        <button
+                            className={`${styles.voteButton} ${userVote === 'yes' ? styles.voteButtonActive : ''}`}
+                            onClick={onVoteYes}
+                            disabled={isClosed || !!votingTarget}
+                            aria-label={t('decision.voteYes')}
+                            type="button"
+                        >
+                            <ThumbsUpIcon />
+                        </button>
+                        {renderVoterChips(yesVoters)}
+                    </div>
+                    <div className={styles.voteColumn}>
+                        <button
+                            className={`${styles.voteButton} ${userVote === 'no' ? styles.voteButtonActive : ''}`}
+                            onClick={onVoteNo}
+                            disabled={isClosed || !!votingTarget}
+                            aria-label={t('decision.voteNo')}
+                            type="button"
+                        >
+                            <ThumbsDownIcon />
+                        </button>
+                        {renderVoterChips(noVoters)}
+                    </div>
                 </div>
-                <div className={styles.voteColumn}>
-                    <button
-                        className={`${styles.voteButton} ${userVote === 'no' ? styles.voteButtonActive : ''}`}
-                        onClick={onVoteNo}
-                        disabled={isClosed || !!votingTarget}
-                        aria-label={t('decision.voteNo')}
-                        type="button"
-                    >
-                        <ThumbsDownIcon />
-                    </button>
-                    {renderVoterChips(noVoters)}
+            )}
+
+            {mode === 'results' && (
+                <div className={styles.voteButtons}>
+                    <div className={styles.voteColumn}>
+                        {renderVoterChips(yesVoters)}
+                    </div>
+                    <div className={styles.voteColumn}>
+                        {renderVoterChips(noVoters)}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

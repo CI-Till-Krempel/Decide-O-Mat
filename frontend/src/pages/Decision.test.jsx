@@ -130,10 +130,13 @@ vi.mock('../components/NamePrompt', () => ({
 
 // Mock ElectionHero — lightweight version that exposes the same prop interface
 vi.mock('../components/ElectionHero', () => ({
-    default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult }) => (
-        <div data-testid="election-hero">
+    default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult, mode }) => (
+        <div data-testid="election-hero" data-mode={mode || 'voting'}>
             <h1>{question}</h1>
-            {isClosed && finalResult && (
+            {mode === 'results' && finalResult && (
+                <div data-testid="result-display">{finalResult}</div>
+            )}
+            {mode !== 'results' && isClosed && finalResult && (
                 <div>{`Decision Closed: ${finalResult}`}</div>
             )}
             <button aria-label="Yes" onClick={onVoteYes} disabled={isClosed}>Yes</button>
@@ -378,7 +381,7 @@ describe('Decision Component', () => {
     });
 
     describe('Close Decision (US-006)', () => {
-        it('shows decision closed banner when closed', async () => {
+        it('passes results mode to ElectionHero when closed', async () => {
             mockSubscribeToDecision.mockImplementation((id, callback) => {
                 callback({ ...mockDecision, status: 'closed' });
                 return () => { };
@@ -386,7 +389,14 @@ describe('Decision Component', () => {
 
             renderDecision();
             await waitFor(() => {
-                expect(screen.getByText(/decision closed/i)).toBeInTheDocument();
+                expect(screen.getByTestId('election-hero')).toHaveAttribute('data-mode', 'results');
+            });
+        });
+
+        it('passes voting mode to ElectionHero when open', async () => {
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByTestId('election-hero')).toHaveAttribute('data-mode', 'voting');
             });
         });
 
@@ -398,7 +408,7 @@ describe('Decision Component', () => {
 
             renderDecision();
             await waitFor(() => {
-                expect(screen.getByText(/approved/i)).toBeInTheDocument();
+                expect(screen.getByTestId('result-display')).toHaveTextContent('Approved');
             });
         });
 
@@ -410,7 +420,7 @@ describe('Decision Component', () => {
 
             renderDecision();
             await waitFor(() => {
-                expect(screen.getByText(/rejected/i)).toBeInTheDocument();
+                expect(screen.getByTestId('result-display')).toHaveTextContent('Rejected');
             });
         });
     });
