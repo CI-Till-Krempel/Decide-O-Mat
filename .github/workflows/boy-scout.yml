@@ -85,13 +85,17 @@ jobs:
             ### 3. Execution Steps (Follow these strictly)
             1. **Analyze**: Run `npm run lint` in `frontend` and `functions`. Search for `TODO`s.
             2. **Plan**: Select ONE small, safe task.
-            3. **Implement**: Create a new branch. Apply the fix.
+            3. **Implement**: Create a new branch (`fix/<short-description>`). Apply the fix.
             4. **Verify**: Run tests (`npm test` in the relevant directory).
-            5. **PR**: Push the branch and create a PR.
+            5. **PR** *(mandatory – this step must always run)*:
+               - Push the branch.
+               - Open a pull request via `gh pr create` targeting `main`.
+               - **A pull request MUST be created every run.** If no improvement was found or all fixes were skipped, create a PR titled "Boy-Scout: daily code-quality report" on a branch named `fix/scout-report-<date>` that documents what was analyzed, what was considered, and why no change was made. This ensures full traceability of every agent run.
 
             ### 4. Configuration Parameters
             - `max_daily_changes`: 1 (Strictly one PR per run)
             - `commit_template`: "Boy-Scout: <description>"
+            - `pr_required`: true (A pull request is non-negotiable; the run is considered failed if no PR is opened)
 
             ### 5. Boy‑Scout Manifesto (Daily Reminder)
             ✨ Boy‑Scout Coding Agent: One good deed a day – let’s keep the code cleaner! ✨
