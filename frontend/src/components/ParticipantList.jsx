@@ -6,8 +6,10 @@ const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
+        if (!isOpen) return;
+
         const handleEsc = (e) => {
-            if (e.key === 'Escape' && isOpen) onClose();
+            if (e.key === 'Escape') onClose();
         };
         document.addEventListener('keydown', handleEsc);
         return () => document.removeEventListener('keydown', handleEsc);
