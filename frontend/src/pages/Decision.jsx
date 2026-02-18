@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes } from '../services/firebase';
+import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes, toggleDecisionStatus } from '../services/firebase';
 
 import ElectionHero from '../components/ElectionHero';
 import { HERO_MODES } from '../components/ElectionHero.modes';
@@ -147,6 +147,16 @@ function Decision() {
             return () => clearTimeout(timer);
         }
     }, [copied]);
+
+    const handleToggleStatus = async () => {
+        const newStatus = decision?.status === 'closed' ? 'open' : 'closed';
+        try {
+            await toggleDecisionStatus(id, newStatus);
+        } catch (error) {
+            console.error('Error toggling status:', error);
+            setToast({ message: t('decision.errors.statusUpdateFailed'), type: 'error' });
+        }
+    };
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -370,6 +380,19 @@ function Decision() {
                         <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
                     </svg>
                     {notificationsEnabled ? t('decision.notifications.enabled') : t('decision.notifications.enableButton')}
+                </button>
+                <button
+                    className={styles.toolbarBtn}
+                    onClick={handleToggleStatus}
+                    type="button"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d={isClosed
+                            ? "M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"
+                            : "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                        } />
+                    </svg>
+                    {isClosed ? t('decision.reopenDecisionButton') : t('decision.closeDecisionButton')}
                 </button>
             </div>
 
