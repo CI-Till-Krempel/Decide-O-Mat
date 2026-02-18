@@ -26,7 +26,7 @@ const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
 
     return (
         <>
-            {isOpen && <div className={styles.backdrop} onClick={onClose} />}
+            {isOpen && <div className={styles.backdrop} onClick={onClose} aria-hidden="true" />}
             <div
                 className={`${styles.overlay} ${isOpen ? styles.overlayOpen : styles.overlayClosed}`}
                 role="dialog"
