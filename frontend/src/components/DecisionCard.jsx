@@ -14,7 +14,7 @@ export default function DecisionCard({ decision, variant = 'archived', onClick, 
             : new Date(decision.createdAt);
 
         if (isRunning) {
-            return t('myDecisions.timeAgo', { time: relativeTime(date) });
+            return relativeTime(date);
         }
         return date.toLocaleDateString();
     };

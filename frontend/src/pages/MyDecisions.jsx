@@ -66,12 +66,13 @@ const MyDecisions = () => {
     }, [navigate]);
 
     const handleContextMenu = useCallback((decision, event) => {
+        const isRightClick = event.type === 'contextmenu';
         const rect = event.currentTarget.getBoundingClientRect();
         setContextMenu({
             decisionId: decision.id,
             position: {
-                top: rect.bottom + window.scrollY,
-                left: rect.left + window.scrollX,
+                top: (isRightClick ? event.clientY : rect.bottom) + window.scrollY,
+                left: (isRightClick ? event.clientX : rect.left) + window.scrollX,
             },
         });
     }, []);
