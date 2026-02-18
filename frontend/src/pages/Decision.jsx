@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes } from '../services/firebase';
 
 import ElectionHero from '../components/ElectionHero';
+import { HERO_MODES } from '../components/ElectionHero.modes';
 import ColumnHeader from '../components/ColumnHeader';
 import StatementCard from '../components/StatementCard';
 import FloatingArgumentInput from '../components/FloatingArgumentInput';
@@ -343,7 +344,7 @@ function Decision() {
                 finalResult={finalResult}
                 finalVotesList={finalVotesList}
                 participantMap={participantMap}
-                mode={isClosed ? 'results' : 'voting'}
+                mode={isClosed ? HERO_MODES.RESULTS : HERO_MODES.VOTING}
             />
 
             <div className={styles.toolbar}>

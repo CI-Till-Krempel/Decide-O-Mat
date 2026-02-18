@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ElectionHero from './ElectionHero';
+import { HERO_MODES } from './ElectionHero.modes';
 
 vi.mock('react-i18next', () => {
     const translations = {
@@ -86,28 +87,28 @@ describe('ElectionHero', () => {
 
     describe('results mode', () => {
         it('does not render vote buttons', () => {
-            render(<ElectionHero {...defaultProps} mode="results" finalResult="Approved" />);
+            render(<ElectionHero {...defaultProps} mode={HERO_MODES.RESULTS} finalResult="Approved" />);
             expect(screen.queryByLabelText('Yes')).not.toBeInTheDocument();
             expect(screen.queryByLabelText('No')).not.toBeInTheDocument();
         });
 
         it('renders Approved result', () => {
-            render(<ElectionHero {...defaultProps} mode="results" finalResult="Approved" />);
+            render(<ElectionHero {...defaultProps} mode={HERO_MODES.RESULTS} finalResult="Approved" />);
             expect(screen.getByText('Approved')).toBeInTheDocument();
         });
 
         it('renders Rejected result', () => {
-            render(<ElectionHero {...defaultProps} mode="results" finalResult="Rejected" />);
+            render(<ElectionHero {...defaultProps} mode={HERO_MODES.RESULTS} finalResult="Rejected" />);
             expect(screen.getByText('Rejected')).toBeInTheDocument();
         });
 
         it('renders No Votes result when finalResult is NoVotes', () => {
-            render(<ElectionHero {...defaultProps} mode="results" finalResult="NoVotes" />);
+            render(<ElectionHero {...defaultProps} mode={HERO_MODES.RESULTS} finalResult="NoVotes" />);
             expect(screen.getByText('No Votes')).toBeInTheDocument();
         });
 
         it('renders fallback No Votes when finalResult is null', () => {
-            render(<ElectionHero {...defaultProps} mode="results" finalResult={null} />);
+            render(<ElectionHero {...defaultProps} mode={HERO_MODES.RESULTS} finalResult={null} />);
             expect(screen.getByText('No Votes')).toBeInTheDocument();
         });
 
@@ -116,7 +117,7 @@ describe('ElectionHero', () => {
                 { userId: 'u1', vote: 'yes', displayName: 'Alice' },
                 { userId: 'u2', vote: 'no', displayName: 'Bob' },
             ];
-            render(<ElectionHero {...defaultProps} mode="results" finalResult="Approved" finalVotesList={finalVotesList} />);
+            render(<ElectionHero {...defaultProps} mode={HERO_MODES.RESULTS} finalResult="Approved" finalVotesList={finalVotesList} />);
             expect(screen.getByText('Alice')).toBeInTheDocument();
             expect(screen.getByText('Bob')).toBeInTheDocument();
         });
