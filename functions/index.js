@@ -500,7 +500,7 @@ exports.deleteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
     throw new HttpsError("permission-denied", "Only the owner can delete this decision.");
   }
 
-  const batch = db.batch();
+  let batch = db.batch();
   let opCount = 0;
 
   // Delete arguments and their votes subcollections
@@ -512,11 +512,17 @@ exports.deleteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
       opCount++;
       if (opCount >= 490) {
         await batch.commit();
+        batch = db.batch();
         opCount = 0;
       }
     }
     batch.delete(argDoc.ref);
     opCount++;
+    if (opCount >= 490) {
+      await batch.commit();
+      batch = db.batch();
+      opCount = 0;
+    }
   }
 
   // Delete finalVotes
@@ -526,6 +532,7 @@ exports.deleteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
     opCount++;
     if (opCount >= 490) {
       await batch.commit();
+      batch = db.batch();
       opCount = 0;
     }
   }
@@ -537,6 +544,7 @@ exports.deleteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
     opCount++;
     if (opCount >= 490) {
       await batch.commit();
+      batch = db.batch();
       opCount = 0;
     }
   }
