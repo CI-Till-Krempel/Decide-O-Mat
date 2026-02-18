@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.1.0",
+    "dotenv": "^17.2.3",
     "firebase": "^12.9.0",
     "firebase-functions": "^7.0.5",
     "html-to-image": "^1.11.13",
@@ -29,7 +30,6 @@
     "vite": "^7.2.2"
   },
   "devDependencies": {
-    "dotenv": "^17.2.3",
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",
     "@testing-library/jest-dom": "^6.9.1",
