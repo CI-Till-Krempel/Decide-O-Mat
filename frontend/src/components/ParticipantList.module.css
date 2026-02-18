@@ -1,0 +1,126 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 300px;
+  background-color: var(--color-bg-card);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  padding: var(--space-2xl) var(--space-md);
+  overflow-y: auto;
+  transition: transform 0.3s ease-in-out, visibility 0.3s;
+}
+
+.overlayOpen {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.overlayClosed {
+  transform: translateX(-100%);
+  visibility: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-on-surface);
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text-on-bg);
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.closeBtn:hover {
+  background: var(--color-bg-base);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.empty {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-base);
+  border: var(--stroke-xs) solid var(--color-border-card);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatarAnonymous {
+  background-color: var(--color-avatar-anonymous-bg);
+}
+
+.avatarVerified {
+  background-color: var(--color-avatar-verified-bg);
+}
+
+.name {
+  font-weight: 500;
+  font-size: var(--text-body-md);
+  color: var(--color-text-on-surface);
+}
+
+.status {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.help {
+  margin-top: var(--space-2xl);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.help p {
+  margin: 0;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}

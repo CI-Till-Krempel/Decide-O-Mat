@@ -22,6 +22,10 @@ vi.mock('react-i18next', () => {
         'decision.resultRejected': 'Rejected',
         'decision.resultNoVotes': 'No Votes',
         'decision.errors.voteFailed': 'Failed to cast vote.',
+        'decision.participantsButton': 'Participants',
+        'decision.notifications.enableButton': 'Enable Notifications',
+        'decision.notifications.enabled': 'Notifications enabled!',
+        'decision.notifications.failed': 'Could not enable notifications.',
         'argumentList.addPro': 'Add pro',
         'argumentList.addCon': 'Add contra',
         'addArgumentForm.placeholderPro': 'Add a Pro...',
@@ -94,6 +98,15 @@ vi.mock('../services/ParticipantService', () => ({
     }
 }));
 import ParticipantService from '../services/ParticipantService';
+
+// Mock NotificationService
+vi.mock('../services/NotificationService', () => ({
+    default: {
+        requestPermission: vi.fn(),
+        onMessageListener: vi.fn(() => Promise.resolve(null)),
+    }
+}));
+import NotificationService from '../services/NotificationService';
 
 // Mock ParticipantList component
 vi.mock('../components/ParticipantList', () => ({
@@ -594,6 +607,47 @@ describe('Decision Component', () => {
                     'arg-1',
                     'New User'
                 );
+            });
+        });
+    });
+
+    describe('Notification Toggle', () => {
+        it('enables notifications when button clicked', async () => {
+            const user = userEvent.setup();
+            NotificationService.requestPermission.mockResolvedValue(true);
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Enable Notifications')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Enable Notifications'));
+
+            await waitFor(() => {
+                expect(NotificationService.requestPermission).toHaveBeenCalledWith(
+                    'test-decision-123',
+                    'test-user-id'
+                );
+            });
+
+            // Button text changes to enabled state
+            const btn = screen.getByRole('button', { name: /notifications enabled/i });
+            expect(btn).toBeDisabled();
+        });
+
+        it('shows error when notification permission denied', async () => {
+            const user = userEvent.setup();
+            NotificationService.requestPermission.mockResolvedValue(false);
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Enable Notifications')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Enable Notifications'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Could not enable notifications.')).toBeInTheDocument();
             });
         });
     });
