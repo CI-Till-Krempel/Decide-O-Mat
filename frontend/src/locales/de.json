@@ -56,7 +56,16 @@
     "roleInvitee": "Teilnehmer",
     "statusOpen": "Offen",
     "statusClosed": "Geschlossen",
-    "timeAgo": "Seit {{time}}"
+    "timeAgo": "Seit {{time}}",
+    "contextMenu": {
+      "open": "Optionen",
+      "view": "Anzeigen",
+      "copyLink": "Link kopieren",
+      "close": "Entscheidung schließen",
+      "reopen": "Entscheidung öffnen",
+      "edit": "Frage bearbeiten",
+      "delete": "Löschen"
+    }
   },
   "login": {
     "titleWelcome": "Willkommen zur\u00fcck",

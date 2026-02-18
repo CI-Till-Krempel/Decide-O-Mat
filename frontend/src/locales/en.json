@@ -56,7 +56,16 @@
     "roleInvitee": "Invitee",
     "statusOpen": "Open",
     "statusClosed": "Closed",
-    "timeAgo": "{{time}} ago"
+    "timeAgo": "{{time}} ago",
+    "contextMenu": {
+      "open": "Options",
+      "view": "View",
+      "copyLink": "Copy Link",
+      "close": "Close Decision",
+      "reopen": "Reopen Decision",
+      "edit": "Edit Question",
+      "delete": "Delete"
+    }
   },
   "login": {
     "titleWelcome": "Welcome Back",
