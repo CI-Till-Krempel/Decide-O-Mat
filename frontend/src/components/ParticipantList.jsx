@@ -59,8 +59,8 @@ const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
                 </div>
 
                 <div className={styles.help}>
-                    <span>🟡 {t('participantList.helpAnonymous')}</span>
-                    <span>🟢 {t('participantList.helpVerified')}</span>
+                    <p>🟡 {t('participantList.helpAnonymous')}</p>
+                    <p>🟢 {t('participantList.helpVerified')}</p>
                 </div>
             </div>
         </>

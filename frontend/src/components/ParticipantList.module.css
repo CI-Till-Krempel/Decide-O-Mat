@@ -75,11 +75,11 @@
 }
 
 .avatarAnonymous {
-  background-color: #fef08a;
+  background-color: var(--color-avatar-anonymous-bg);
 }
 
 .avatarVerified {
-  background-color: #bbf7d0;
+  background-color: var(--color-avatar-verified-bg);
 }
 
 .name {
@@ -103,6 +103,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+}
+
+.help p {
+  margin: 0;
 }
 
 .backdrop {

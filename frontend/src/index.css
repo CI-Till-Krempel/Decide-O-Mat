@@ -31,6 +31,8 @@
   --color-success: #b9dd8b;
   --color-danger: #f87171;
   --color-warning: #ffc9ad;
+  --color-avatar-anonymous-bg: #fef08a;
+  --color-avatar-verified-bg: #bbf7d0;
   --color-bg-secondary: #1d1d34;
 
   /* --- Typography --- */
