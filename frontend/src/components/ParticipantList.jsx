@@ -5,7 +5,7 @@ import styles from './ParticipantList.module.css';
 const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
     const { t } = useTranslation();
 
-    const participants = Array.from(participantMap.entries()).map(([id, data]) => ({
+    const participants = Array.from((participantMap || new Map()).entries()).map(([id, data]) => ({
         id,
         ...data
     })).sort((a, b) => {
@@ -14,12 +14,10 @@ const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
         return 0;
     });
 
-    if (!isOpen) return null;
-
     return (
         <>
-            <div className={styles.backdrop} onClick={onClose} />
-            <div className={styles.overlay}>
+            {isOpen && <div className={styles.backdrop} onClick={onClose} />}
+            <div className={`${styles.overlay} ${isOpen ? styles.overlayOpen : styles.overlayClosed}`}>
                 <div className={styles.header}>
                     <h2 className={styles.title}>
                         {t('participantList.title', { count: participants.length })}

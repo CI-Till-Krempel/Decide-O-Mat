@@ -42,7 +42,10 @@ function Decision() {
     const [activeColumn, setActiveColumn] = useState(null); // null | 'pro' | 'con'
     const [submittingArgument, setSubmittingArgument] = useState(false);
     const [votedArgIds, setVotedArgIds] = useState(new Set());
-    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(() =>
+        typeof Notification !== 'undefined' && Notification.permission === 'granted'
+    );
+    const [notificationsRequesting, setNotificationsRequesting] = useState(false);
 
     // Parse key from URL hash
     useEffect(() => {
@@ -147,7 +150,8 @@ function Decision() {
     };
 
     const handleToggleNotifications = async () => {
-        if (notificationsEnabled) return;
+        if (notificationsEnabled || notificationsRequesting) return;
+        setNotificationsRequesting(true);
         try {
             const success = await NotificationService.requestPermission(id, user.userId);
             if (success) {
@@ -159,6 +163,8 @@ function Decision() {
         } catch (error) {
             console.error('Error enabling notifications:', error);
             setToast({ message: t('decision.notifications.failed'), type: 'error' });
+        } finally {
+            setNotificationsRequesting(false);
         }
     };
 
@@ -349,7 +355,7 @@ function Decision() {
                 <button
                     className={`${styles.toolbarBtn} ${notificationsEnabled ? styles.toolbarBtnActive : ''}`}
                     onClick={handleToggleNotifications}
-                    disabled={notificationsEnabled}
+                    disabled={notificationsEnabled || notificationsRequesting}
                     type="button"
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">

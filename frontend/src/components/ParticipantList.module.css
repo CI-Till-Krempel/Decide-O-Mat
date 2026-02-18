@@ -9,8 +9,17 @@
   z-index: 1000;
   padding: var(--space-2xl) var(--space-md);
   overflow-y: auto;
+  transition: transform 0.3s ease-in-out, visibility 0.3s;
+}
+
+.overlayOpen {
   transform: translateX(0);
-  transition: transform 0.3s ease-in-out;
+  visibility: visible;
+}
+
+.overlayClosed {
+  transform: translateX(-100%);
+  visibility: hidden;
 }
 
 .header {
