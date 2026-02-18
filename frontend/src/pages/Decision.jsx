@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes, toggleDecisionStatus } from '../services/firebase';
+import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes, toggleDecisionStatus, updateDecisionQuestion, deleteDecision } from '../services/firebase';
 
 import ElectionHero from '../components/ElectionHero';
 import { HERO_MODES } from '../components/ElectionHero.modes';
@@ -13,6 +13,8 @@ import NamePrompt from '../components/NamePrompt';
 import Spinner from '../components/Spinner';
 import ParticipantList from '../components/ParticipantList';
 import Toast from '../components/Toast';
+import EditQuestionModal from '../components/EditQuestionModal';
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
 import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
@@ -25,6 +27,7 @@ function Decision() {
     const { t } = useTranslation();
     const { id } = useParams();
     const location = useLocation();
+    const navigate = useNavigate();
     const { user, setDisplayName } = useUser();
     const [decision, setDecision] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -45,6 +48,10 @@ function Decision() {
     const [votedArgIds, setVotedArgIds] = useState(new Set());
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
     const [notificationsRequesting, setNotificationsRequesting] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [editLoading, setEditLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         if ('Notification' in window && Notification.permission === 'granted') {
@@ -147,16 +154,6 @@ function Decision() {
             return () => clearTimeout(timer);
         }
     }, [copied]);
-
-    const handleToggleStatus = async () => {
-        const newStatus = decision?.status === 'closed' ? 'open' : 'closed';
-        try {
-            await toggleDecisionStatus(id, newStatus);
-        } catch (error) {
-            console.error('Error toggling status:', error);
-            setToast({ message: t('decision.errors.statusUpdateFailed'), type: 'error' });
-        }
-    };
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -289,6 +286,48 @@ function Decision() {
         });
     }, []);
 
+    const isOwner = decision?.ownerId === user?.userId;
+
+    const handleToggleStatus = async () => {
+        const newStatus = decision.status === 'closed' ? 'open' : 'closed';
+        try {
+            await toggleDecisionStatus(id, newStatus);
+        } catch (err) {
+            console.error("Failed to toggle status:", err);
+            setToast({ message: t('decision.errors.statusUpdateFailed'), type: 'error' });
+        }
+    };
+
+    const handleEditSave = async (newQuestion) => {
+        setEditLoading(true);
+        try {
+            let questionToSend = newQuestion;
+            if (encryptionKey) {
+                questionToSend = await EncryptionService.encrypt(newQuestion, encryptionKey);
+            }
+            await updateDecisionQuestion(id, questionToSend);
+            setShowEditModal(false);
+        } catch (err) {
+            console.error("Failed to edit question:", err);
+            setToast({ message: t('decision.errors.editFailed'), type: 'error' });
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    const handleDeleteConfirm = async () => {
+        setDeleteLoading(true);
+        try {
+            await deleteDecision(id);
+            setToast({ message: t('decision.deleteSuccess'), type: 'success' });
+            navigate('/my-decisions');
+        } catch (err) {
+            console.error("Failed to delete decision:", err);
+            setToast({ message: t('decision.errors.deleteFailed'), type: 'error' });
+            setDeleteLoading(false);
+        }
+    };
+
     if (loading) return (
         <div className={styles.loading}>
             <Spinner size="lg" color="var(--color-primary)" />
@@ -381,19 +420,44 @@ function Decision() {
                     </svg>
                     {notificationsEnabled ? t('decision.notifications.enabled') : t('decision.notifications.enableButton')}
                 </button>
-                <button
-                    className={styles.toolbarBtn}
-                    onClick={handleToggleStatus}
-                    type="button"
-                >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d={isClosed
-                            ? "M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"
-                            : "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
-                        } />
-                    </svg>
-                    {isClosed ? t('decision.reopenDecisionButton') : t('decision.closeDecisionButton')}
-                </button>
+                {isOwner && (
+                    <>
+                        <button
+                            className={styles.toolbarBtn}
+                            onClick={handleToggleStatus}
+                            type="button"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                {isClosed ? (
+                                    <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H8.9V6zM18 20H6V10h12v10z" />
+                                ) : (
+                                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" />
+                                )}
+                            </svg>
+                            {isClosed ? t('decision.reopenDecisionButton') : t('decision.closeDecisionButton')}
+                        </button>
+                        <button
+                            className={styles.toolbarBtn}
+                            onClick={() => setShowEditModal(true)}
+                            type="button"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                            </svg>
+                            {t('decision.editQuestion')}
+                        </button>
+                        <button
+                            className={`${styles.toolbarBtn} ${styles.toolbarBtnDanger}`}
+                            onClick={() => setShowDeleteDialog(true)}
+                            type="button"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                            </svg>
+                            {t('decision.deleteDecision')}
+                        </button>
+                    </>
+                )}
             </div>
 
             <div className={styles.columns}>
@@ -471,6 +535,24 @@ function Decision() {
                 onClick={handleCopyLink}
                 label={t('decision.copyLinkButton')}
             />
+
+            {showEditModal && (
+                <EditQuestionModal
+                    question={decision.question || decision.text}
+                    onSave={handleEditSave}
+                    onCancel={() => setShowEditModal(false)}
+                    isLoading={editLoading}
+                />
+            )}
+
+            {showDeleteDialog && (
+                <ConfirmDeleteDialog
+                    question={decision.question || decision.text}
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={() => setShowDeleteDialog(false)}
+                    isLoading={deleteLoading}
+                />
+            )}
         </div>
     );
 }

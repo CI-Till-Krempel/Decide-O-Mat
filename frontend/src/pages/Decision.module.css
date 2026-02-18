@@ -82,6 +82,16 @@
   cursor: default;
 }
 
+.toolbarBtnDanger {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.toolbarBtnDanger:hover:not(:disabled) {
+  background: var(--color-danger);
+  color: white;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .columns {

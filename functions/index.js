@@ -445,6 +445,110 @@ exports.generateMagicLink = onCall({cors: true, enforceAppCheck: enforceAppCheck
   }
 });
 
+exports.updateDecisionQuestion = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
+  const {decisionId, question} = request.data;
+  const userId = request.auth.uid;
+
+  if (!decisionId || !question || typeof question !== "string" || question.trim().length === 0) {
+    throw new HttpsError("invalid-argument", "Missing or invalid decisionId or question.");
+  }
+
+  if (question.length > 1000) {
+    throw new HttpsError("invalid-argument", "Question must be under 1000 characters.");
+  }
+
+  const decisionRef = db.collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+
+  if (!decisionDoc.exists) {
+    throw new HttpsError("not-found", "Decision not found.");
+  }
+
+  if (decisionDoc.data().ownerId !== userId) {
+    throw new HttpsError("permission-denied", "Only the owner can edit this decision.");
+  }
+
+  await decisionRef.update({question: question.trim()});
+
+  return {success: true};
+});
+
+exports.deleteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
+  const {decisionId} = request.data;
+  const userId = request.auth.uid;
+
+  if (!decisionId) {
+    throw new HttpsError("invalid-argument", "Missing decisionId.");
+  }
+
+  const decisionRef = db.collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+
+  if (!decisionDoc.exists) {
+    throw new HttpsError("not-found", "Decision not found.");
+  }
+
+  if (decisionDoc.data().ownerId !== userId) {
+    throw new HttpsError("permission-denied", "Only the owner can delete this decision.");
+  }
+
+  const batch = db.batch();
+  let opCount = 0;
+
+  // Delete arguments and their votes subcollections
+  const argsSnapshot = await decisionRef.collection("arguments").get();
+  for (const argDoc of argsSnapshot.docs) {
+    const votesSnapshot = await argDoc.ref.collection("votes").get();
+    for (const voteDoc of votesSnapshot.docs) {
+      batch.delete(voteDoc.ref);
+      opCount++;
+      if (opCount >= 490) {
+        await batch.commit();
+        opCount = 0;
+      }
+    }
+    batch.delete(argDoc.ref);
+    opCount++;
+  }
+
+  // Delete finalVotes
+  const finalVotesSnapshot = await decisionRef.collection("finalVotes").get();
+  for (const voteDoc of finalVotesSnapshot.docs) {
+    batch.delete(voteDoc.ref);
+    opCount++;
+    if (opCount >= 490) {
+      await batch.commit();
+      opCount = 0;
+    }
+  }
+
+  // Delete participants
+  const participantsSnapshot = await decisionRef.collection("participants").get();
+  for (const participantDoc of participantsSnapshot.docs) {
+    batch.delete(participantDoc.ref);
+    opCount++;
+    if (opCount >= 490) {
+      await batch.commit();
+      opCount = 0;
+    }
+  }
+
+  // Delete the decision document itself
+  batch.delete(decisionRef);
+
+  await batch.commit();
+
+  return {success: true};
+});
+
 const {deleteUser} = require("./deleteUser");
 exports.deleteUser = deleteUser;
 
