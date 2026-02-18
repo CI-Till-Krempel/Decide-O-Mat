@@ -84,21 +84,32 @@
   color: var(--color-text-on-secondary);
 }
 
-.closedBanner {
-  font-size: var(--text-label-lg);
+.resultsSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.resultIcon {
+  color: var(--color-text-muted-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultText {
+  font-size: var(--text-headline-sm);
   font-weight: 600;
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-full);
+  color: var(--color-text-on-surface);
 }
 
-.approved {
-  background: var(--color-success);
-  color: var(--color-icon-on-primary);
+.resultApproved {
+  color: var(--color-success);
 }
 
-.rejected {
-  background: var(--color-danger);
-  color: white;
+.resultRejected {
+  color: var(--color-danger);
 }
 
 .voterChips {

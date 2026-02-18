@@ -21,6 +21,9 @@ vi.mock('react-i18next', () => {
         'decision.resultApproved': 'Approved',
         'decision.resultRejected': 'Rejected',
         'decision.resultNoVotes': 'No Votes',
+        'decision.closeDecisionButton': 'Close Decision',
+        'decision.reopenDecisionButton': 'Re-open Decision',
+        'decision.errors.statusUpdateFailed': 'Failed to update decision status.',
         'decision.errors.voteFailed': 'Failed to cast vote.',
         'decision.participantsButton': 'Participants',
         'decision.notifications.enableButton': 'Enable Notifications',
@@ -61,6 +64,7 @@ vi.mock('../services/firebase', () => ({
 import {
     subscribeToDecision as mockSubscribeToDecision,
     subscribeToArguments as mockSubscribeToArguments,
+    toggleDecisionStatus as mockToggleDecisionStatus,
     voteDecision as mockVoteDecision,
     voteArgument as mockVoteArgument,
     addArgument as mockAddArgument,
@@ -130,10 +134,13 @@ vi.mock('../components/NamePrompt', () => ({
 
 // Mock ElectionHero — lightweight version that exposes the same prop interface
 vi.mock('../components/ElectionHero', () => ({
-    default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult }) => (
-        <div data-testid="election-hero">
+    default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult, mode }) => (
+        <div data-testid="election-hero" data-mode={mode || 'voting'}>
             <h1>{question}</h1>
-            {isClosed && finalResult && (
+            {mode === 'results' && finalResult && (
+                <div data-testid="result-display">{finalResult}</div>
+            )}
+            {mode !== 'results' && isClosed && finalResult && (
                 <div>{`Decision Closed: ${finalResult}`}</div>
             )}
             <button aria-label="Yes" onClick={onVoteYes} disabled={isClosed}>Yes</button>
@@ -378,7 +385,7 @@ describe('Decision Component', () => {
     });
 
     describe('Close Decision (US-006)', () => {
-        it('shows decision closed banner when closed', async () => {
+        it('passes results mode to ElectionHero when closed', async () => {
             mockSubscribeToDecision.mockImplementation((id, callback) => {
                 callback({ ...mockDecision, status: 'closed' });
                 return () => { };
@@ -386,7 +393,14 @@ describe('Decision Component', () => {
 
             renderDecision();
             await waitFor(() => {
-                expect(screen.getByText(/decision closed/i)).toBeInTheDocument();
+                expect(screen.getByTestId('election-hero')).toHaveAttribute('data-mode', 'results');
+            });
+        });
+
+        it('passes voting mode to ElectionHero when open', async () => {
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByTestId('election-hero')).toHaveAttribute('data-mode', 'voting');
             });
         });
 
@@ -398,7 +412,7 @@ describe('Decision Component', () => {
 
             renderDecision();
             await waitFor(() => {
-                expect(screen.getByText(/approved/i)).toBeInTheDocument();
+                expect(screen.getByTestId('result-display')).toHaveTextContent('Approved');
             });
         });
 
@@ -410,8 +424,56 @@ describe('Decision Component', () => {
 
             renderDecision();
             await waitFor(() => {
-                expect(screen.getByText(/rejected/i)).toBeInTheDocument();
+                expect(screen.getByTestId('result-display')).toHaveTextContent('Rejected');
             });
+        });
+
+        it('renders close button when decision is open', async () => {
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Close Decision')).toBeInTheDocument();
+            });
+        });
+
+        it('renders reopen button when decision is closed', async () => {
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback({ ...mockDecision, status: 'closed' });
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Re-open Decision')).toBeInTheDocument();
+            });
+        });
+
+        it('calls toggleDecisionStatus with closed when closing', async () => {
+            mockToggleDecisionStatus.mockResolvedValue({});
+            const user = userEvent.setup();
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Close Decision')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Close Decision'));
+            expect(mockToggleDecisionStatus).toHaveBeenCalledWith('test-decision-123', 'closed');
+        });
+
+        it('calls toggleDecisionStatus with open when reopening', async () => {
+            mockToggleDecisionStatus.mockResolvedValue({});
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback({ ...mockDecision, status: 'closed' });
+                return () => { };
+            });
+
+            const user = userEvent.setup();
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Re-open Decision')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Re-open Decision'));
+            expect(mockToggleDecisionStatus).toHaveBeenCalledWith('test-decision-123', 'open');
         });
     });
 
