@@ -28,7 +28,7 @@ function StatsIcon() {
 
 function BallotIcon() {
     return (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M13 9.5h5v-2h-5v2zm0 7h5v-2h-5v2zm6 4.5H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2zM6 11h5V6H6v5zm1-4h3v3H7V7zM6 18h5v-5H6v5zm1-4h3v3H7v-3z" />
         </svg>
     );
@@ -73,7 +73,7 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
 
             <h1 className={styles.question}>{question}</h1>
 
-            {mode === 'results' && finalResult && (
+            {mode === 'results' && (
                 <div className={styles.resultsSection}>
                     <span className={styles.resultIcon}><BallotIcon /></span>
                     <span className={`${styles.resultText} ${getResultClass()}`}>
@@ -82,9 +82,9 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
                 </div>
             )}
 
-            {mode === 'voting' && (
-                <div className={styles.voteButtons}>
-                    <div className={styles.voteColumn}>
+            <div className={styles.voteButtons}>
+                <div className={styles.voteColumn}>
+                    {mode === 'voting' && (
                         <button
                             className={`${styles.voteButton} ${userVote === 'yes' ? styles.voteButtonActive : ''}`}
                             onClick={onVoteYes}
@@ -94,9 +94,11 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
                         >
                             <ThumbsUpIcon />
                         </button>
-                        {renderVoterChips(yesVoters)}
-                    </div>
-                    <div className={styles.voteColumn}>
+                    )}
+                    {renderVoterChips(yesVoters)}
+                </div>
+                <div className={styles.voteColumn}>
+                    {mode === 'voting' && (
                         <button
                             className={`${styles.voteButton} ${userVote === 'no' ? styles.voteButtonActive : ''}`}
                             onClick={onVoteNo}
@@ -106,21 +108,10 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
                         >
                             <ThumbsDownIcon />
                         </button>
-                        {renderVoterChips(noVoters)}
-                    </div>
+                    )}
+                    {renderVoterChips(noVoters)}
                 </div>
-            )}
-
-            {mode === 'results' && (
-                <div className={styles.voteButtons}>
-                    <div className={styles.voteColumn}>
-                        {renderVoterChips(yesVoters)}
-                    </div>
-                    <div className={styles.voteColumn}>
-                        {renderVoterChips(noVoters)}
-                    </div>
-                </div>
-            )}
+            </div>
         </div>
     );
 }
