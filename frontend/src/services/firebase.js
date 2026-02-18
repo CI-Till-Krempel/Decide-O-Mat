@@ -143,6 +143,16 @@ export const registerParticipant = async (decisionId, encryptedDisplayName, plai
     return await registerParticipantFn({ decisionId, encryptedDisplayName, plainDisplayName });
 };
 
+export const updateDecisionQuestion = async (decisionId, question) => {
+    const updateFn = httpsCallable(functions, 'updateDecisionQuestion');
+    return await updateFn({ decisionId, question });
+};
+
+export const deleteDecision = async (decisionId) => {
+    const deleteFn = httpsCallable(functions, 'deleteDecision');
+    return await deleteFn({ decisionId });
+};
+
 export const deleteUser = async () => {
     const deleteUserFn = httpsCallable(functions, 'deleteUser');
     return await deleteUserFn();

@@ -1,0 +1,77 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.dialog {
+  background: var(--color-bg-card);
+  border: var(--stroke-sm) solid var(--color-border-outline);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 420px;
+  margin: var(--space-md);
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-body-lg);
+  color: var(--color-danger);
+  margin: 0 0 var(--space-sm);
+}
+
+.message {
+  font-size: var(--text-body-md);
+  color: var(--color-text-muted-alt);
+  margin: 0 0 var(--space-md);
+}
+
+.questionPreview {
+  background: var(--color-bg-base);
+  border: var(--stroke-xs) solid var(--color-border-card);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-on-bg);
+  margin-bottom: var(--space-lg);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.btnCancel {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-on-surface);
+  font-family: var(--font-family);
+  font-size: var(--text-body-sm);
+  cursor: pointer;
+}
+
+.btnDanger {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-danger);
+  color: white;
+  font-family: var(--font-family);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnDanger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

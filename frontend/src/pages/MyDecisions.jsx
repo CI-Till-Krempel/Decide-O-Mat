@@ -2,10 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../contexts/UserContext';
-import { getUserDecisions, toggleDecisionStatus } from '../services/firebase';
+import { getUserDecisions, toggleDecisionStatus, updateDecisionQuestion, deleteDecision } from '../services/firebase';
 import EncryptionService from '../services/EncryptionService';
 import DecisionCard from '../components/DecisionCard';
 import ContextMenu from '../components/ContextMenu';
+import EditQuestionModal from '../components/EditQuestionModal';
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 import Toast from '../components/Toast';
 import Spinner from '../components/Spinner';
 import styles from './MyDecisions.module.css';
@@ -19,6 +21,10 @@ const MyDecisions = () => {
     const [error, setError] = useState(null);
     const [contextMenu, setContextMenu] = useState(null); // { decisionId, position }
     const [toast, setToast] = useState(null);
+    const [editTarget, setEditTarget] = useState(null); // decision object to edit
+    const [deleteTarget, setDeleteTarget] = useState(null); // decision object to delete
+    const [editLoading, setEditLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         const fetchDecisions = async () => {
@@ -102,13 +108,51 @@ const MyDecisions = () => {
         }
     }, [t]);
 
-    const handleEdit = useCallback(() => {
-        // Placeholder for US-035
+    const handleEdit = useCallback((decision) => {
+        setEditTarget(decision);
     }, []);
 
-    const handleDelete = useCallback(() => {
-        // Placeholder for US-035
+    const handleEditSave = useCallback(async (newQuestion) => {
+        if (!editTarget) return;
+        setEditLoading(true);
+        try {
+            let questionToSend = newQuestion;
+            const key = await EncryptionService.getStoredKey(editTarget.id);
+            if (key) {
+                questionToSend = await EncryptionService.encrypt(newQuestion, key);
+            }
+            await updateDecisionQuestion(editTarget.id, questionToSend);
+            setDecisions(prev => prev.map(d =>
+                d.id === editTarget.id ? { ...d, question: newQuestion } : d
+            ));
+            setEditTarget(null);
+        } catch (err) {
+            console.error("Failed to edit question:", err);
+            setToast({ message: t('decision.errors.editFailed'), type: 'error' });
+        } finally {
+            setEditLoading(false);
+        }
+    }, [editTarget, t]);
+
+    const handleDelete = useCallback((decision) => {
+        setDeleteTarget(decision);
     }, []);
+
+    const handleDeleteConfirm = useCallback(async () => {
+        if (!deleteTarget) return;
+        setDeleteLoading(true);
+        try {
+            await deleteDecision(deleteTarget.id);
+            setDecisions(prev => prev.filter(d => d.id !== deleteTarget.id));
+            setDeleteTarget(null);
+            setToast({ message: t('decision.deleteSuccess'), type: 'success' });
+        } catch (err) {
+            console.error("Failed to delete decision:", err);
+            setToast({ message: t('decision.errors.deleteFailed'), type: 'error' });
+        } finally {
+            setDeleteLoading(false);
+        }
+    }, [deleteTarget, t]);
 
     const getContextMenuItems = useCallback((decision) => {
         const items = [
@@ -224,6 +268,24 @@ const MyDecisions = () => {
                     items={getContextMenuItems(activeDecision)}
                     position={contextMenu.position}
                     onClose={closeContextMenu}
+                />
+            )}
+
+            {editTarget && (
+                <EditQuestionModal
+                    question={editTarget.question}
+                    onSave={handleEditSave}
+                    onCancel={() => setEditTarget(null)}
+                    isLoading={editLoading}
+                />
+            )}
+
+            {deleteTarget && (
+                <ConfirmDeleteDialog
+                    question={deleteTarget.question}
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={() => setDeleteTarget(null)}
+                    isLoading={deleteLoading}
                 />
             )}
         </div>

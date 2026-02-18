@@ -38,10 +38,17 @@
       "enabled": "Benachrichtigungen aktiviert!",
       "failed": "Benachrichtigungen konnten nicht aktiviert werden. Bitte pr\u00fcfe deine Browser-Einstellungen."
     },
+    "editQuestion": "Frage bearbeiten",
+    "deleteDecision": "Entscheidung löschen",
+    "deleteConfirmTitle": "Entscheidung löschen?",
+    "deleteConfirmMessage": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Argumente, Stimmen und Teilnehmer werden dauerhaft gelöscht.",
+    "deleteSuccess": "Entscheidung erfolgreich gelöscht.",
     "errors": {
       "statusUpdateFailed": "Status konnte nicht aktualisiert werden.",
       "voteFailed": "Abstimmung fehlgeschlagen.",
-      "exportFailed": "Export fehlgeschlagen."
+      "exportFailed": "Export fehlgeschlagen.",
+      "editFailed": "Frage konnte nicht aktualisiert werden.",
+      "deleteFailed": "Entscheidung konnte nicht gelöscht werden."
     }
   },
   "myDecisions": {

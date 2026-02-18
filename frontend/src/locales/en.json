@@ -38,10 +38,17 @@
       "enabled": "Notifications enabled!",
       "failed": "Could not enable notifications. Please check your browser settings."
     },
+    "editQuestion": "Edit Question",
+    "deleteDecision": "Delete Decision",
+    "deleteConfirmTitle": "Delete Decision?",
+    "deleteConfirmMessage": "This action cannot be undone. All arguments, votes, and participants will be permanently deleted.",
+    "deleteSuccess": "Decision deleted successfully.",
     "errors": {
       "statusUpdateFailed": "Failed to update decision status.",
       "voteFailed": "Failed to cast vote.",
-      "exportFailed": "Failed to export image."
+      "exportFailed": "Failed to export image.",
+      "editFailed": "Failed to update question.",
+      "deleteFailed": "Failed to delete decision."
     }
   },
   "myDecisions": {

@@ -1,0 +1,79 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: var(--color-bg-card);
+  border: var(--stroke-sm) solid var(--color-border-outline);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 480px;
+  margin: var(--space-md);
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-body-lg);
+  color: var(--color-text-on-surface);
+  margin: 0 0 var(--space-lg);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg-base);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-on-bg);
+  font-family: var(--font-family);
+  font-size: var(--text-body-md);
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent-secondary);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.btnCancel {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-on-surface);
+  font-family: var(--font-family);
+  font-size: var(--text-body-sm);
+  cursor: pointer;
+}
+
+.btnSave {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-accent-primary);
+  color: var(--color-text-on-primary);
+  font-family: var(--font-family);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnSave:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

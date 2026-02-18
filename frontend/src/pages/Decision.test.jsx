@@ -25,6 +25,13 @@ vi.mock('react-i18next', () => {
         'decision.reopenDecisionButton': 'Re-open Decision',
         'decision.errors.statusUpdateFailed': 'Failed to update decision status.',
         'decision.errors.voteFailed': 'Failed to cast vote.',
+        'decision.errors.editFailed': 'Failed to update question.',
+        'decision.errors.deleteFailed': 'Failed to delete decision.',
+        'decision.editQuestion': 'Edit Question',
+        'decision.deleteDecision': 'Delete Decision',
+        'decision.deleteConfirmTitle': 'Delete Decision?',
+        'decision.deleteConfirmMessage': 'This action cannot be undone.',
+        'decision.deleteSuccess': 'Decision deleted successfully.',
         'decision.participantsButton': 'Participants',
         'decision.notifications.enableButton': 'Enable Notifications',
         'decision.notifications.enabled': 'Notifications enabled!',
@@ -59,6 +66,8 @@ vi.mock('../services/firebase', () => ({
     voteArgument: vi.fn(),
     addArgument: vi.fn(),
     subscribeToFinalVotes: vi.fn(),
+    updateDecisionQuestion: vi.fn(),
+    deleteDecision: vi.fn(),
 }));
 
 import {
@@ -181,6 +190,28 @@ vi.mock('../components/FAB', () => ({
     )
 }));
 
+// Mock EditQuestionModal
+vi.mock('../components/EditQuestionModal', () => ({
+    default: ({ question, onSave, onCancel }) => (
+        <div data-testid="edit-modal">
+            <span>{question}</span>
+            <button data-testid="edit-save" onClick={() => onSave('Updated Question')}>Save</button>
+            <button data-testid="edit-cancel" onClick={onCancel}>Cancel</button>
+        </div>
+    )
+}));
+
+// Mock ConfirmDeleteDialog
+vi.mock('../components/ConfirmDeleteDialog', () => ({
+    default: ({ question, onConfirm, onCancel }) => (
+        <div data-testid="delete-dialog">
+            <span>{question}</span>
+            <button data-testid="delete-confirm" onClick={onConfirm}>Confirm Delete</button>
+            <button data-testid="delete-cancel" onClick={onCancel}>Cancel</button>
+        </div>
+    )
+}));
+
 // Mock ColumnHeader
 vi.mock('../components/ColumnHeader', () => ({
     default: ({ label, onAdd, disabled }) => (
@@ -208,6 +239,7 @@ describe('Decision Component', () => {
         status: 'open',
         yesVotes: 5,
         noVotes: 3,
+        ownerId: 'test-user-id',
     };
 
     const mockArguments = [
@@ -710,6 +742,111 @@ describe('Decision Component', () => {
 
             await waitFor(() => {
                 expect(screen.getByText('Could not enable notifications.')).toBeInTheDocument();
+            });
+        });
+    });
+
+    describe('Owner Toolbar (US-035)', () => {
+        const ownerDecision = {
+            ...mockDecision,
+            ownerId: 'test-user-id',
+        };
+
+        it('shows owner actions when user is the owner', async () => {
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(ownerDecision);
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Close Decision')).toBeInTheDocument();
+                expect(screen.getByText('Edit Question')).toBeInTheDocument();
+                expect(screen.getByText('Delete Decision')).toBeInTheDocument();
+            });
+        });
+
+        it('does not show owner actions when user is not the owner', async () => {
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback({ ...mockDecision, ownerId: 'other-user-id' });
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Should we have pizza for lunch?')).toBeInTheDocument();
+            });
+            expect(screen.queryByText('Edit Question')).not.toBeInTheDocument();
+            expect(screen.queryByText('Delete Decision')).not.toBeInTheDocument();
+        });
+
+        it('opens edit modal when edit button clicked', async () => {
+            const user = userEvent.setup();
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(ownerDecision);
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Edit Question')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Edit Question'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('edit-modal')).toBeInTheDocument();
+            });
+        });
+
+        it('opens delete dialog when delete button clicked', async () => {
+            const user = userEvent.setup();
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(ownerDecision);
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Delete Decision')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Delete Decision'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
+            });
+        });
+
+        it('calls toggleDecisionStatus when close button clicked', async () => {
+            const user = userEvent.setup();
+            mockToggleDecisionStatus.mockResolvedValue({ success: true });
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(ownerDecision);
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Close Decision')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Close Decision'));
+
+            await waitFor(() => {
+                expect(mockToggleDecisionStatus).toHaveBeenCalledWith('test-decision-123', 'closed');
+            });
+        });
+
+        it('shows reopen button when decision is closed', async () => {
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback({ ...ownerDecision, status: 'closed' });
+                return () => { };
+            });
+
+            renderDecision();
+            await waitFor(() => {
+                expect(screen.getByText('Re-open Decision')).toBeInTheDocument();
             });
         });
     });
