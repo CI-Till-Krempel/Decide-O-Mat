@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import MagicHandler from './MagicHandler';
 
@@ -37,6 +37,10 @@ describe('MagicHandler', () => {
         vi.clearAllMocks();
     });
 
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     it('shows loading state initially', async () => {
         // Return a pending promise so state doesn't update during test
         signInWithCustomToken.mockReturnValue(new Promise(() => { }));
@@ -53,29 +57,32 @@ describe('MagicHandler', () => {
         });
     });
 
-    it.skip('shows success message and redirects on success', async () => {
-        vi.useFakeTimers();
-        try {
-            signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
-            renderWithRouter('/magic?token=valid-token');
+    it('shows success message and redirects on success', async () => {
+        const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
+        signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
+        renderWithRouter('/magic?token=valid-token');
 
-            await waitFor(() => {
-                expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
-            });
+        await waitFor(() => {
+            expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
+        });
 
-            // Fast-forward time to trigger redirect
-            vi.advanceTimersByTime(2500);
+        // Check if setTimeout was called with 2000ms
+        const timeoutCall = setTimeoutSpy.mock.calls.find(call => call[1] === 2000);
+        expect(timeoutCall).toBeDefined();
 
-            await waitFor(() => {
-                expect(screen.getByText('Home Page')).toBeInTheDocument();
-            });
-        } finally {
-            vi.useRealTimers();
-        }
+        // Execute the callback manually to trigger redirect
+        const callback = timeoutCall[0];
+        act(() => {
+            callback();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Home Page')).toBeInTheDocument();
+        });
     });
 
-    // TODO: Fix timeout issue in this test case
-    it.skip('shows error message on failure', async () => {
+    it('shows error message on failure', async () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         signInWithCustomToken.mockRejectedValue(new Error('Invalid token'));
 
         renderWithRouter('/magic?token=invalid-token');
