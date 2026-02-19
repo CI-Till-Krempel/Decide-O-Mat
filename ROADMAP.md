@@ -57,14 +57,14 @@
 - **Goal**: Apply the Figma design system to the entire application — dark theme, new component library, and improved UX patterns.
 - **Figma Design File**: `ac7nNE0NZCX5iJy25dxDkY`
 - **Features**:
-    - [ ] [US-028](stories/US-028-Design-System-Foundation.md): Design System Foundation (tokens, CSS architecture, dark theme)
-    - [ ] [US-029](stories/US-029-Navigation-Redesign.md): Navigation Bar Redesign
-    - [ ] [US-030](stories/US-030-Footer-Redesign.md): Footer Redesign (legal links, branding)
-    - [ ] [US-031](stories/US-031-Home-Page-Redesign.md): Home Page Redesign (Startseite)
-    - [ ] [US-032](stories/US-032-Voting-Page-Redesign.md): Voting Page Redesign (Election hero, statement cards, floating input, FAB)
-    - [ ] [US-033](stories/US-033-Results-Page-Redesign.md): Results Page Redesign
-    - [ ] [US-034](stories/US-034-Archive-Page-Redesign.md): Archive / My Decisions Page Redesign (Aktivitaeten)
-    - [ ] [US-035](stories/US-035-Decision-Management-Actions.md): Decision Management Actions (edit question, delete decision, statistics)
+    - [x] [US-028](stories/US-028-Design-System-Foundation.md): Design System Foundation (tokens, CSS architecture, dark theme)
+    - [x] [US-029](stories/US-029-Navigation-Redesign.md): Navigation Bar Redesign
+    - [x] [US-030](stories/US-030-Footer-Redesign.md): Footer Redesign (legal links, branding)
+    - [x] [US-031](stories/US-031-Home-Page-Redesign.md): Home Page Redesign (Startseite)
+    - [x] [US-032](stories/US-032-Voting-Page-Redesign.md): Voting Page Redesign (Election hero, statement cards, floating input, FAB)
+    - [x] [US-033](stories/US-033-Results-Page-Redesign.md): Results Page Redesign
+    - [x] [US-034](stories/US-034-Archive-Page-Redesign.md): Archive / My Decisions Page Redesign (Aktivitaeten)
+    - [x] [US-035](stories/US-035-Decision-Management-Actions.md): Decision Management Actions (edit question, delete decision, statistics)
 
 ## v1.7 Participants and Notifications
 - **Goal**: Make visible who participates in a decision and enable notifications on new votes, arguments or versions.

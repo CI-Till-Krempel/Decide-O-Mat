@@ -6,7 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
- 
+
+## [1.6.0] - 2026-02-18
+
+### Added
+- **Design System Foundation** (US-028): Dark-only theme with CSS custom properties, "Alfa Slab One" and "Open Sans" typography, CSS Modules architecture, and i18n support (English/German).
+- **Navigation Bar Redesign** (US-029): Dark-themed responsive navigation with settings panel and language switcher.
+- **Footer Redesign** (US-030): New footer with legal links (Terms, Privacy, Imprint) and version branding.
+- **Home Page Redesign** (US-031): Full-bleed dark layout matching Figma design.
+- **Voting Page Redesign** (US-032): New Election Hero component, floating argument input, statement cards, and FAB pattern.
+- **Results Page Redesign** (US-033): Dedicated results mode on Election Hero with ballot icon and color-coded outcome (Approved/Rejected).
+- **Archive / My Decisions Page Redesign** (US-034): Decision cards with running/archived variants, context menu with keyboard navigation, and localized relative timestamps via `Intl.RelativeTimeFormat`.
+- **Decision Management Actions** (US-035): Owners can edit decision questions, delete decisions (with cascading subcollection cleanup), and close/reopen decisions from both the decision page and My Decisions.
+- **Participant List**: Real-time participant list with owner badge and notification toggle.
+
+### Changed
+- Migrated all pages and components from inline styles to CSS Modules with design tokens.
+- Replaced hardcoded color values with CSS custom properties throughout the application.
+
+### Fixed
+- **Firestore Batch Handling**: Fixed critical bug where Firestore batches were reused after `commit()` in cascading decision deletion.
+
  ## [1.5.2] - 2026-01-23
  
  ### Security
