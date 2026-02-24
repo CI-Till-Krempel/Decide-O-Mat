@@ -33,7 +33,7 @@ jobs:
           fi
 
       - name: Generate Token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2
         id: app-token
         with:
           app-id: ${{ secrets.GEMINI_APP_ID }}
