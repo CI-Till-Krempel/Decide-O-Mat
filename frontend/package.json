@@ -21,7 +21,7 @@
     "firebase": "^12.9.0",
     "firebase-functions": "^7.0.5",
     "html-to-image": "^1.11.13",
-    "i18next": "^25.8.6",
+    "i18next": "^25.8.11",
     "i18next-browser-languagedetector": "^8.2.0",
     "react": "^19.2.0",
     "react-i18next": "^16.5.4",
