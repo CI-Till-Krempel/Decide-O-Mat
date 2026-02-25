@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import MagicHandler from './MagicHandler';
 
@@ -53,8 +53,8 @@ describe('MagicHandler', () => {
         });
     });
 
-    it.skip('shows success message and redirects on success', async () => {
-        vi.useFakeTimers();
+    it('shows success message and redirects on success', async () => {
+        vi.useFakeTimers({ shouldAdvanceTime: true });
         try {
             signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
             renderWithRouter('/magic?token=valid-token');
@@ -64,7 +64,7 @@ describe('MagicHandler', () => {
             });
 
             // Fast-forward time to trigger redirect
-            vi.advanceTimersByTime(2500);
+            act(() => { vi.advanceTimersByTime(2500); });
 
             await waitFor(() => {
                 expect(screen.getByText('Home Page')).toBeInTheDocument();
@@ -74,8 +74,7 @@ describe('MagicHandler', () => {
         }
     });
 
-    // TODO: Fix timeout issue in this test case
-    it.skip('shows error message on failure', async () => {
+    it('shows error message on failure', async () => {
         signInWithCustomToken.mockRejectedValue(new Error('Invalid token'));
 
         renderWithRouter('/magic?token=invalid-token');
