@@ -53,29 +53,21 @@ describe('MagicHandler', () => {
         });
     });
 
-    it.skip('shows success message and redirects on success', async () => {
-        vi.useFakeTimers();
-        try {
-            signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
-            renderWithRouter('/magic?token=valid-token');
+    it('shows success message and redirects on success', async () => {
+        signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
+        renderWithRouter('/magic?token=valid-token');
 
-            await waitFor(() => {
-                expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
-            });
+        await waitFor(() => {
+            expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
+        });
 
-            // Fast-forward time to trigger redirect
-            vi.advanceTimersByTime(2500);
-
-            await waitFor(() => {
-                expect(screen.getByText('Home Page')).toBeInTheDocument();
-            });
-        } finally {
-            vi.useRealTimers();
-        }
+        // Wait for the 2 second redirect timeout
+        await waitFor(() => {
+            expect(screen.getByText('Home Page')).toBeInTheDocument();
+        }, { timeout: 3000 });
     });
 
-    // TODO: Fix timeout issue in this test case
-    it.skip('shows error message on failure', async () => {
+    it('shows error message on failure', async () => {
         signInWithCustomToken.mockRejectedValue(new Error('Invalid token'));
 
         renderWithRouter('/magic?token=invalid-token');
@@ -88,6 +80,7 @@ describe('MagicHandler', () => {
     it('shows error if no token provided', () => {
         renderWithRouter('/magic');
         expect(screen.getByText(/transfer failed/i)).toBeInTheDocument();
+
         expect(signInWithCustomToken).not.toHaveBeenCalled();
     });
 });
