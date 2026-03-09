@@ -21,64 +21,69 @@ vi.mock('../contexts/UserContext', () => ({
     useUser: vi.fn(() => ({ user: null })),
 }));
 
-const renderWithRouter = (initialEntry) => {
-    return render(
-        <MemoryRouter initialEntries={[initialEntry]}>
-            <Routes>
-                <Route path="/magic" element={<MagicHandler />} />
-                <Route path="/" element={<div>Home Page</div>} />
-            </Routes>
-        </MemoryRouter>
-    );
-};
-
 describe('MagicHandler', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
     it('shows loading state initially', async () => {
-        // Return a pending promise so state doesn't update during test
         signInWithCustomToken.mockReturnValue(new Promise(() => { }));
-        renderWithRouter('/magic?token=test-token');
+        render(
+            <MemoryRouter initialEntries={['/magic?token=test-token']}>
+                <Routes>
+                    <Route path="/magic" element={<MagicHandler />} />
+                </Routes>
+            </MemoryRouter>
+        );
         expect(screen.getByText(/Processing/i)).toBeInTheDocument();
     });
 
     it('calls signInWithCustomToken with token from URL', async () => {
         signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
-        renderWithRouter('/magic?token=valid-token');
+        render(
+            <MemoryRouter initialEntries={['/magic?token=valid-token']}>
+                <Routes>
+                    <Route path="/magic" element={<MagicHandler />} />
+                </Routes>
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(signInWithCustomToken).toHaveBeenCalledWith(expect.anything(), 'valid-token');
         });
     });
 
-    it.skip('shows success message and redirects on success', async () => {
-        vi.useFakeTimers();
-        try {
-            signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
-            renderWithRouter('/magic?token=valid-token');
+    it('shows success message and redirects on success', async () => {
+        signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
+        render(
+            <MemoryRouter initialEntries={['/magic?token=valid-token']}>
+                <Routes>
+                    <Route path="/magic" element={<MagicHandler />} />
+                    <Route path="/" element={<div>Home Page</div>} />
+                </Routes>
+            </MemoryRouter>
+        );
 
-            await waitFor(() => {
-                expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
-            });
+        await waitFor(() => {
+            expect(screen.getByText(/transfer successful/i)).toBeInTheDocument();
+        });
 
-            // Fast-forward time to trigger redirect
-            vi.advanceTimersByTime(2500);
-
-            await waitFor(() => {
-                expect(screen.getByText('Home Page')).toBeInTheDocument();
-            });
-        } finally {
-            vi.useRealTimers();
-        }
+        await waitFor(() => {
+            expect(screen.getByText('Home Page')).toBeInTheDocument();
+        }, { timeout: 3000 });
     });
 
-    // TODO: Fix timeout issue in this test case
-    it.skip('shows error message on failure', async () => {
+    it('shows error message on failure', async () => {
         signInWithCustomToken.mockRejectedValue(new Error('Invalid token'));
 
-        renderWithRouter('/magic?token=invalid-token');
+        render(
+            <MemoryRouter initialEntries={['/magic?token=invalid-token']}>
+                <Routes>
+                    <Route path="/magic" element={<MagicHandler />} />
+                    <Route path="/" element={<div>Home Page</div>} />
+                </Routes>
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(screen.getByText(/transfer failed/i)).toBeInTheDocument();
@@ -86,7 +91,14 @@ describe('MagicHandler', () => {
     });
 
     it('shows error if no token provided', () => {
-        renderWithRouter('/magic');
+        render(
+            <MemoryRouter initialEntries={['/magic']}>
+                <Routes>
+                    <Route path="/magic" element={<MagicHandler />} />
+                    <Route path="/" element={<div>Home Page</div>} />
+                </Routes>
+            </MemoryRouter>
+        );
         expect(screen.getByText(/transfer failed/i)).toBeInTheDocument();
         expect(signInWithCustomToken).not.toHaveBeenCalled();
     });
