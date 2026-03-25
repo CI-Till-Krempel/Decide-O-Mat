@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -15,7 +15,7 @@ function MagicHandler() {
     // We need to track if we've already checked the user status to avoid loops
     const [hasCheckedUser, setHasCheckedUser] = useState(false);
 
-    const performSignIn = async () => {
+    const performSignIn = useCallback(async () => {
         try {
             await signInWithCustomToken(auth, token);
             setStatus('success');
@@ -23,10 +23,10 @@ function MagicHandler() {
                 navigate('/');
             }, 2000);
         } catch (error) {
-            console.error("Magic link failed", error);
+            console.error('Magic link failed', error);
             setStatus('error');
         }
-    };
+    }, [token, navigate]);
 
     useEffect(() => {
         if (!token) {
@@ -37,7 +37,7 @@ function MagicHandler() {
         // currentUser is null initially? No, useUser returns loading. 
         // But hook runs after mount.
         // We can check auth.currentUser directly for synchronous state mostly, 
-        // but useUser gives us the "Decide-O-Mat" enriched user (with local name).
+        // but useUser gives us the 'Decide-O-Mat' enriched user (with local name).
 
         // This effect might run multiple times.
         if (hasCheckedUser) return;
@@ -68,7 +68,7 @@ function MagicHandler() {
         // So currentUser is stable-ish.
         checkAndProcess();
 
-    }, [token, currentUser, hasCheckedUser, status]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [token, currentUser, hasCheckedUser, status, performSignIn]);
 
 
     const handleConfirmSwitch = () => {
@@ -81,11 +81,11 @@ function MagicHandler() {
     };
 
     return (
-        <div className="container" style={{ textAlign: 'center', marginTop: '4rem' }}>
+        <div className='container' style={{ textAlign: 'center', marginTop: '4rem' }}>
             {status === 'processing' && (
                 <div>
                     <h2>Processing...</h2>
-                    <Spinner size="lg" color="var(--color-primary)" />
+                    <Spinner size='lg' color='var(--color-primary)' />
                 </div>
             )}
 
@@ -97,10 +97,10 @@ function MagicHandler() {
                     <p style={{ margin: '1.5rem 0' }}>Using this link will <strong>overwrite</strong> your current session on this device.</p>
 
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                        <button onClick={handleCancel} className="btn btn-secondary">
+                        <button onClick={handleCancel} className='btn btn-secondary'>
                             Cancel
                         </button>
-                        <button onClick={handleConfirmSwitch} className="btn btn-primary">
+                        <button onClick={handleConfirmSwitch} className='btn btn-primary'>
                             Yes, Switch
                         </button>
                     </div>
@@ -119,7 +119,7 @@ function MagicHandler() {
                 <div style={{ color: 'var(--color-danger)' }}>
                     <h2>Transfer Failed</h2>
                     <p>The link may be invalid or expired.</p>
-                    <button onClick={() => navigate('/')} className="btn">Go Home</button>
+                    <button onClick={() => navigate('/')} className='btn'>Go Home</button>
                 </div>
             )}
         </div>

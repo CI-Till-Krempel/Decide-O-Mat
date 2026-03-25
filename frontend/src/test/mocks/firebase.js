@@ -42,13 +42,10 @@ mockAddArgument.mockResolvedValue('test-argument-id');
 mockVoteArgument.mockResolvedValue({ success: true });
 mockToggleDecisionStatus.mockResolvedValue({ success: true });
 mockVoteDecision.mockResolvedValue({ success: true });
-// eslint-disable-next-line no-unused-vars
-mockSubscribeToDecision.mockImplementation((_id, _callback) => {
-    // Return unsubscribe function
+mockSubscribeToDecision.mockImplementation(() => {
     return () => { };
 });
-// eslint-disable-next-line no-unused-vars
-mockSubscribeToArguments.mockImplementation((_id, _callback) => {
-    // Return unsubscribe function
+
+mockSubscribeToArguments.mockImplementation(() => {
     return () => { };
 });
