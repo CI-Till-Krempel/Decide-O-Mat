@@ -45,7 +45,9 @@ exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
   });
 
   // Ensure owner is added to participants subcollection
-  await ensureParticipant(db, decisionRef.id, request.auth.uid, request.auth);
+  if (request.auth) {
+    await ensureParticipant(db, decisionRef.id, request.auth.uid, request.auth);
+  }
 
   return {id: decisionRef.id};
 });
