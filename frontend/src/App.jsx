@@ -15,7 +15,7 @@ function App() {
   const [isReady, setIsReady] = React.useState(false);
 
   useEffect(() => {
-    const version = "v1.4.1";
+    const version = typeof __APP_VERSION__ !== 'undefined' ? `v${__APP_VERSION__}` : 'v0.0.0';
     // Check various env naming conventions or defaults
     const mode = import.meta.env.MODE || 'production';
     const stage = mode === 'production' ? '' : ` (${mode})`;
