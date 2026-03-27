@@ -10,6 +10,7 @@ import EditQuestionModal from '../components/EditQuestionModal';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 import Toast from '../components/Toast';
 import Spinner from '../components/Spinner';
+import { copyRichLink } from '../utils/ClipboardUtils';
 import styles from './MyDecisions.module.css';
 
 const MyDecisions = () => {
@@ -92,27 +93,10 @@ const MyDecisions = () => {
         const hash = key ? `#key=${key}` : '';
         const url = `${window.location.origin}/d/${decision.id}${hash}`;
 
-        try {
-            const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
-            const creatorName = decision.role === 'owner' ? user?.displayName : null;
-            const authorPart = creatorName ? ` (by ${creatorName})` : '';
-            
-            const shareHtml = `<a href="${url}">${decisionTitle}${authorPart}</a>`;
-            const shareText = `${decisionTitle}${authorPart}\n${url}`;
-
-            const blobHtml = new Blob([shareHtml], { type: 'text/html' });
-            const blobText = new Blob([shareText], { type: 'text/plain' });
-
-            const data = [new window.ClipboardItem({
-                'text/html': blobHtml,
-                'text/plain': blobText
-            })];
-
-            await navigator.clipboard.write(data);
-        } catch (err) {
-            console.warn("Rich text copy failed, falling back to basic text copy.", err);
-            await navigator.clipboard.writeText(url);
-        }
+        const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
+        const creatorName = decision.role === 'owner' ? user?.displayName : null;
+        
+        await copyRichLink(url, decisionTitle, creatorName);
 
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
     }, [t, user]);

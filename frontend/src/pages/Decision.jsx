@@ -20,6 +20,7 @@ import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
 import ParticipantService from '../services/ParticipantService';
 import NotificationService from '../services/NotificationService';
+import { copyRichLink } from '../utils/ClipboardUtils';
 
 import styles from './Decision.module.css';
 
@@ -155,32 +156,18 @@ function Decision() {
         }
     }, [copied]);
 
-    const handleCopyLink = async () => {
+    const handleCopyLink = useCallback(async () => {
         const url = window.location.href;
-        try {
-            const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
-            const ownerParticipant = participantMap.get(decision.ownerId);
-            const creatorName = ownerParticipant?.name || t('participantList.unknown');
+        
+        const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
+        const ownerParticipant = participantMap.get(decision.ownerId);
+        const creatorName = ownerParticipant?.name || t('participantList.unknown');
 
-            const shareHtml = `<a href="${url}">${decisionTitle} (by ${creatorName})</a>`;
-            const shareText = `${decisionTitle} (by ${creatorName})\n${url}`;
+        await copyRichLink(url, decisionTitle, creatorName);
 
-            const blobHtml = new Blob([shareHtml], { type: 'text/html' });
-            const blobText = new Blob([shareText], { type: 'text/plain' });
-
-            const data = [new window.ClipboardItem({
-                'text/html': blobHtml,
-                'text/plain': blobText
-            })];
-
-            await navigator.clipboard.write(data);
-        } catch (err) {
-            console.warn("Rich text copy failed, falling back to basic text copy.", err);
-            await navigator.clipboard.writeText(url);
-        }
         setCopied(true);
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
-    };
+    }, [decision, participantMap, t]);
 
     const handleToggleNotifications = async () => {
         if (notificationsEnabled || notificationsRequesting) return;
