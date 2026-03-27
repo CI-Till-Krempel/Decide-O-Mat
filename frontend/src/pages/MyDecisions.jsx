@@ -10,6 +10,7 @@ import EditQuestionModal from '../components/EditQuestionModal';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 import Toast from '../components/Toast';
 import Spinner from '../components/Spinner';
+import { copyRichLink } from '../utils/ClipboardUtils';
 import styles from './MyDecisions.module.css';
 
 const MyDecisions = () => {
@@ -87,13 +88,18 @@ const MyDecisions = () => {
         setContextMenu(null);
     }, []);
 
-    const handleCopyLink = useCallback((decision) => {
+    const handleCopyLink = useCallback(async (decision) => {
         const key = EncryptionService.getStoredKeyString(decision.id);
         const hash = key ? `#key=${key}` : '';
         const url = `${window.location.origin}/d/${decision.id}${hash}`;
-        navigator.clipboard.writeText(url);
+
+        const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
+        const creatorName = decision.role === 'owner' ? user?.displayName : null;
+        
+        await copyRichLink(url, decisionTitle, creatorName);
+
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
-    }, [t]);
+    }, [t, user]);
 
     const handleToggleStatus = useCallback(async (decision) => {
         const newStatus = decision.status === 'closed' ? 'open' : 'closed';

@@ -20,6 +20,7 @@ import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
 import ParticipantService from '../services/ParticipantService';
 import NotificationService from '../services/NotificationService';
+import { copyRichLink } from '../utils/ClipboardUtils';
 
 import styles from './Decision.module.css';
 
@@ -155,11 +156,18 @@ function Decision() {
         }
     }, [copied]);
 
-    const handleCopyLink = () => {
-        navigator.clipboard.writeText(window.location.href);
+    const handleCopyLink = useCallback(async () => {
+        const url = window.location.href;
+        
+        const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
+        const ownerParticipant = participantMap.get(decision.ownerId);
+        const creatorName = ownerParticipant?.name || t('participantList.unknown');
+
+        await copyRichLink(url, decisionTitle, creatorName);
+
         setCopied(true);
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
-    };
+    }, [decision, participantMap, t]);
 
     const handleToggleNotifications = async () => {
         if (notificationsEnabled || notificationsRequesting) return;
