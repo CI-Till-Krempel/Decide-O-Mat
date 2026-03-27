@@ -91,13 +91,14 @@ const MyDecisions = () => {
         const key = EncryptionService.getStoredKeyString(decision.id);
         const hash = key ? `#key=${key}` : '';
         const url = `${window.location.origin}/d/${decision.id}${hash}`;
-        
+
         try {
             const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
-            const creatorName = decision.role === 'owner' ? user?.displayName : t('participantList.unknown');
+            const creatorName = decision.role === 'owner' ? user?.displayName : null;
+            const authorPart = creatorName ? ` (by ${creatorName})` : '';
             
-            const shareHtml = `<a href="${url}">${decisionTitle} (by ${creatorName})</a>`;
-            const shareText = `${decisionTitle} (by ${creatorName})\n${url}`;
+            const shareHtml = `<a href="${url}">${decisionTitle}${authorPart}</a>`;
+            const shareText = `${decisionTitle}${authorPart}\n${url}`;
 
             const blobHtml = new Blob([shareHtml], { type: 'text/html' });
             const blobText = new Blob([shareText], { type: 'text/plain' });
