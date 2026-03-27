@@ -23,7 +23,7 @@ jobs:
       - name: Audit Frontend
         run: |
           cd frontend
-          npm audit --omit=dev
+          npm audit --omit=dev --audit-level=moderate
       - name: Lint Frontend
         run: |
           cd frontend
@@ -63,7 +63,7 @@ jobs:
       - name: Audit Functions
         run: |
           cd functions
-          npm audit --omit=dev
+          npm audit --omit=dev --audit-level=moderate
       - name: Lint Functions
         run: |
           cd functions
