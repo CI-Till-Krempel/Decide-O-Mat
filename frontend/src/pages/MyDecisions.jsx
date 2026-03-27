@@ -87,13 +87,34 @@ const MyDecisions = () => {
         setContextMenu(null);
     }, []);
 
-    const handleCopyLink = useCallback((decision) => {
+    const handleCopyLink = useCallback(async (decision) => {
         const key = EncryptionService.getStoredKeyString(decision.id);
         const hash = key ? `#key=${key}` : '';
         const url = `${window.location.origin}/d/${decision.id}${hash}`;
-        navigator.clipboard.writeText(url);
+        
+        try {
+            const decisionTitle = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
+            const creatorName = decision.role === 'owner' ? user?.displayName : t('participantList.unknown');
+            
+            const shareHtml = `<a href="${url}">${decisionTitle} (by ${creatorName})</a>`;
+            const shareText = `${decisionTitle} (by ${creatorName})\n${url}`;
+
+            const blobHtml = new Blob([shareHtml], { type: 'text/html' });
+            const blobText = new Blob([shareText], { type: 'text/plain' });
+
+            const data = [new window.ClipboardItem({
+                'text/html': blobHtml,
+                'text/plain': blobText
+            })];
+
+            await navigator.clipboard.write(data);
+        } catch (err) {
+            console.warn("Rich text copy failed, falling back to basic text copy.", err);
+            await navigator.clipboard.writeText(url);
+        }
+
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
-    }, [t]);
+    }, [t, user]);
 
     const handleToggleStatus = useCallback(async (decision) => {
         const newStatus = decision.status === 'closed' ? 'open' : 'closed';
