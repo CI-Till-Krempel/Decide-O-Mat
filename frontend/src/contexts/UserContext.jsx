@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-// import { generateUUID } from '../utils/uuid'; // Removed
 import NameGenerator from '../utils/NameGenerator';
 import { auth, deleteUser } from '../services/firebase';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, updateProfile, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, linkWithPopup, linkWithCredential, EmailAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup } from 'firebase/auth';
@@ -102,9 +101,7 @@ export function UserProvider({ children }) {
                     const result = await linkWithPopup(auth.currentUser, provider);
                     setFirebaseUser(result.user);
                     return; // Success
-                    // eslint-disable-next-line no-unused-vars
-                } catch (linkError) {
-                    // console.log("Link failed, falling back to sign in", linkError);
+                } catch {
                     // If link fails (e.g. email already in use), fall back to normal sign in
                     // This will switch the user, effectively "logging out" the anonymous session
                 }
