@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decide-O-Mat — Runtime Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { margin: 0; background: #050509; display: flex; flex-direction: column; align-items: center; padding: 40px 24px 80px; font-family: 'Open Sans', sans-serif; }
+    h1 { font-family: 'Alfa Slab One', serif; color: #b9dd8b; font-size: 28px; margin-bottom: 8px; }
+    p.sub { color: #aeaec6; font-size: 14px; margin-bottom: 40px; }
+    svg { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <h1>Decide-O-Mat — Runtime Architecture</h1>
+  <p class="sub">v1.6 · How the system components interact at runtime</p>
+
+<svg width="920" height="680" viewBox="0 0 920 680" xmlns="http://www.w3.org/2000/svg" font-family="'Open Sans', sans-serif">
+  <defs>
+    <marker id="arr-g" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#b9dd8b"/>
+    </marker>
+    <marker id="arr-p" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#c4c3fe"/>
+    </marker>
+    <marker id="arr-m" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#6f6f8e"/>
+    </marker>
+    <marker id="arr-g-rev" markerWidth="9" markerHeight="7" refX="1" refY="3.5" orient="auto">
+      <polygon points="9 0, 0 3.5, 9 7" fill="#b9dd8b"/>
+    </marker>
+  </defs>
+
+  <!-- ── BROWSER ZONE ── -->
+  <rect x="10" y="10" width="900" height="235" rx="16" fill="#1d1d34" stroke="#272745" stroke-width="1.5"/>
+  <text x="28" y="36" font-size="10" font-weight="700" letter-spacing="2.5" fill="#6f6f8e">BROWSER</text>
+
+  <!-- React SPA box -->
+  <rect x="28" y="48" width="415" height="182" rx="12" fill="#12122a" stroke="#272745" stroke-width="1.5"/>
+  <text x="48" y="76" font-family="'Open Sans', sans-serif" font-weight="700" font-size="15" fill="#b9dd8b">React SPA</text>
+  <text x="48" y="98" font-size="12.5" fill="#aeaec6">Vite build · React Router</text>
+  <text x="48" y="116" font-size="12.5" fill="#aeaec6">react-i18next (EN / DE)</text>
+  <text x="48" y="134" font-size="12.5" fill="#aeaec6">Firebase SDK  (Auth + Firestore)</text>
+  <text x="48" y="152" font-size="12.5" fill="#aeaec6">CSS Modules · Design tokens</text>
+  <text x="48" y="170" font-size="12.5" fill="#aeaec6">Capability URL access control</text>
+  <text x="48" y="188" font-size="12.5" fill="#aeaec6">html-to-image export</text>
+  <text x="48" y="208" font-size="12.5" fill="#aeaec6">My Decisions · Profile management</text>
+
+  <!-- Web Crypto box -->
+  <rect x="477" y="48" width="415" height="182" rx="12" fill="#12122a" stroke="#272745" stroke-width="1.5"/>
+  <text x="497" y="76" font-family="'Open Sans', sans-serif" font-weight="700" font-size="15" fill="#c4c3fe">E2EE  —  Web Crypto API</text>
+  <text x="497" y="98" font-size="12.5" fill="#aeaec6">AES-256 GCM  (client-side only)</text>
+  <text x="497" y="116" font-size="12.5" fill="#aeaec6">Encryption key stored in URL #hash</text>
+  <text x="497" y="134" font-size="12.5" fill="#aeaec6">Key never sent to server</text>
+  <text x="497" y="152" font-size="12.5" fill="#aeaec6">Encrypt question + arguments before write</text>
+  <text x="497" y="170" font-size="12.5" fill="#aeaec6">Decrypt after read from Firestore</text>
+  <text x="497" y="188" font-size="12.5" fill="#aeaec6">localStorage caches key for My Decisions</text>
+  <text x="497" y="208" font-size="12.5" fill="#aeaec6">Server sees only ciphertext</text>
+
+  <!-- SPA ↔ WebCrypto arrow -->
+  <line x1="445" y1="140" x2="475" y2="140" stroke="#c4c3fe" stroke-width="1.5" marker-end="url(#arr-p)" marker-start="url(#arr-g-rev)"/>
+
+  <!-- ── CONNECTOR: SPA → Cloud ── -->
+  <!-- vertical line from browser zone centre down -->
+  <line x1="240" y1="245" x2="240" y2="288" stroke="#6f6f8e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-m)"/>
+  <text x="244" y="270" font-size="11" fill="#6f6f8e">Firebase SDK  (HTTPS / WebSocket)</text>
+
+  <!-- right side: SPA → Cloud Functions -->
+  <line x1="680" y1="245" x2="680" y2="288" stroke="#6f6f8e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-m)"/>
+  <text x="684" y="270" font-size="11" fill="#6f6f8e">HTTPS calls</text>
+
+  <!-- ── GOOGLE CLOUD ZONE ── -->
+  <rect x="10" y="290" width="900" height="378" rx="16" fill="#1d1d34" stroke="#272745" stroke-width="1.5"/>
+  <text x="28" y="316" font-size="10" font-weight="700" letter-spacing="2.5" fill="#6f6f8e">GOOGLE CLOUD  ·  FIREBASE  ·  europe-west4</text>
+
+  <!-- App Hosting bar -->
+  <rect x="28" y="324" width="862" height="62" rx="10" fill="#0d1a06" stroke="rgba(185,221,139,.25)" stroke-width="1.5"/>
+  <text x="48" y="349" font-family="'Open Sans', sans-serif" font-weight="700" font-size="14" fill="#b9dd8b">App Hosting  (CDN)</text>
+  <text x="48" y="368" font-size="12.5" fill="#aeaec6">Serves React SPA bundle globally  ·  Global edge network  ·  Automatic HTTPS  ·  Zero-config deploys</text>
+
+  <!-- Firebase Auth -->
+  <rect x="28" y="408" width="210" height="248" rx="12" fill="#12122a" stroke="#272745" stroke-width="1.5"/>
+  <text x="48" y="436" font-family="'Open Sans', sans-serif" font-weight="700" font-size="14" fill="#ffc9ad">Firebase Auth</text>
+  <text x="48" y="458" font-size="12.5" fill="#aeaec6">Google OAuth</text>
+  <text x="48" y="476" font-size="12.5" fill="#aeaec6">Email / Password</text>
+  <text x="48" y="494" font-size="12.5" fill="#aeaec6">Magic Link (device transfer)</text>
+  <text x="48" y="512" font-size="12.5" fill="#aeaec6">Anonymous display name</text>
+  <text x="48" y="530" font-size="12.5" fill="#aeaec6">JWT session tokens</text>
+  <text x="48" y="548" font-size="12.5" fill="#aeaec6">GDPR account deletion</text>
+
+  <!-- Firestore -->
+  <rect x="258" y="408" width="230" height="248" rx="12" fill="#12122a" stroke="#272745" stroke-width="1.5"/>
+  <text x="278" y="436" font-family="'Open Sans', sans-serif" font-weight="700" font-size="14" fill="#b9dd8b">Firestore</text>
+  <text x="278" y="458" font-size="12.5" fill="#aeaec6">NoSQL document store</text>
+  <text x="278" y="476" font-size="12.5" fill="#aeaec6">Real-time listeners (WSS)</text>
+  <text x="278" y="494" font-size="12.5" fill="#aeaec6">decisions/ collection</text>
+  <text x="278" y="512" font-size="12.5" fill="#aeaec6">arguments/ subcollection</text>
+  <text x="278" y="530" font-size="12.5" fill="#aeaec6">Stores ciphertext only</text>
+  <text x="278" y="548" font-size="12.5" fill="#aeaec6">Security rules enforced</text>
+
+  <!-- Cloud Functions -->
+  <rect x="508" y="408" width="382" height="248" rx="12" fill="#12122a" stroke="#272745" stroke-width="1.5"/>
+  <text x="528" y="436" font-family="'Open Sans', sans-serif" font-weight="700" font-size="14" fill="#c4c3fe">Cloud Functions</text>
+  <text x="528" y="458" font-size="12.5" fill="#aeaec6">Node.js 20  ·  Stateless  ·  Scale-to-zero</text>
+  <text x="528" y="476" font-size="12.5" fill="#aeaec6">deleteUser — GDPR account removal</text>
+  <text x="528" y="494" font-size="12.5" fill="#aeaec6">Business logic validation</text>
+  <text x="528" y="512" font-size="12.5" fill="#aeaec6">Rate limiting</text>
+  <text x="528" y="530" font-size="12.5" fill="#aeaec6">Firebase Admin SDK (elevated access)</text>
+  <text x="528" y="548" font-size="12.5" fill="#aeaec6">Firestore + Auth admin operations</text>
+
+  <!-- Cloud Functions → Firestore arrow -->
+  <line x1="506" y1="510" x2="490" y2="510" stroke="#c4c3fe" stroke-width="1.5" marker-end="url(#arr-p)"/>
+  <text x="493" y="500" font-size="10" fill="#6f6f8e" text-anchor="end">admin</text>
+
+  <!-- Cloud Functions → Firebase Auth arrow -->
+  <line x1="506" y1="540" x2="242" y2="540" stroke="#c4c3fe" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-p)"/>
+
+</svg>
+
+</body>
+</html>
