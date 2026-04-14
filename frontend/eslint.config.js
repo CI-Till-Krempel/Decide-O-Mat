@@ -39,4 +39,14 @@ export default defineConfig([
       },
     },
   },
+  {
+    files: ['public/firebase-messaging-sw.template.js'],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+        firebase: 'readonly',
+        importScripts: 'readonly',
+      },
+    },
+  },
 ])
