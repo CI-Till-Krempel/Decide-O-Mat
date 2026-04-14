@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Decide-O-Mat Pitch Deck: Collaborative, zero-friction, and end-to-end encrypted decision making for teams." />
   <title>Decide-O-Mat — Pitch Deck</title>
   <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -300,6 +301,19 @@
     }
     #nav a:hover { background: var(--accent-primary); transform: scale(1.4); }
 
+    /* ── Accessibility ── */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 640px) {
       .slide { padding: 40px 24px; min-height: unset; }
@@ -313,16 +327,16 @@
 <body>
 
 <nav id="nav" aria-label="Slide navigation">
-  <a href="#s1" title="Title"></a>
-  <a href="#s2" title="Problem"></a>
-  <a href="#s3" title="Solution"></a>
-  <a href="#s4" title="Features"></a>
-  <a href="#s5" title="How it works"></a>
-  <a href="#s6" title="Security"></a>
-  <a href="#s7" title="Stack"></a>
-  <a href="#s8" title="Roadmap"></a>
-  <a href="#s9" title="Audience"></a>
-  <a href="#s10" title="CTA"></a>
+  <a href="#s1" title="Title"><span class="sr-only">Slide 1: Title</span></a>
+  <a href="#s2" title="Problem"><span class="sr-only">Slide 2: Problem</span></a>
+  <a href="#s3" title="Solution"><span class="sr-only">Slide 3: Solution</span></a>
+  <a href="#s4" title="Features"><span class="sr-only">Slide 4: Features</span></a>
+  <a href="#s5" title="How it works"><span class="sr-only">Slide 5: How it works</span></a>
+  <a href="#s6" title="Security"><span class="sr-only">Slide 6: Security</span></a>
+  <a href="#s7" title="Stack"><span class="sr-only">Slide 7: Stack</span></a>
+  <a href="#s8" title="Roadmap"><span class="sr-only">Slide 8: Roadmap</span></a>
+  <a href="#s9" title="Audience"><span class="sr-only">Slide 9: Audience</span></a>
+  <a href="#s10" title="CTA"><span class="sr-only">Slide 10: Call to Action</span></a>
 </nav>
 
 <div class="deck">
@@ -367,7 +381,7 @@
     <div class="stats">
       <div class="stat">
         <div class="num">0</div>
-        <div class="desc">Sign-ups required to participate</div>
+        <div class="desc">Sign-up required to participate</div>
       </div>
       <div class="stat">
         <div class="num">E2E</div>
@@ -610,7 +624,7 @@
   <!-- 10. CTA -->
   <section id="s10" class="slide cta-slide">
     <span class="slide-num">10 / 10</span>
-    <div class="logo" style="font-size:44px;">Decide-O-Mat</div>
+    <div class="logo">Decide-O-Mat</div>
     <p class="tagline" style="margin-top:24px; font-size:20px;">
       Structured. Private. Zero friction.<br>
       <strong style="color: var(--text-base);">The democratic way to make group decisions.</strong>
