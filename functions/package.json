@@ -23,7 +23,7 @@
         "eslint": "^9.39.4",
         "eslint-config-google": "^0.14.0",
         "globals": "^17.4.0",
-        "lodash": "^4.17.23"
+        "lodash": "^4.18.1"
     },
     "private": true,
     "version": "1.6.0"
