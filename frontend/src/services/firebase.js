@@ -63,7 +63,6 @@ export const ensureAppCheck = async () => {
     if (!appCheck) return Promise.resolve(false);
     try {
         const result = await getToken(appCheck, true); // forceRefresh = true
-        console.log("ensureAppCheck: Token ready", result.token.substring(0, 5) + "...");
         return true;
     } catch (err) {
         console.error("ensureAppCheck: Error getting token", err);
@@ -113,7 +112,6 @@ export const addArgument = async (decisionId, type, text, authorName, authorId) 
 
 export const voteArgument = async (decisionId, argumentId, displayName) => {
     const voteArgumentFunction = httpsCallable(functions, 'voteArgument');
-    console.log("Calling voteArgument with:", { decisionId, argumentId, displayName });
     return await voteArgumentFunction({ decisionId, argumentId, displayName });
 };
 
