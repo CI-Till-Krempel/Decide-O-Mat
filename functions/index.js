@@ -17,6 +17,11 @@ const db = admin.firestore();
 const {enforceAppCheck} = require("./config");
 
 exports.debugAppCheck = onCall({cors: true, enforceAppCheck: false}, async (request) => {
+  // This endpoint is only available outside of production to prevent
+  // information disclosure of auth/App Check internals.
+  if (process.env.GCLOUD_PROJECT === "decide-o-mat") {
+    throw new HttpsError("not-found", "Not available.");
+  }
   return {
     app: request.app || null,
     auth: request.auth || null,
@@ -25,6 +30,10 @@ exports.debugAppCheck = onCall({cors: true, enforceAppCheck: false}, async (requ
 });
 
 exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
   const question = request.data.question;
 
   if (!question || typeof question !== "string" || question.trim().length === 0) {
@@ -40,8 +49,8 @@ exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
   await decisionRef.set({
     question: question.trim(),
     createdAt: FieldValue.serverTimestamp(),
-    ownerId: request.auth ? request.auth.uid : null,
-    participantIds: request.auth ? [request.auth.uid] : [],
+    ownerId: request.auth.uid,
+    participantIds: [request.auth.uid],
   });
 
   // Ensure owner is added to participants subcollection
@@ -91,12 +100,15 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
     createdAt: FieldValue.serverTimestamp(),
   };
 
-  // Add optional author information if provided
+  // Add optional author information if provided.
+  // authorId is always taken from the authenticated session when available to
+  // prevent a client from attributing an argument to a different user's ID.
   if (authorName) {
     argumentData.authorName = authorName;
   }
-  if (authorId) {
-    argumentData.authorId = authorId;
+  const resolvedAuthorId = request.auth ? request.auth.uid : authorId;
+  if (resolvedAuthorId) {
+    argumentData.authorId = resolvedAuthorId;
   }
 
   await argumentRef.set(argumentData);
@@ -186,6 +198,10 @@ exports.voteArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
 });
 
 exports.toggleDecisionStatus = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
   const {decisionId, status} = request.data;
 
   if (!decisionId || !status) {
@@ -201,6 +217,10 @@ exports.toggleDecisionStatus = onCall({cors: true, enforceAppCheck: enforceAppCh
 
   if (!decisionDoc.exists) {
     throw new HttpsError("not-found", "Decision not found");
+  }
+
+  if (decisionDoc.data().ownerId !== request.auth.uid) {
+    throw new HttpsError("permission-denied", "Only the owner can change the decision status.");
   }
 
   await decisionRef.update({status: status});

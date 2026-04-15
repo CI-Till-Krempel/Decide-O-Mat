@@ -18,3 +18,10 @@ ui-debug.log*
 Thumbs.db
 frontend/playwright-report/
 frontend/test-results/
+frontend/test_output.txt
+
+# IAM policy files may contain real project IDs / email addresses.
+# Commit only sanitized template versions; never commit files with real values.
+# If you need to track real IAM state, use a private repo or GCP Console export.
+iam_policy.local.json
+iam_policy_v2.local.json
