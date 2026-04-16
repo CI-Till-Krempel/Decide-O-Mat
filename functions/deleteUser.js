@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 if (admin.apps.length === 0) {
   admin.initializeApp();
 }
+const db = admin.firestore();
 
 const animals = [
   "Alpaca", "Ant", "Anteater", "Antelope", "Armadillo", "Badger", "Bat", "Bear", "Beaver", "Bee",
@@ -33,7 +34,6 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
   }
 
   const uid = request.auth.uid;
-  const db = admin.firestore();
   const batch = db.batch();
   let operationCount = 0;
 
