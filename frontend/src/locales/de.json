@@ -2,17 +2,17 @@
   "home": {
     "title": "Decide-O-Mat",
     "subtitle": "Einfach entscheiden",
-    "description": "Ein Mensch trifft sch\u00e4tzungsweise zwischen 20.000 und 35.000 Entscheidungen pro Tag, wobei die meisten davon automatisch und unbewusst ablaufen. Nur etwa 5 % dieser Entscheidungen sind bewusst und erfordern eine sorgf\u00e4ltige Abw\u00e4gung, w\u00e4hrend die restlichen 95 % als sogenannte \u201eMikroentscheidungen\u201c schnell und oft ohne Nachdenken getroffen werden.",
+    "description": "Ein Mensch trifft schätzungsweise zwischen 20.000 und 35.000 Entscheidungen pro Tag, wobei die meisten davon automatisch und unbewusst ablaufen. Nur etwa 5 % dieser Entscheidungen sind bewusst und erfordern eine sorgfältige Abwägung, während die restlichen 95 % als sogenannte „Mikroentscheidungen“ schnell und oft ohne Nachdenken getroffen werden.",
     "inputPlaceholder": "Gib hier deine Frage ein",
-    "inputLabel": "Zur Kl\u00e4rung stehende Frage",
+    "inputLabel": "Zur Klärung stehende Frage",
     "buttonStart": "Entscheidung starten",
     "buttonStarting": "Wird erstellt...",
     "errorCreateFailed": "Entscheidung konnte nicht erstellt werden. Bitte versuche es erneut.",
-    "clearAlt": "L\u00f6schen"
+    "clearAlt": "Löschen"
   },
   "decision": {
     "notFound": "Entscheidung nicht gefunden",
-    "decryptionFailed": "[Entschl\u00fcsselung fehlgeschlagen]",
+    "decryptionFailed": "[Entschlüsselung fehlgeschlagen]",
     "participantsButton": "Teilnehmer",
     "votingTitle": "Finale Abstimmung",
     "voteYes": "Ja",
@@ -22,8 +22,8 @@
     "anonymous": "Anonym",
     "copyLinkButton": "Link kopieren",
     "copyLinkSuccess": "Link kopiert!",
-    "closeDecisionButton": "Entscheidung schlie\u00dfen",
-    "reopenDecisionButton": "Entscheidung \u00f6ffnen",
+    "closeDecisionButton": "Entscheidung schließen",
+    "reopenDecisionButton": "Entscheidung öffnen",
     "exportButton": "Als Bild exportieren",
     "decisionClosed": "Entscheidung geschlossen: {{result}}",
     "resultApproved": "Angenommen",
@@ -31,12 +31,12 @@
     "resultNoVotes": "Keine Stimmen",
     "statistics": "Statistiken",
     "argumentLabel": "Argument",
-    "voteBalance": "Stimmenverh\u00e4ltnis",
+    "voteBalance": "Stimmenverhältnis",
     "argumentScore": "Argument-Score",
     "notifications": {
       "enableButton": "Benachrichtigungen aktivieren",
       "enabled": "Benachrichtigungen aktiviert!",
-      "failed": "Benachrichtigungen konnten nicht aktiviert werden. Bitte pr\u00fcfe deine Browser-Einstellungen."
+      "failed": "Benachrichtigungen konnten nicht aktiviert werden. Bitte prüfe deine Browser-Einstellungen."
     },
     "editQuestion": "Frage bearbeiten",
     "deleteDecision": "Entscheidung löschen",
@@ -54,7 +54,7 @@
   "myDecisions": {
     "title": "Meine Entscheidungen",
     "runningTitle": "Welche Entscheidungen laufen gerade?",
-    "archiveTitle": "Alle Aktivit\u00e4ten",
+    "archiveTitle": "Alle Aktivitäten",
     "loading": "Wird geladen...",
     "loginPrompt": "Bitte melde dich an, um deine Entscheidungen zu sehen.",
     "empty": "Du hast noch keine Entscheidungen erstellt oder daran teilgenommen.",
@@ -75,33 +75,33 @@
     }
   },
   "login": {
-    "titleWelcome": "Willkommen zur\u00fcck",
+    "titleWelcome": "Willkommen zurück",
     "titleRegister": "Konto erstellen",
-    "titleReset": "Passwort zur\u00fccksetzen",
+    "titleReset": "Passwort zurücksetzen",
     "tabSignIn": "Anmelden",
     "tabRegister": "Registrieren",
     "labelEmail": "E-Mail",
     "labelPassword": "Passwort",
     "placeholderEmail": "du@beispiel.de",
     "placeholderPassword": "Passwort eingeben",
-    "linkAccountCheckbox": "Mit meinem aktuellen Gastkonto verkn\u00fcpfen",
+    "linkAccountCheckbox": "Mit meinem aktuellen Gastkonto verknüpfen",
     "buttonSignIn": "Anmelden",
     "buttonCreateAccount": "Konto erstellen",
-    "buttonSendReset": "Link zum Zur\u00fccksetzen senden",
+    "buttonSendReset": "Link zum Zurücksetzen senden",
     "buttonProcessing": "Wird verarbeitet...",
     "forgotPassword": "Passwort vergessen?",
-    "backToLogin": "Zur\u00fcck zur Anmeldung",
+    "backToLogin": "Zurück zur Anmeldung",
     "dividerOr": "ODER",
     "googleSignIn": "Mit Google anmelden",
     "googleSignUp": "Mit Google registrieren",
-    "resetMessage": "Pr\u00fcfe deine E-Mail f\u00fcr weitere Anweisungen.",
+    "resetMessage": "Prüfe deine E-Mail für weitere Anweisungen.",
     "errors": {
       "genericFailed": "Aktion fehlgeschlagen.",
       "wrongPassword": "Falsches Passwort.",
       "userNotFound": "Kein Konto mit dieser E-Mail gefunden.",
       "emailInUse": "E-Mail wird bereits verwendet.",
       "weakPassword": "Passwort ist zu schwach.",
-      "invalidEmail": "Ung\u00fcltige E-Mail-Adresse.",
+      "invalidEmail": "Ungültige E-Mail-Adresse.",
       "googleFailed": "Anmeldung mit Google fehlgeschlagen."
     }
   },
@@ -109,57 +109,300 @@
     "processing": "Wird verarbeitet...",
     "confirmTitle": "Konto wechseln?",
     "confirmCurrentUser": "Du bist derzeit angemeldet als:",
-    "confirmWarning": "Dieser Link \u00fcberschreibt deine aktuelle Sitzung auf diesem Ger\u00e4t.",
+    "confirmWarning": "Dieser Link überschreibt deine aktuelle Sitzung auf diesem Gerät.",
     "buttonCancel": "Abbrechen",
     "buttonConfirm": "Ja, wechseln",
     "successTitle": "Transfer erfolgreich!",
-    "successMessage": "Du bist jetzt mit deiner urspr\u00fcnglichen Identit\u00e4t angemeldet.",
+    "successMessage": "Du bist jetzt mit deiner ursprünglichen Identität angemeldet.",
     "redirecting": "Weiterleitung...",
     "errorTitle": "Transfer fehlgeschlagen",
-    "errorMessage": "Der Link ist m\u00f6glicherweise ung\u00fcltig oder abgelaufen.",
+    "errorMessage": "Der Link ist möglicherweise ungültig oder abgelaufen.",
     "buttonGoHome": "Zur Startseite"
   },
   "header": {
     "appName": "Decide-O-Mat",
     "navDecision": "Entscheidung",
-    "navActivities": "Aktivit\u00e4ten",
+    "navActivities": "Aktivitäten",
     "navLogin": "Anmelden"
   },
   "footer": {
-    "encrypted": "Ende-zu-Ende-verschl\u00fcsselt",
-    "unencrypted": "Unverschl\u00fcsselt ({{env}})",
+    "encrypted": "Ende-zu-Ende-verschlüsselt",
+    "unencrypted": "Unverschlüsselt ({{env}})",
     "termsOfService": "AGB",
     "privacyPolicy": "Datenschutz",
     "imprint": "Impressum"
   },
   "legal": {
-    "placeholder": "Diese Seite befindet sich im Aufbau. Inhalte werden in K\u00fcrze verf\u00fcgbar sein."
+    "lastUpdatedLabel": "Zuletzt aktualisiert",
+    "terms": {
+      "lastUpdated": "15. April 2026",
+      "sections": [
+        {
+          "heading": "1. Geltungsbereich",
+          "paragraphs": [
+            "Mit der Nutzung von Decide-O-Mat (\"Dienst\") erklären Sie sich mit diesen Nutzungsbedingungen (\"Bedingungen\") einverstanden. Wenn Sie den Bedingungen nicht zustimmen, dürfen Sie den Dienst nicht nutzen.",
+            "Der Dienst wird von der im Impressum genannten Privatperson (\"Betreiber\") angeboten."
+          ]
+        },
+        {
+          "heading": "2. Leistungsbeschreibung",
+          "paragraphs": [
+            "Decide-O-Mat ist eine Webanwendung zur kollaborativen Entscheidungsfindung mittels Pro/Contra-Argumentenlisten. Nutzer können Entscheidungen erstellen, Argumente hinzufügen, darüber abstimmen und Ergebnisse per Link teilen.",
+            "Der Dienst wird kostenlos und ohne Gewährleistung der dauerhaften Verfügbarkeit oder Eignung für einen bestimmten Zweck bereitgestellt."
+          ]
+        },
+        {
+          "heading": "3. Nutzerkonten und Nutzungsvoraussetzungen",
+          "paragraphs": [
+            "Sie können den Dienst anonym ohne Registrierung nutzen. Ihre anonyme Identität wird lokal im Browser-Speicher Ihres Geräts gespeichert.",
+            "Wenn Sie ein verifiziertes Konto erstellen (E-Mail/Passwort oder Google-Anmeldung), müssen Sie mindestens 16 Jahre alt sein und wahrheitsgemäße Angaben machen.",
+            "Sie sind allein für die Vertraulichkeit Ihrer Zugangsdaten verantwortlich. Der Betreiber haftet nicht für unbefugte Zugriffe, die auf eine mangelnde Sicherung Ihrer Zugangsdaten zurückzuführen sind."
+          ]
+        },
+        {
+          "heading": "4. Nutzungspflichten",
+          "paragraphs": [
+            "Es ist Ihnen untersagt:"
+          ],
+          "items": [
+            "Den Dienst für rechtswidrige Zwecke oder unter Verstoß gegen geltendes Recht zu nutzen",
+            "Inhalte einzustellen, die diffamierend, belästigend, obszön oder rechtsverletzend sind",
+            "Sicherheitsmechanismen des Dienstes zu umgehen, zu manipulieren oder zu reverse-engineeren",
+            "Automatisierte Tools oder Bots ohne ausdrückliche Genehmigung zu verwenden",
+            "Andere Personen oder Einrichtungen zu imitieren"
+          ]
+        },
+        {
+          "heading": "5. Nutzerinhalte",
+          "paragraphs": [
+            "Sie behalten das Eigentum an den von Ihnen eingestellten Inhalten (Entscheidungen, Argumente). Mit dem Einstellen gewähren Sie dem Betreiber eine beschränkte, nicht-exklusive Lizenz, diese Inhalte ausschließlich zur Bereitstellung des Dienstes zu speichern und zu verarbeiten.",
+            "Entscheidungsinhalte werden Ende-zu-Ende-verschlüsselt, wobei der Schlüssel im Freigabe-Link eingebettet ist. Der Betreiber kann diese Inhalte nicht einsehen.",
+            "Der Betreiber überprüft oder moderiert keine Nutzerinhalte und übernimmt dafür keine Verantwortung. Sie sind allein für die von Ihnen erstellten Inhalte verantwortlich."
+          ]
+        },
+        {
+          "heading": "6. Gewährleistungsausschluss",
+          "paragraphs": [
+            "DER DIENST WIRD „WIE GESEHEN“ UND „WIE VERFÜGBAR“ OHNE JEGLICHE AUSDRÜCKLICHE ODER STILLSCHWEIGENDE GEWÄHRLEISTUNG BEREITGESTELLT, EINSCHLIEßLICH GEWÄHRLEISTUNGEN DER MARKTGÄNGIGKEIT, EIGNUNG FÜR EINEN BESTIMMTEN ZWECK, GENAUIGKEIT ODER NICHTVERLETZUNG VON RECHTEN DRITTER.",
+            "DER BETREIBER ÜBERNIMMT KEINE GEWÄHR DAFÜR, DASS DER DIENST UNUNTERBROCHEN, SICHER, FEHLERFREI ODER FREI VON SCHÄDLICHEN KOMPONENTEN IST."
+          ]
+        },
+        {
+          "heading": "7. Haftungsbeschränkung",
+          "paragraphs": [
+            "SOWEIT GESETZLICH ZULÄSSIG, HAFTET DER BETREIBER NICHT FÜR INDIREKTE, ZUFÄLLIGE, BESONDERE, FOLGE- ODER STRAFSCHÄDEN, EINSCHLIEßLICH DATENVERLUST, ENTGANGENEM GEWINN ODER GESCHÄFTSAUSFALL, DIE AUS ODER IM ZUSAMMENHANG MIT DER NUTZUNG ODER UNMÖGLICHKEIT DER NUTZUNG DES DIENSTES ENTSTEHEN.",
+            "SOWEIT DIE HAFTUNG GESETZLICH NICHT AUSGESCHLOSSEN WERDEN KANN, IST DIE GESAMTHAFTUNG DES BETREIBERS AUF EINEN BETRAG VON 10 € (ZEHN EURO) BEGRENZT.",
+            "Diese Beschränkung gilt unabhängig von der Rechtsgrundlage (Vertrag, unerlaubte Handlung, verschuldensunabhängige Haftung o. Ä.) und auch dann, wenn der Betreiber auf die Möglichkeit solcher Schäden hingewiesen wurde."
+          ]
+        },
+        {
+          "heading": "8. Verfügbarkeit des Dienstes",
+          "paragraphs": [
+            "Der Betreiber behält sich vor, den Dienst ganz oder teilweise jederzeit und ohne Vorankündigung zu ändern, auszusetzen oder einzustellen. Der Betreiber haftet weder Ihnen noch Dritten gegenüber für derartige Änderungen, Unterbrechungen oder Einstellungen."
+          ]
+        },
+        {
+          "heading": "9. Drittanbieterdienste",
+          "paragraphs": [
+            "Der Dienst nutzt Infrastruktur von Drittanbietern, insbesondere Google Firebase (Authentifizierung, Datenbank, Hosting) und Google ReCAPTCHA Enterprise (Spam-Schutz). Diese Dienste unterliegen deren eigenen Nutzungsbedingungen und Datenschutzrichtlinien. Der Betreiber ist nicht für Handlungen oder Unterlassungen dieser Drittanbieter verantwortlich."
+          ]
+        },
+        {
+          "heading": "10. Änderungen dieser Bedingungen",
+          "paragraphs": [
+            "Der Betreiber kann diese Bedingungen jederzeit aktualisieren. Die überarbeiteten Bedingungen werden mit einem aktualisierten Datum auf dieser Seite veröffentlicht. Die fortgesetzte Nutzung des Dienstes nach Inkrafttreten der Änderungen gilt als Zustimmung zu den neuen Bedingungen."
+          ]
+        },
+        {
+          "heading": "11. Kündigung",
+          "paragraphs": [
+            "Der Betreiber kann Ihren Zugang zum Dienst jederzeit und ohne Vorankündigung oder Haftung sperren oder beenden, wenn er der Ansicht ist, dass Sie gegen diese Bedingungen oder geltendes Recht verstoßen. Sie können den Dienst jederzeit ohne Angabe von Gründen einstellen zu nutzen."
+          ]
+        },
+        {
+          "heading": "12. Anwendbares Recht und Gerichtsstand",
+          "paragraphs": [
+            "Diese Bedingungen unterliegen ausschließlich dem Recht der Bundesrepublik Deutschland unter Ausschluss des Kollisionsrechts und des UN-Kaufrechts (CISG).",
+            "Als ausschließlicher Gerichtsstand für alle Streitigkeiten aus oder im Zusammenhang mit diesen Bedingungen gilt der Wohnsitz des Betreibers, soweit dies gesetzlich zulässig ist."
+          ]
+        },
+        {
+          "heading": "13. Kontakt",
+          "paragraphs": [
+            "Bei Fragen zu diesen Bedingungen wenden Sie sich bitte an die im Impressum angegebenen Kontaktdaten."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "lastUpdated": "15. April 2026",
+      "sections": [
+        {
+          "heading": "1. Verantwortlicher",
+          "paragraphs": [
+            "Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist die im Impressum genannte Privatperson. Die Kontaktdaten finden Sie dort."
+          ]
+        },
+        {
+          "heading": "2. Verarbeitete Daten",
+          "paragraphs": [
+            "Anonyme Nutzer: Bei der Nutzung ohne registriertes Konto verarbeiten wir eine Firebase Anonymous Authentication UID (im Browser-Lokalspeicher und in unserer Datenbank gespeichert), Ihren gewählten Anzeigenamen (Ende-zu-Ende-verschlüsselt) sowie Ihre Argumente und Stimmen (Ende-zu-Ende-verschlüsselt). Technische Anfragedaten (IP-Adresse, Browser-Typ, Zeitstempel) werden von unserem Infrastrukturanbieter zu Sicherheitszwecken transient verarbeitet.",
+            "Registrierte Nutzer: Bei Erstellung eines Kontos verarbeiten wir zusätzlich Ihre E-Mail-Adresse (über Firebase Authentication) sowie bei Google-Anmeldung die von Google bereitgestellten Profildaten (Name, Profilbild).",
+            "ReCAPTCHA Enterprise: Wir verwenden Google ReCAPTCHA Enterprise für den Bot-Schutz (Firebase App Check). Dieser Dienst kann Browser-Eigenschaften und Verhaltenssignale verarbeiten. Weitere Informationen finden Sie in der Datenschutzerklärung von Google.",
+            "Firebase Hosting: Statische Inhalte werden über Firebase Hosting ausgeliefert. IP-Adressen können von Googles Infrastruktur transient protokolliert werden."
+          ]
+        },
+        {
+          "heading": "3. Rechtsgrundlagen der Verarbeitung",
+          "paragraphs": [
+            "Vertragserfüllung / vorvertragliche Maßnahmen (Art. 6 Abs. 1 lit. b DSGVO): Verarbeitung, die zur Bereitstellung des von Ihnen angeforderten Dienstes erforderlich ist.",
+            "Berechtigte Interessen (Art. 6 Abs. 1 lit. f DSGVO): Sicherheit, Betrugsbekämpfung und technische Integrität des Dienstes.",
+            "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO): Soweit Sie ausdrücklich eingewilligt haben, z. B. durch die Erstellung eines registrierten Kontos."
+          ]
+        },
+        {
+          "heading": "4. Speicherdauer",
+          "paragraphs": [
+            "Entscheidungsinhalte (Fragen, Argumente, Stimmen) werden gespeichert, bis der Ersteller die Entscheidung oder sein Konto löscht.",
+            "Anonyme UIDs werden im Browser-Lokalspeicher gespeichert und gelöscht, wenn Sie Ihre Browser-Daten leeren.",
+            "Registrierte Kontodaten werden gespeichert, bis Sie die Kontolöschung über die App-Einstellungen beantragen.",
+            "Bei Kontolöschung werden Ihre Stimmen anonymisiert (der Stimmenwert bleibt ohne Personenbezug erhalten), um die Integrität der Entscheidungen zu wahren, an denen Sie teilgenommen haben. Alle anderen personenbezogenen Daten werden gelöscht.",
+            "Infrastrukturprotokolle unterliegen den Aufbewahrungsrichtlinien von Google."
+          ]
+        },
+        {
+          "heading": "5. Internationale Datenübermittlung",
+          "paragraphs": [
+            "Wir verwenden Google Firebase-Dienste. Google LLC hat seinen Sitz in den USA. Datenübermittlungen in die USA sind durch die Standardvertragsklauseln (SCCs) von Google gemäß Art. 46 DSGVO abgesichert.",
+            "In Cloud Firestore gespeicherte Entscheidungsinhalte werden in der Region europe-west4 (Niederlande, EU) gehostet und verlassen die EU nicht. Die Inhalte sind zusätzlich durch Ende-zu-Ende-Verschlüsselung geschützt."
+          ]
+        },
+        {
+          "heading": "6. Ende-zu-Ende-Verschlüsselung",
+          "paragraphs": [
+            "Entscheidungsinhalte (Fragen, Argumente, Anzeigenamen) werden in Ihrem Browser verschlüsselt, bevor sie an unsere Server übertragen werden. Der Verschlüsselungsschlüssel ist im URL-Hash des Freigabe-Links eingebettet und wird niemals an unsere Server gesendet.",
+            "Der Betreiber kann keine Entscheidungsinhalte einsehen, lesen oder entschlüsseln. Nur Nutzer, die den Freigabe-Link besitzen, können die Inhalte entschlüsseln."
+          ]
+        },
+        {
+          "heading": "7. Ihre Rechte nach der DSGVO",
+          "paragraphs": [
+            "Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:"
+          ],
+          "items": [
+            "Auskunftsrecht (Art. 15 DSGVO): Auskunft über die bei uns gespeicherten Daten.",
+            "Recht auf Berichtigung (Art. 16 DSGVO): Berichtigung unrichtiger personenbezogener Daten.",
+            "Recht auf Löschung (Art. 17 DSGVO): Löschung Ihrer Daten – nutzen Sie die Kontolöschfunktion in der App oder kontaktieren Sie uns.",
+            "Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO): Einschränkung der Verarbeitung unter bestimmten Voraussetzungen.",
+            "Recht auf Datenübertragbarkeit (Art. 20 DSGVO): Erhalt Ihrer Daten in einem strukturierten, gängigen, maschinenlesbaren Format.",
+            "Widerspruchsrecht (Art. 21 DSGVO): Widerspruch gegen Verarbeitung auf Basis berechtigter Interessen.",
+            "Recht auf Widerruf der Einwilligung (Art. 7 Abs. 3 DSGVO): Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft.",
+            "Beschwerderecht: Sie haben das Recht, sich bei der zuständigen Datenschutzbehörde Ihres EU-Mitgliedstaats zu beschweren."
+          ]
+        },
+        {
+          "heading": "8. Datensicherheit",
+          "paragraphs": [
+            "Wir setzen geeignete technische und organisatorische Maßnahmen zum Schutz Ihrer Daten ein, darunter Ende-zu-Ende-Verschlüsselung der Entscheidungsinhalte, Firebase App Check (Bot-Schutz) und HTTPS-Transportverschlüsselung.",
+            "Keine Übertragung über das Internet kann als 100 % sicher garantiert werden. Wir können keine absolute Sicherheit Ihrer Daten gewährleisten."
+          ]
+        },
+        {
+          "heading": "9. Datenschutz für Minderjährige",
+          "paragraphs": [
+            "Der Dienst richtet sich nicht an Kinder unter 16 Jahren. Wir erheben wissentlich keine personenbezogenen Daten von Kindern unter 16 Jahren. Sollten Sie der Ansicht sein, dass wir versehentlich solche Daten erhoben haben, kontaktieren Sie uns bitte umgehend, damit wir diese löschen können."
+          ]
+        },
+        {
+          "heading": "10. Änderungen dieser Datenschutzerklärung",
+          "paragraphs": [
+            "Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Die aktualisierte Erklärung wird mit einem geänderten Datum auf dieser Seite veröffentlicht. Die fortgesetzte Nutzung des Dienstes nach Inkrafttreten der Änderungen gilt als Zustimmung zur aktualisierten Erklärung."
+          ]
+        },
+        {
+          "heading": "11. Kontakt und Beschwerden",
+          "paragraphs": [
+            "Für datenschutzbezogene Anfragen und zur Ausübung Ihrer Rechte verwenden Sie bitte die im Impressum angegebenen Kontaktdaten.",
+            "Sie können sich auch an die zuständige Datenschutzaufsichtsbehörde wenden. In Deutschland ist dies die Landesdatenschutzbehörde des Bundeslandes, in dem der Betreiber seinen Wohnsitz hat."
+          ]
+        }
+      ]
+    },
+    "imprint": {
+      "sections": [
+        {
+          "heading": "Angaben gemäß § 5 TMG",
+          "address": [
+            "Till Krempel",
+            "[Straße und Hausnummer]",
+            "[PLZ] [Stadt]",
+            "Deutschland"
+          ]
+        },
+        {
+          "heading": "Kontakt",
+          "paragraphs": [
+            "E-Mail: [ihre-email@example.com]"
+          ]
+        },
+        {
+          "heading": "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV",
+          "address": [
+            "Till Krempel",
+            "[Straße und Hausnummer]",
+            "[PLZ] [Stadt]",
+            "Deutschland"
+          ]
+        },
+        {
+          "heading": "EU-Streitschlichtung",
+          "paragraphs": [
+            "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: https://ec.europa.eu/consumers/odr/",
+            "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+          ]
+        },
+        {
+          "heading": "Haftung für Inhalte",
+          "paragraphs": [
+            "Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.",
+            "Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen."
+          ]
+        },
+        {
+          "heading": "Haftung für Links",
+          "paragraphs": [
+            "Unser Dienst enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.",
+            "Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen."
+          ]
+        }
+      ]
+    }
   },
   "addArgumentForm": {
-    "placeholderPro": "Pro hinzuf\u00fcgen...",
-    "placeholderCon": "Kontra hinzuf\u00fcgen...",
-    "buttonAdd": "Hinzuf\u00fcgen",
-    "clearLabel": "L\u00f6schen",
-    "errorFailed": "Argument konnte nicht hinzugef\u00fcgt werden. Bitte versuche es erneut."
+    "placeholderPro": "Pro hinzufügen...",
+    "placeholderCon": "Kontra hinzufügen...",
+    "buttonAdd": "Hinzufügen",
+    "clearLabel": "Löschen",
+    "errorFailed": "Argument konnte nicht hinzugefügt werden. Bitte versuche es erneut."
   },
   "argumentItem": {
     "statementBy": "Statement von {{name}}",
     "yourStatement": "Dein Statement",
     "approvalFrom": "Zustimmung von",
-    "addedBy": "Hinzugef\u00fcgt von {{name}}",
+    "addedBy": "Hinzugefügt von {{name}}",
     "errorVoteFailed": "Abstimmung fehlgeschlagen. Bitte versuche es erneut."
   },
   "argumentList": {
     "titlePros": "Pro",
     "titleCons": "Kontra",
-    "addPro": "Pro hinzuf\u00fcgen",
-    "addCon": "Kontra hinzuf\u00fcgen",
+    "addPro": "Pro hinzufügen",
+    "addCon": "Kontra hinzufügen",
     "noPros": "Noch keine Pro-Argumente. Sei der Erste!",
     "noCons": "Noch keine Kontra-Argumente. Sei der Erste!"
   },
   "namePrompt": {
-    "title": "Wie hei\u00dft du?",
-    "description": "Dein Name wird bei deinen Beitr\u00e4gen angezeigt, damit andere dich erkennen k\u00f6nnen.",
+    "title": "Wie heißt du?",
+    "description": "Dein Name wird bei deinen Beiträgen angezeigt, damit andere dich erkennen können.",
     "placeholder": "Deinen Namen eingeben",
     "buttonCancel": "Abbrechen",
     "buttonSave": "Speichern"
@@ -170,7 +413,7 @@
     "unknown": "Unbekannt",
     "statusAnonymous": "Anonym",
     "statusVerified": "Verifiziert",
-    "helpAnonymous": "Anonyme Konten sind tempor\u00e4r.",
+    "helpAnonymous": "Anonyme Konten sind temporär.",
     "helpVerified": "Verifizierte Konten sind dauerhaft."
   },
   "userSettings": {
@@ -178,42 +421,42 @@
     "youAre": "Du bist",
     "buttonLogin": "Anmelden",
     "buttonLogout": "Abmelden",
-    "buttonDelete": "L\u00f6schen",
-    "buttonClose": "Schlie\u00dfen",
+    "buttonDelete": "Löschen",
+    "buttonClose": "Schließen",
     "editTitle": "Namen bearbeiten",
     "editPlaceholder": "Deinen Namen eingeben",
     "buttonCancel": "Abbrechen",
     "buttonSave": "Speichern",
-    "resetTitle": "Name zur\u00fccksetzen?",
-    "resetDescription": "Dein Anzeigename wird auf deine urspr\u00fcngliche anonyme Identit\u00e4t zur\u00fcckgesetzt:",
-    "resetOriginal": "Urspr\u00fcnglicher Name",
-    "deleteTitle": "Konto l\u00f6schen?",
-    "deleteWarning": "Diese Aktion ist unwiderruflich. Auch wir k\u00f6nnen sie nicht r\u00fcckg\u00e4ngig machen.",
-    "deleteVotesWarning": "Deine Stimmen werden anonymisiert, um die Entscheidungsintegrit\u00e4t zu wahren.",
-    "deletePasswordLabel": "Passwort best\u00e4tigen:",
-    "deleteError": "Konto konnte nicht gel\u00f6scht werden. Passwort pr\u00fcfen.",
-    "helpTitle": "Anonyme Identit\u00e4t",
-    "helpDescription": "Du nimmst anonym teil. Deine Identit\u00e4t ist sicher auf diesem Ger\u00e4t gespeichert.",
-    "helpCipher": "Dein Anzeigename ist Ende-zu-Ende-verschl\u00fcsselt. Nur Personen mit dem Link-Schl\u00fcssel k\u00f6nnen ihn sehen.",
-    "helpNoLogin": "Du brauchst kein Konto. Wir haben dich \u00fcber eine sichere ID gespeichert.",
-    "helpTransfer": "Verwende den Transfer-Button, um deine Identit\u00e4t auf ein anderes Ger\u00e4t zu \u00fcbertragen.",
-    "titleTransfer": "Identit\u00e4t \u00fcbertragen",
-    "buttonReset": "Zur\u00fccksetzen",
-    "buttonTransfer": "\u00dcbertragen",
+    "resetTitle": "Name zurücksetzen?",
+    "resetDescription": "Dein Anzeigename wird auf deine ursprüngliche anonyme Identität zurückgesetzt:",
+    "resetOriginal": "Ursprünglicher Name",
+    "deleteTitle": "Konto löschen?",
+    "deleteWarning": "Diese Aktion ist unwiderruflich. Auch wir können sie nicht rückgängig machen.",
+    "deleteVotesWarning": "Deine Stimmen werden anonymisiert, um die Entscheidungsintegrität zu wahren.",
+    "deletePasswordLabel": "Passwort bestätigen:",
+    "deleteError": "Konto konnte nicht gelöscht werden. Passwort prüfen.",
+    "helpTitle": "Anonyme Identität",
+    "helpDescription": "Du nimmst anonym teil. Deine Identität ist sicher auf diesem Gerät gespeichert.",
+    "helpCipher": "Dein Anzeigename ist Ende-zu-Ende-verschlüsselt. Nur Personen mit dem Link-Schlüssel können ihn sehen.",
+    "helpNoLogin": "Du brauchst kein Konto. Wir haben dich über eine sichere ID gespeichert.",
+    "helpTransfer": "Verwende den Transfer-Button, um deine Identität auf ein anderes Gerät zu übertragen.",
+    "titleTransfer": "Identität übertragen",
+    "buttonReset": "Zurücksetzen",
+    "buttonTransfer": "Übertragen",
     "buttonHelp": "Hilfe",
     "editNameButton": "Name bearbeiten",
     "avatarAlt": "Profilbild",
-    "helpCipherLabel": "Verschl\u00fcsselung",
+    "helpCipherLabel": "Verschlüsselung",
     "helpNoLoginLabel": "Kein Login",
-    "helpTransferLabel": "\u00dcbertragen"
+    "helpTransferLabel": "Übertragen"
   },
   "magicLinkData": {
-    "title": "Identit\u00e4t \u00fcbertragen",
-    "description": "Deine anonyme Identit\u00e4t und Stimmen auf ein anderes Ger\u00e4t \u00fcbertragen.",
+    "title": "Identität übertragen",
+    "description": "Deine anonyme Identität und Stimmen auf ein anderes Gerät übertragen.",
     "buttonGenerate": "Magic Link erstellen",
     "buttonCopy": "Link kopieren",
     "buttonCopied": "Kopiert!",
-    "warning": "ACHTUNG: Teile diesen Link nicht. Er gew\u00e4hrt vollen Zugriff auf dein Konto.",
+    "warning": "ACHTUNG: Teile diesen Link nicht. Er gewährt vollen Zugriff auf dein Konto.",
     "errorFailed": "Link konnte nicht erstellt werden. Bitte versuche es erneut."
   },
   "common": {
@@ -221,11 +464,11 @@
     "error": "Ein Fehler ist aufgetreten.",
     "cancel": "Abbrechen",
     "save": "Speichern",
-    "close": "Schlie\u00dfen",
-    "confirm": "Best\u00e4tigen",
-    "delete": "L\u00f6schen",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
     "edit": "Bearbeiten",
-    "back": "Zur\u00fcck",
+    "back": "Zurück",
     "pageNotFound": "Seite nicht gefunden"
   }
 }
