@@ -105,7 +105,7 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
   // prevent a client from attributing an argument to a different user's ID.
   if (authorName) {
     argumentData.authorName = authorName;
-  }
+  const resolvedAuthorId = request.auth?.uid;
     const resolvedAuthorId = request.auth.uid;
   if (resolvedAuthorId) {
     argumentData.authorId = resolvedAuthorId;
