@@ -70,6 +70,10 @@ exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
  * @return {Promise<Object>} The created argument ID.
  */
 exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
   const {decisionId, type, text, authorName} = request.data;
 
   if (!decisionId || !type || !text) {
@@ -93,29 +97,23 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
 
   const argumentRef = decisionRef.collection("arguments").doc();
 
+  // authorId is always taken from the authenticated session to prevent a client
+  // from attributing an argument to a different user's ID.
   const argumentData = {
     type,
     text: text.trim(),
     votes: 0,
     createdAt: FieldValue.serverTimestamp(),
+    authorId: request.auth.uid,
   };
 
-  // Add optional author information if provided.
-  // authorId is always taken from the authenticated session when available to
-  // prevent a client from attributing an argument to a different user's ID.
   if (authorName) {
     argumentData.authorName = authorName;
-    if (request.auth) {
-      argumentData.authorId = request.auth.uid;
-    }
   }
 
   await argumentRef.set(argumentData);
 
-  // Ensure author is added to participants subcollection
-  if (request.auth) {
-    await ensureParticipant(db, decisionId, request.auth.uid, request.auth, authorName);
-  }
+  await ensureParticipant(db, decisionId, request.auth.uid, request.auth, authorName);
 
   return {id: argumentRef.id};
 });

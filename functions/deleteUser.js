@@ -1,5 +1,6 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+const {FieldValue} = require("firebase-admin/firestore");
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -85,11 +86,36 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
     const votesSnapshot = await votesQuery.get();
 
     for (const docSnap of votesSnapshot.docs) {
-      batch.update(docSnap.ref, {displayName: deletedName});
+      batch.update(docSnap.ref, {displayName: deletedName, userId: "deleted"});
       operationCount++;
       if (operationCount >= BATCH_LIMIT) {
         batch = await flushBatch(batch);
         operationCount = 0;
+      }
+    }
+
+    // C. Participant Records
+    // Anonymize the display name and remove device-linked PII (FCM token, photo).
+    // We query by participantIds on the decision document because participant
+    // sub-documents use the userId as their document ID (no userId field to index).
+    const decisionsSnapshot = await db.collection("decisions")
+        .where("participantIds", "array-contains", uid)
+        .get();
+
+    for (const decisionDoc of decisionsSnapshot.docs) {
+      const participantRef = decisionDoc.ref.collection("participants").doc(uid);
+      const participantDoc = await participantRef.get();
+      if (participantDoc.exists) {
+        batch.update(participantRef, {
+          plainDisplayName: deletedName,
+          fcmToken: FieldValue.delete(),
+          photoURL: FieldValue.delete(),
+        });
+        operationCount++;
+        if (operationCount >= BATCH_LIMIT) {
+          batch = await flushBatch(batch);
+          operationCount = 0;
+        }
       }
     }
 
