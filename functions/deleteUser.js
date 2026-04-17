@@ -1,5 +1,6 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+const {FieldValue} = require("firebase-admin/firestore");
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -34,8 +35,13 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
 
   const uid = request.auth.uid;
   const db = admin.firestore();
-  const batch = db.batch();
-  let operationCount = 0;
+  const BATCH_LIMIT = 490;
+
+  // Helper: commit the current batch and return a fresh one.
+  const flushBatch = async (b) => {
+    await b.commit();
+    return db.batch();
+  };
 
   try {
     // 2. Determine "Deleted Name"
@@ -55,47 +61,73 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
         hash |= 0; // Convert to 32bit integer
       }
       const index = Math.abs(hash) % animals.length;
-      const randomAnimal = animals[index];
-      deletedName = `Deleted ${randomAnimal}`;
+      deletedName = `Deleted ${animals[index]}`;
     }
 
     // 3. Find and Anonymize Data (Collection Group Queries)
+    let batch = db.batch();
+    let operationCount = 0;
 
     // A. Final Votes
     const finalVotesQuery = db.collectionGroup("finalVotes").where("userId", "==", uid);
     const finalVotesSnapshot = await finalVotesQuery.get();
 
-    finalVotesSnapshot.forEach((doc) => {
-      batch.update(doc.ref, {
-        displayName: deletedName,
-        userId: "deleted",
-      });
+    for (const docSnap of finalVotesSnapshot.docs) {
+      batch.update(docSnap.ref, {displayName: deletedName, userId: "deleted"});
       operationCount++;
-    });
+      if (operationCount >= BATCH_LIMIT) {
+        batch = await flushBatch(batch);
+        operationCount = 0;
+      }
+    }
 
     // B. Argument Votes
     const votesQuery = db.collectionGroup("votes").where("userId", "==", uid);
     const votesSnapshot = await votesQuery.get();
 
-    votesSnapshot.forEach((doc) => {
-      batch.update(doc.ref, {
-        displayName: deletedName,
-      });
+    for (const docSnap of votesSnapshot.docs) {
+      batch.update(docSnap.ref, {displayName: deletedName, userId: "deleted"});
       operationCount++;
-    });
-
-    // Commit Anonymization
-    if (operationCount > 0) {
-      if (operationCount > 490) {
-        // Simple chunking strategy not implemented yet.
+      if (operationCount >= BATCH_LIMIT) {
+        batch = await flushBatch(batch);
+        operationCount = 0;
       }
+    }
+
+    // C. Participant Records
+    // Anonymize the display name and remove device-linked PII (FCM token, photo).
+    // We query by participantIds on the decision document because participant
+    // sub-documents use the userId as their document ID (no userId field to index).
+    const decisionsSnapshot = await db.collection("decisions")
+        .where("participantIds", "array-contains", uid)
+        .get();
+
+    for (const decisionDoc of decisionsSnapshot.docs) {
+      const participantRef = decisionDoc.ref.collection("participants").doc(uid);
+      const participantDoc = await participantRef.get();
+      if (participantDoc.exists) {
+        batch.update(participantRef, {
+          plainDisplayName: deletedName,
+          fcmToken: FieldValue.delete(),
+          photoURL: FieldValue.delete(),
+        });
+        operationCount++;
+        if (operationCount >= BATCH_LIMIT) {
+          batch = await flushBatch(batch);
+          operationCount = 0;
+        }
+      }
+    }
+
+    // Commit any remaining operations
+    if (operationCount > 0) {
       await batch.commit();
     }
 
-    // 4. Delete Auth User
+    // 4. Delete Auth User — done last so anonymization always completes first
     await admin.auth().deleteUser(uid);
 
-    return {success: true, count: operationCount, anonymizedName: deletedName};
+    return {success: true, anonymizedName: deletedName};
   } catch (error) {
     console.error("Error deleting user:", error);
     throw new HttpsError("internal", "Failed to delete user account.", error);

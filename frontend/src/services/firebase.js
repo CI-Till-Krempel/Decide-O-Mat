@@ -113,7 +113,6 @@ export const addArgument = async (decisionId, type, text, authorName, authorId) 
 
 export const voteArgument = async (decisionId, argumentId, displayName) => {
     const voteArgumentFunction = httpsCallable(functions, 'voteArgument');
-    console.log("Calling voteArgument with:", { decisionId, argumentId, displayName });
     return await voteArgumentFunction({ decisionId, argumentId, displayName });
 };
 
