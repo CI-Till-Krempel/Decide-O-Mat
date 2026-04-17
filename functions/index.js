@@ -106,7 +106,7 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
   if (authorName) {
     argumentData.authorName = authorName;
   }
-  const resolvedAuthorId = request.auth ? request.auth.uid : authorId;
+    const resolvedAuthorId = request.auth.uid;
   if (resolvedAuthorId) {
     argumentData.authorId = resolvedAuthorId;
   }
