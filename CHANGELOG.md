@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-04-17
+
+### Added
+- **Privacy Policy**: Added responsible data protection supervisory authorities to the Privacy Policy (English and German), completing GDPR-required regulatory contact information.
+
+### Fixed
+- **Prompt Injection (CI)**: Hardened the Gemini issue triage workflow against agentic prompt injection (reported in #238). User-submitted issue content is now wrapped in `<issue_content>` XML tags with an explicit security notice and post-content reminder, and a failure condition for out-of-allowlist labels was added.
+
 ## [1.6.1] - 2026-04-17
 
 ### Added
