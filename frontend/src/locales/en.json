@@ -133,7 +133,254 @@
     "imprint": "Imprint"
   },
   "legal": {
-    "placeholder": "This page is under construction. Content will be available soon."
+    "lastUpdatedLabel": "Last updated",
+    "terms": {
+      "lastUpdated": "April 15, 2026",
+      "sections": [
+        {
+          "heading": "1. Acceptance of Terms",
+          "paragraphs": [
+            "By accessing or using Decide-O-Mat (\"Service\"), you agree to be bound by these Terms of Service (\"Terms\"). If you do not agree, please do not use the Service.",
+            "The Service is operated by the individual named in the Imprint (\"Operator\")."
+          ]
+        },
+        {
+          "heading": "2. Description of Service",
+          "paragraphs": [
+            "Decide-O-Mat is a web application for collaborative decision-making through pro/con argument lists. Users can create decisions, add arguments, vote on them, and share results via a unique link.",
+            "The Service is provided free of charge, on an \"as is\" basis, without any guarantee of continued availability or fitness for a particular purpose."
+          ]
+        },
+        {
+          "heading": "3. User Accounts and Eligibility",
+          "paragraphs": [
+            "You may use the Service anonymously. Your anonymous identity is stored locally on your device using your browser's local storage.",
+            "If you register a verified account (email/password or Google Sign-In), you must be at least 16 years old and provide accurate information.",
+            "You are solely responsible for maintaining the confidentiality of your login credentials. The Operator accepts no liability for unauthorized access resulting from your failure to protect your credentials."
+          ]
+        },
+        {
+          "heading": "4. User Conduct",
+          "paragraphs": [
+            "You agree not to:"
+          ],
+          "items": [
+            "Use the Service for any unlawful purpose or in violation of applicable law",
+            "Submit content that is defamatory, harassing, obscene, or infringes third-party rights",
+            "Attempt to reverse-engineer, disrupt, or circumvent the security mechanisms of the Service",
+            "Use automated tools or bots to access the Service without express permission",
+            "Impersonate any person or entity"
+          ]
+        },
+        {
+          "heading": "5. User Content",
+          "paragraphs": [
+            "You retain ownership of content you submit (decisions, arguments). By submitting content, you grant the Operator a limited, non-exclusive license to store and process it solely to provide the Service.",
+            "Decision content is end-to-end encrypted using a key embedded in the sharing link. The Operator cannot access or read this content.",
+            "The Operator does not screen or moderate user-submitted content and bears no responsibility for it. You are solely responsible for the content you create."
+          ]
+        },
+        {
+          "heading": "6. Disclaimer of Warranties",
+          "paragraphs": [
+            "THE SERVICE IS PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, OR NON-INFRINGEMENT.",
+            "THE OPERATOR MAKES NO WARRANTY THAT THE SERVICE WILL BE UNINTERRUPTED, SECURE, ERROR-FREE, OR FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS."
+          ]
+        },
+        {
+          "heading": "7. Limitation of Liability",
+          "paragraphs": [
+            "TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE OPERATOR SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF DATA, PROFITS, GOODWILL, OR BUSINESS OPPORTUNITY, ARISING FROM OR IN CONNECTION WITH YOUR USE OF OR INABILITY TO USE THE SERVICE.",
+            "WHERE LIABILITY CANNOT BE EXCLUDED BY LAW, THE OPERATOR'S TOTAL AGGREGATE LIABILITY SHALL NOT EXCEED €10 (TEN EUROS).",
+            "This limitation applies regardless of the legal theory (contract, tort, strict liability, or otherwise) and even if the Operator has been advised of the possibility of such damages."
+          ]
+        },
+        {
+          "heading": "8. Service Availability",
+          "paragraphs": [
+            "The Operator reserves the right to modify, suspend, or discontinue the Service, in whole or in part, at any time and without prior notice. The Operator shall not be liable to you or any third party for any such modification, suspension, or discontinuation."
+          ]
+        },
+        {
+          "heading": "9. Third-Party Services",
+          "paragraphs": [
+            "The Service relies on third-party infrastructure, including Google Firebase (authentication, database, hosting) and Google ReCAPTCHA Enterprise (spam protection). These services are governed by their own terms and privacy policies. The Operator is not responsible for the acts or omissions of these third parties."
+          ]
+        },
+        {
+          "heading": "10. Modifications to These Terms",
+          "paragraphs": [
+            "The Operator may update these Terms at any time. The revised Terms will be posted on this page with an updated date. Continued use of the Service after changes take effect constitutes your acceptance of the new Terms."
+          ]
+        },
+        {
+          "heading": "11. Termination",
+          "paragraphs": [
+            "The Operator may suspend or terminate your access to the Service at any time, without notice or liability, for any conduct deemed to violate these Terms or applicable law. You may stop using the Service at any time."
+          ]
+        },
+        {
+          "heading": "12. Governing Law and Jurisdiction",
+          "paragraphs": [
+            "These Terms are governed exclusively by the laws of the Federal Republic of Germany, excluding its conflict-of-law provisions and the UN Convention on Contracts for the International Sale of Goods (CISG).",
+            "The place of exclusive jurisdiction for all disputes arising from or in connection with these Terms shall be the registered domicile of the Operator, to the extent permitted by law."
+          ]
+        },
+        {
+          "heading": "13. Contact",
+          "paragraphs": [
+            "For questions regarding these Terms, please refer to the contact details in the Imprint."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "lastUpdated": "April 15, 2026",
+      "sections": [
+        {
+          "heading": "1. Controller",
+          "paragraphs": [
+            "The controller responsible for data processing within the meaning of the General Data Protection Regulation (GDPR) is the individual named in the Imprint. Contact details are provided there."
+          ]
+        },
+        {
+          "heading": "2. Data We Process",
+          "paragraphs": [
+            "Anonymous users: When you use the Service without a registered account, we process a Firebase Anonymous Authentication UID (stored in your browser's local storage and in our database), your chosen display name (end-to-end encrypted), and your arguments and votes (end-to-end encrypted). Technical request data (IP address, browser type, timestamp) is processed transiently by our infrastructure provider for security purposes.",
+            "Registered users: If you create an account, we additionally process your email address (via Firebase Authentication) and, if you sign in with Google, your Google profile data (name, profile picture) as provided by Google.",
+            "ReCAPTCHA Enterprise: We use Google ReCAPTCHA Enterprise for bot protection (Firebase App Check). This service may process browser attributes and behavioral signals. Please refer to Google's Privacy Policy for details.",
+            "Firebase Hosting: Static assets are delivered via Firebase Hosting. IP addresses may be transiently logged by Google's infrastructure."
+          ]
+        },
+        {
+          "heading": "3. Legal Basis for Processing",
+          "paragraphs": [
+            "Performance of contract / pre-contractual measures (Art. 6(1)(b) GDPR): Processing necessary to deliver the Service you have requested.",
+            "Legitimate interests (Art. 6(1)(f) GDPR): Security, fraud prevention, and ensuring the technical integrity of the Service.",
+            "Consent (Art. 6(1)(a) GDPR): Where you have explicitly consented, for example by creating a registered account."
+          ]
+        },
+        {
+          "heading": "4. Data Retention",
+          "paragraphs": [
+            "Decision content (questions, arguments, votes) is retained until the decision owner deletes it or their account is deleted.",
+            "Anonymous UIDs are stored in your browser's local storage and are deleted when you clear your browser data.",
+            "Registered account data is stored until you request account deletion via the in-app settings.",
+            "Upon account deletion, your votes are anonymized (the vote value is preserved without attribution) to maintain the integrity of decisions you participated in. All other personal data is erased.",
+            "Infrastructure logs are subject to Google's own retention policies."
+          ]
+        },
+        {
+          "heading": "5. International Data Transfers",
+          "paragraphs": [
+            "We use Google Firebase services. Google LLC is headquartered in the United States. Data transfers to the USA are safeguarded by Google's Standard Contractual Clauses (SCCs) pursuant to Art. 46 GDPR.",
+            "Decision content stored in Cloud Firestore is hosted in the europe-west4 region (Netherlands, EU) and does not leave the EU. The content is additionally protected by end-to-end encryption."
+          ]
+        },
+        {
+          "heading": "6. End-to-End Encryption",
+          "paragraphs": [
+            "Decision content (questions, arguments, display names) is encrypted in your browser before being transmitted to our servers. The encryption key is embedded in the sharing URL hash and is never sent to our servers.",
+            "This means the Operator cannot access, read, or decrypt any decision content. Only users who possess the sharing link can decrypt the content."
+          ]
+        },
+        {
+          "heading": "7. Your Rights Under GDPR",
+          "paragraphs": [
+            "You have the following rights regarding your personal data:"
+          ],
+          "items": [
+            "Right of access (Art. 15 GDPR): Request information about the data we hold about you.",
+            "Right to rectification (Art. 16 GDPR): Request correction of inaccurate personal data.",
+            "Right to erasure (Art. 17 GDPR): Request deletion of your data — use the in-app account deletion feature or contact us.",
+            "Right to restriction of processing (Art. 18 GDPR): Request restricted processing under certain conditions.",
+            "Right to data portability (Art. 20 GDPR): Receive your data in a structured, commonly used, machine-readable format.",
+            "Right to object (Art. 21 GDPR): Object to processing based on legitimate interests.",
+            "Right to withdraw consent (Art. 7(3) GDPR): Withdraw consent at any time; this does not affect the lawfulness of prior processing.",
+            "Right to lodge a complaint: You may lodge a complaint with the supervisory authority in your EU Member State of habitual residence, place of work, or place of the alleged infringement."
+          ]
+        },
+        {
+          "heading": "8. Data Security",
+          "paragraphs": [
+            "We implement appropriate technical and organizational measures to protect your data, including end-to-end encryption of decision content, Firebase App Check (bot protection), and HTTPS transport encryption.",
+            "No transmission over the internet can be guaranteed to be 100% secure. We cannot guarantee absolute security of your data."
+          ]
+        },
+        {
+          "heading": "9. Children's Privacy",
+          "paragraphs": [
+            "The Service is not directed at children under the age of 16. We do not knowingly collect personal data from children under 16. If you believe we have inadvertently collected such data, please contact us immediately so we can delete it."
+          ]
+        },
+        {
+          "heading": "10. Changes to This Policy",
+          "paragraphs": [
+            "We may update this Privacy Policy from time to time. The updated policy will be posted on this page with a revised date. Continued use of the Service after changes take effect constitutes acceptance of the updated policy."
+          ]
+        },
+        {
+          "heading": "11. Contact",
+          "paragraphs": [
+            "For privacy-related inquiries and to exercise your rights, please use the contact details provided in the Imprint.",
+            "You may also contact the competent data protection supervisory authority. In Germany, this is the state data protection authority (Landesdatenschutzbehörde) of the Operator's registered state."
+          ]
+        }
+      ]
+    },
+    "imprint": {
+      "sections": [
+        {
+          "heading": "Information pursuant to § 5 TMG",
+          "address": [
+            "Cologne Intelligence GmbH (CI)",
+            "Marie-Curie-Straße 10",
+            "51103 Köln",
+            "Tel.: +49 (0) 221 99 041-0",
+            "E-Mail: kontakt@cologne-intelligence.de",
+            "Web: www.cologne-intelligence.de"
+          ]
+        },
+        {
+          "heading": "Contact",
+          "paragraphs": [
+            "E-Mail: kontakt@cologne-intelligence.de"
+          ]
+        },
+        {
+          "heading": "Responsible for Content pursuant to § 55 (2) RStV",
+          "address": [
+            "Cologne Intelligence GmbH (CI)",
+            "Marie-Curie-Straße 10",
+            "51103 Köln",
+            "Tel.: +49 (0) 221 99 041-0",
+            "E-Mail: kontakt@cologne-intelligence.de",
+            "Web: www.cologne-intelligence.de"
+          ]
+        },
+        {
+          "heading": "EU Online Dispute Resolution",
+          "paragraphs": [
+            "The European Commission provides a platform for online dispute resolution (ODR): https://ec.europa.eu/consumers/odr/",
+            "We are not obligated to participate in dispute resolution proceedings before a consumer arbitration board and do not voluntarily do so."
+          ]
+        },
+        {
+          "heading": "Liability for Content",
+          "paragraphs": [
+            "As a service provider, we are responsible for our own content on these pages in accordance with general law pursuant to § 7 (1) TMG. However, pursuant to §§ 8 to 10 TMG, we are not obligated as a service provider to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.",
+            "Obligations to remove or block the use of information under general law remain unaffected. However, liability in this regard is only possible from the point in time at which we become aware of a specific legal violation. Upon becoming aware of such violations, we will remove the relevant content immediately."
+          ]
+        },
+        {
+          "heading": "Liability for Links",
+          "paragraphs": [
+            "Our Service contains links to external third-party websites over whose content we have no control. We therefore accept no liability for this external content. The respective provider or operator of the linked pages is always responsible for the content of those pages.",
+            "The linked pages were checked for possible legal violations at the time of linking. Illegal content was not recognizable at the time of linking. Continuous monitoring of the content of linked pages is not reasonable without concrete evidence of a legal violation. Upon becoming aware of legal violations, we will remove such links immediately."
+          ]
+        }
+      ]
+    }
   },
   "addArgumentForm": {
     "placeholderPro": "Add a Pro...",
