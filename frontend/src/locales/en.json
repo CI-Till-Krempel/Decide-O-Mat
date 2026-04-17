@@ -161,7 +161,9 @@
         },
         {
           "heading": "4. User Conduct",
-          "paragraphs": ["You agree not to:"],
+          "paragraphs": [
+            "You agree not to:"
+          ],
           "items": [
             "Use the Service for any unlawful purpose or in violation of applicable law",
             "Submit content that is defamatory, harassing, obscene, or infringes third-party rights",
@@ -284,7 +286,9 @@
         },
         {
           "heading": "7. Your Rights Under GDPR",
-          "paragraphs": ["You have the following rights regarding your personal data:"],
+          "paragraphs": [
+            "You have the following rights regarding your personal data:"
+          ],
           "items": [
             "Right of access (Art. 15 GDPR): Request information about the data we hold about you.",
             "Right to rectification (Art. 16 GDPR): Request correction of inaccurate personal data.",
@@ -329,10 +333,12 @@
         {
           "heading": "Information pursuant to § 5 TMG",
           "address": [
-            "Till Krempel",
-            "[Street and House Number]",
-            "[Postal Code] [City]",
-            "Germany"
+            "Cologne Intelligence GmbH (CI)",
+            "Marie-Curie-Straße 10",
+            "51103 Köln",
+            "Tel.: +49 (0) 221 99 041-0",
+            "E-Mail: kontakt@cologne-intelligence.de",
+            "Web: www.cologne-intelligence.de"
           ]
         },
         {
@@ -344,10 +350,12 @@
         {
           "heading": "Responsible for Content pursuant to § 55 (2) RStV",
           "address": [
-            "Till Krempel",
-            "[Street and House Number]",
-            "[Postal Code] [City]",
-            "Germany"
+            "Cologne Intelligence GmbH (CI)",
+            "Marie-Curie-Straße 10",
+            "51103 Köln",
+            "Tel.: +49 (0) 221 99 041-0",
+            "E-Mail: kontakt@cologne-intelligence.de",
+            "Web: www.cologne-intelligence.de"
           ]
         },
         {
