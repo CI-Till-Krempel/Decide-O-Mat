@@ -70,7 +70,7 @@ exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, 
  * @return {Promise<Object>} The created argument ID.
  */
 exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
-  const {decisionId, type, text, authorName, authorId} = request.data;
+  const {decisionId, type, text, authorName} = request.data;
 
   if (!decisionId || !type || !text) {
     throw new HttpsError("invalid-argument", "Missing required arguments: decisionId, type, text.");
@@ -105,10 +105,9 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
   // prevent a client from attributing an argument to a different user's ID.
   if (authorName) {
     argumentData.authorName = authorName;
-  const resolvedAuthorId = request.auth?.uid;
-    const resolvedAuthorId = request.auth.uid;
-  if (resolvedAuthorId) {
-    argumentData.authorId = resolvedAuthorId;
+    if (request.auth) {
+      argumentData.authorId = request.auth.uid;
+    }
   }
 
   await argumentRef.set(argumentData);
