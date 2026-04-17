@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-04-17
+
+### Added
+- **Legal Documents**: Added GDPR-compliant Imprint, Terms of Service, and Privacy Policy pages (English and German).
+- **Rich Text Clipboard Sharing**: Copying a decision link now includes the decision title and creator name as rich text for richer paste experience in Slack, email, etc.
+- **Dynamic Page Title**: Browser tab title now reflects the current application version.
+
+### Fixed
+- **XSS**: Sanitized clipboard HTML to prevent cross-site scripting when copying decision links.
+- **MagicHandler Test**: Resolved flaky test timeout in the anonymous-identity magic-link handler.
+
+### Security
+- Updated multiple dependencies to address vulnerabilities: `lodash`, `path-to-regexp`, `node-forge`, `undici`, `flatted`, `fast-xml-parser`, `firebase-functions`, `firebase-admin`, and related packages.
+
 ## [1.6.0] - 2026-02-18
 
 ### Added
