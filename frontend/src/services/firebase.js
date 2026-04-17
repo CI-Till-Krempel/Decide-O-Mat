@@ -48,7 +48,6 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         // Debug: Attempt to fetch token immediately to check for errors
         getToken(appCheck)
             .then((tokenResult) => {
-                console.log("App Check Token success:", tokenResult.token ? "Token received" : "No token");
             })
             .catch((err) => {
                 console.error("App Check Token failed:", err);
@@ -63,7 +62,6 @@ export const ensureAppCheck = async () => {
     if (!appCheck) return Promise.resolve(false);
     try {
         const result = await getToken(appCheck, true); // forceRefresh = true
-        console.log("ensureAppCheck: Token ready", result.token.substring(0, 5) + "...");
         return true;
     } catch (err) {
         console.error("ensureAppCheck: Error getting token", err);
@@ -86,7 +84,6 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         console.log("App Check initialized.");
     }
 
-    console.log("Functions region:", functions.region);
 }
 
 export const createDecision = async (question) => {
@@ -113,7 +110,6 @@ export const addArgument = async (decisionId, type, text, authorName, authorId) 
 
 export const voteArgument = async (decisionId, argumentId, displayName) => {
     const voteArgumentFunction = httpsCallable(functions, 'voteArgument');
-    console.log("Calling voteArgument with:", { decisionId, argumentId, displayName });
     return await voteArgumentFunction({ decisionId, argumentId, displayName });
 };
 

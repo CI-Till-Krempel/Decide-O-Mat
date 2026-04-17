@@ -30,19 +30,6 @@ const KEYS_STORAGE_KEY = 'dom_decision_keys';
 const EncryptionService = {
     isEnabled: () => import.meta.env.VITE_ENABLE_ENCRYPTION === 'true',
 
-    // Cache key for a decision (persisted locally)
-    saveKey: async (decisionId, callback) => {
-        // Key is CryptoKey, we need to export it to string to save
-        if (!decisionId || !callback) return;
-        try {
-            // We assume the key is passed as cryptoKey. But wait, importKey returns CryptoKey.
-            // Let's change signature: saveKey(decisionId, keyString)
-            // Actually, better to save the RAW STRING from URL to avoid export overhead/issues.
-            // Caller (Decision.jsx) has the string from URL.
-        } catch (e) {
-            console.error("Failed to save key", e);
-        }
-    },
 
     // Improved implementation below
     storeKey: (decisionId, keyString) => {
