@@ -25,17 +25,8 @@ function App() {
     import('./services/firebase').then(async ({ ensureAppCheck, functions }) => {
       // 1. Ensure App Check Token is ready
       await ensureAppCheck();
-      console.log("App Check Initialized - Mounting App");
       setIsReady(true); // Mount the app/providers only now
 
-      // 2. Debug App Check logs (keep for now)
-      const { httpsCallable } = await import('firebase/functions');
-      const debugFn = httpsCallable(functions, 'debugAppCheck');
-      debugFn().then(result => {
-        console.log("DEBUG APP CHECK RESULT:", result.data);
-      }).catch(err => {
-        console.error("DEBUG APP CHECK FAILED:", err);
-      });
     });
   }, []);
 
