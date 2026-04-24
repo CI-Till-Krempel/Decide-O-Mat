@@ -94,28 +94,39 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
       }
     }
 
-    // C. Participant Records
+    // C. Arguments authored by this user
+    const argumentsQuery = db.collectionGroup("arguments").where("authorId", "==", uid);
+    const argumentsSnapshot = await argumentsQuery.get();
+
+    for (const docSnap of argumentsSnapshot.docs) {
+      batch.update(docSnap.ref, {authorName: deletedName, authorId: "deleted"});
+      operationCount++;
+      if (operationCount >= BATCH_LIMIT) {
+        batch = await flushBatch(batch);
+        operationCount = 0;
+      }
+    }
+
+    // D. Participant Records
     // Anonymize the display name and remove device-linked PII (FCM token, photo).
-    // We query by participantIds on the decision document because participant
-    // sub-documents use the userId as their document ID (no userId field to index).
-    const decisionsSnapshot = await db.collection("decisions")
-        .where("participantIds", "array-contains", uid)
-        .get();
+    // Participant docs are keyed by userId, so we query via decisions where the user
+    // participated (participantIds already has a collection-scoped index).
+    // batch.set with merge avoids a per-document read before updating.
+    const decisionsQuery = db.collection("decisions")
+        .where("participantIds", "array-contains", uid);
+    const decisionsSnapshot = await decisionsQuery.get();
 
     for (const decisionDoc of decisionsSnapshot.docs) {
       const participantRef = decisionDoc.ref.collection("participants").doc(uid);
-      const participantDoc = await participantRef.get();
-      if (participantDoc.exists) {
-        batch.update(participantRef, {
-          plainDisplayName: deletedName,
-          fcmToken: FieldValue.delete(),
-          photoURL: FieldValue.delete(),
-        });
-        operationCount++;
-        if (operationCount >= BATCH_LIMIT) {
-          batch = await flushBatch(batch);
-          operationCount = 0;
-        }
+      batch.set(participantRef, {
+        plainDisplayName: deletedName,
+        fcmToken: FieldValue.delete(),
+        photoURL: FieldValue.delete(),
+      }, {merge: true});
+      operationCount++;
+      if (operationCount >= BATCH_LIMIT) {
+        batch = await flushBatch(batch);
+        operationCount = 0;
       }
     }
 
