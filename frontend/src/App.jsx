@@ -23,10 +23,8 @@ function App() {
 
     // Wait for App Check logic
     import('./services/firebase').then(async ({ ensureAppCheck }) => {
-      // 1. Ensure App Check Token is ready
       await ensureAppCheck();
-      console.log("App Check Initialized - Mounting App");
-      setIsReady(true); // Mount the app/providers only now
+      setIsReady(true);
     });
   }, []);
 

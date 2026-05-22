@@ -14,17 +14,19 @@
     },
     "main": "index.js",
     "dependencies": {
-        "firebase-admin": "^13.7.0",
-        "firebase-functions": "^7.2.2"
+        "firebase-functions": "^7.2.5"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.5",
-        "@eslint/js": "^9.39.4",
-        "eslint": "^9.39.4",
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.4.0",
         "eslint-config-google": "^0.14.0",
-        "globals": "^17.4.0",
-        "lodash": "^4.17.23"
+        "globals": "^17.6.0",
+        "lodash": "^4.18.1"
     },
     "private": true,
-    "version": "1.6.0"
+    "version": "1.6.2",
+    "overrides": {
+        "uuid": "^11.1.1"
+    }
 }

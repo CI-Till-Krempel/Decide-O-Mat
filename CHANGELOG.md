@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-04-17
+
+### Added
+- **Privacy Policy**: Added responsible data protection supervisory authorities to the Privacy Policy (English and German), completing GDPR-required regulatory contact information.
+
+### Fixed
+- **Prompt Injection (CI)**: Hardened the Gemini issue triage workflow against agentic prompt injection (reported in #238). User-submitted issue content is now wrapped in `<issue_content>` XML tags with an explicit security notice and post-content reminder, and a failure condition for out-of-allowlist labels was added.
+
+## [1.6.1] - 2026-04-17
+
+### Added
+- **Legal Documents**: Added GDPR-compliant Imprint, Terms of Service, and Privacy Policy pages (English and German).
+- **Rich Text Clipboard Sharing**: Copying a decision link now includes the decision title and creator name as rich text for richer paste experience in Slack, email, etc.
+- **Dynamic Page Title**: Browser tab title now reflects the current application version.
+
+### Fixed
+- **XSS**: Sanitized clipboard HTML to prevent cross-site scripting when copying decision links.
+- **MagicHandler Test**: Resolved flaky test timeout in the anonymous-identity magic-link handler.
+
+### Security
+- Updated multiple dependencies to address vulnerabilities: `lodash`, `path-to-regexp`, `node-forge`, `undici`, `flatted`, `fast-xml-parser`, `firebase-functions`, `firebase-admin`, and related packages.
+
 ## [1.6.0] - 2026-02-18
 
 ### Added
