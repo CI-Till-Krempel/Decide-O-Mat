@@ -62,7 +62,7 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 export const ensureAppCheck = async () => {
     if (!appCheck) return Promise.resolve(false);
     try {
-        const result = await getToken(appCheck, true); // forceRefresh = true
+        await getToken(appCheck, true); // forceRefresh = true
         return true;
     } catch (err) {
         console.error("ensureAppCheck: Error getting token", err);
