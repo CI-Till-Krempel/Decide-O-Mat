@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-05-22
+
+### Fixed
+- **GDPR – Account Deletion**: Argument author fields are now anonymized when a user deletes their account, and participant records are cleaned up in a single efficient batch operation.
+- **Firestore Rules & Backend**: Resolved a critical Firestore rules bypass, authentication gaps in Cloud Functions, and residual PII exposure paths identified during a pre-launch security audit.
+- **CI Workflows**: Added missing `GEMINI_CLI_TRUST_WORKSPACE` environment variable to all Gemini CLI workflow steps.
+- **Lint**: Removed unused `result` variable in `ensureAppCheck`.
+
+### Security
+- Resolved all outstanding npm audit vulnerabilities in frontend and Cloud Functions packages.
+
+### Changed
+- **Dependencies (frontend)**: Updated `vite` 7.3.1 → 8.0.10, `@vitejs/plugin-react` 5.1.0 → 6.0.1, `react`/`react-dom` 19.2.4 → 19.2.5, `eslint`/`@eslint/js` to v10, `fast-xml-parser` 5.5.9 → 5.7.1, `postcss` 8.5.6 → 8.5.12, `@protobufjs/utf8` 1.1.0 → 1.1.1, `fast-xml-builder` 1.1.5 → 1.2.0.
+- **Dependencies (functions)**: Updated `firebase-functions` 4.9.0 → 7.2.5, `eslint` 10.2.0 → 10.4.0, `globals` 17.4.0 → 17.6.0, `fast-xml-parser` 5.5.9 → 5.7.1.
+- **CI**: Updated `softprops/action-gh-release` from v2 to v3.
+
 ## [1.6.2] - 2026-04-17
 
 ### Added
