@@ -47,18 +47,14 @@ function Decision() {
     const [activeColumn, setActiveColumn] = useState(null); // null | 'pro' | 'con'
     const [submittingArgument, setSubmittingArgument] = useState(false);
     const [votedArgIds, setVotedArgIds] = useState(new Set());
-    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(
+        () => 'Notification' in window && Notification.permission === 'granted'
+    );
     const [notificationsRequesting, setNotificationsRequesting] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [editLoading, setEditLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
-
-    useEffect(() => {
-        if ('Notification' in window && Notification.permission === 'granted') {
-            setNotificationsEnabled(true);
-        }
-    }, []);
 
     // Parse key from URL hash
     useEffect(() => {
@@ -137,9 +133,8 @@ function Decision() {
         setupSubscriptions();
 
         const storedVote = localStorage.getItem(`decision_vote_${id}`);
-        if (storedVote) {
-            setFinalVote(storedVote);
-        }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (storedVote) setFinalVote(storedVote);
 
         return () => {
             unsubscribeDecision();
