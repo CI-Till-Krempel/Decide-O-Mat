@@ -3,7 +3,9 @@ const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/fi
 const admin = require("firebase-admin");
 const {FieldValue} = require("firebase-admin/firestore");
 
-// setGlobalOptions({region: "europe-west1"});
+const {setGlobalOptions} = require("firebase-functions/v2");
+
+setGlobalOptions({region: "europe-west3"});
 
 admin.initializeApp();
 const db = admin.firestore();
