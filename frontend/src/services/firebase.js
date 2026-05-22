@@ -71,7 +71,7 @@ export const ensureAppCheck = async () => {
 };
 
 const db = getFirestore(app);
-const functions = getFunctions(app);
+const functions = getFunctions(app, "europe-west3");
 const auth = getAuth(app);
 
 // Connect to emulators if running locally
