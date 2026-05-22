@@ -211,7 +211,7 @@ const EncryptionService = {
             // In that case, we probably SHOULD throw or return a fallback, 
             // but returning raw encrypted data is useless/ugly.
             // However, sticking to the requested behavior of not crashing:
-            throw new Error("Decryption failed");
+            throw new Error("Decryption failed", { cause: error });
         }
     }
 };
