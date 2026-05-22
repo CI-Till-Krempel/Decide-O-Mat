@@ -102,9 +102,7 @@ export function UserProvider({ children }) {
                     const result = await linkWithPopup(auth.currentUser, provider);
                     setFirebaseUser(result.user);
                     return; // Success
-                    // eslint-disable-next-line no-unused-vars
-                } catch (linkError) {
-                    // console.log("Link failed, falling back to sign in", linkError);
+                } catch {
                     // If link fails (e.g. email already in use), fall back to normal sign in
                     // This will switch the user, effectively "logging out" the anonymous session
                 }
