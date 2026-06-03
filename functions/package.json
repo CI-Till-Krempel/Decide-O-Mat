@@ -21,8 +21,7 @@
         "@eslint/js": "^10.0.1",
         "eslint": "^10.4.0",
         "eslint-config-google": "^0.14.0",
-        "globals": "^17.6.0",
-        "lodash": "^4.18.1"
+        "globals": "^17.6.0"
     },
     "private": true,
     "version": "1.6.3",
