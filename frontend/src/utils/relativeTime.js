@@ -4,13 +4,25 @@
  * @param {string} [locale] - BCP 47 locale string; defaults to browser locale
  * @returns {string} Relative time string
  */
+const rtfCache = new Map();
+
+function getRelativeTimeFormat(locale) {
+    const key = locale || 'default';
+    let rtf = rtfCache.get(key);
+    if (!rtf) {
+        rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'always', style: 'narrow' });
+        rtfCache.set(key, rtf);
+    }
+    return rtf;
+}
+
 export function relativeTime(date, locale) {
     const now = Date.now();
     const timestamp = date instanceof Date ? date.getTime() : date;
     const diffMs = now - timestamp;
     const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
 
-    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'always', style: 'narrow' });
+    const rtf = getRelativeTimeFormat(locale);
 
     if (diffSeconds < 60) return rtf.format(-diffSeconds, 'second');
 
