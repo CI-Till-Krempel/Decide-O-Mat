@@ -211,7 +211,7 @@ exports.toggleDecisionStatus = onCall({cors: true, enforceAppCheck: enforceAppCh
     throw new HttpsError("invalid-argument", "Status must be 'open' or 'closed'");
   }
 
-  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const decisionRef = db.collection("decisions").doc(decisionId);
   const decisionDoc = await decisionRef.get();
 
   if (!decisionDoc.exists) {
@@ -244,7 +244,7 @@ exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
     throw new HttpsError("invalid-argument", "Vote must be 'yes' or 'no'");
   }
 
-  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const decisionRef = db.collection("decisions").doc(decisionId);
   const decisionDoc = await decisionRef.get();
 
   if (!decisionDoc.exists) {
@@ -259,7 +259,7 @@ exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
   const voteRef = decisionRef.collection("finalVotes").doc(userId);
 
   // Use a transaction to ensure atomic updates
-  await admin.firestore().runTransaction(async (transaction) => {
+  await db.runTransaction(async (transaction) => {
     // Ensure participant exists
     await ensureParticipant(db, decisionId, userId, request.auth, request.data.displayName, transaction);
 
@@ -339,7 +339,6 @@ exports.updateUserDisplayName = onCall({cors: true, enforceAppCheck: enforceAppC
     throw new HttpsError("invalid-argument", "Missing valid arguments.");
   }
 
-  const db = admin.firestore();
   const decisionRef = db.collection("decisions").doc(decisionId);
   const decisionDoc = await decisionRef.get();
 
@@ -588,14 +587,13 @@ exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{
   }
   const argument = snap.data();
   // Safe navigation for authorId
-  const authorId = argument ? (argument.authorId || null) : null;
-
   if (!argument) {
     console.warn("No argument data found");
     return;
   }
+  const authorId = argument.authorId || null;
 
-  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const decisionRef = db.collection("decisions").doc(decisionId);
   const decisionDoc = await decisionRef.get();
   if (!decisionDoc.exists) return;
 
@@ -643,7 +641,7 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
   const title = newStatus === "closed" ? "Decision Closed" : "Decision Re-opened";
   const body = newStatus === "closed" ? "A decision has been reached." : "Additional input is requested.";
 
-  const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
+  const decisionRef = db.collection("decisions").doc(decisionId);
   const participantsSnapshot = await decisionRef.collection("participants").get();
   const tokens = [];
 
@@ -681,8 +679,7 @@ async function ensureParticipant(dbInstance, decisionId, userId, auth, displayNa
 
   // Create reference based on the global db (which we need properly scoped or passed)
   // For safety, we use admin.firestore() to create the ref, as 'db' might not be passed correctly if called as helper
-  const firestore = admin.firestore();
-  const participantRef = firestore.collection("decisions").doc(decisionId).collection("participants").doc(userId);
+  const participantRef = dbInstance.collection("decisions").doc(decisionId).collection("participants").doc(userId);
 
   const prepareData = () => {
     const data = {
