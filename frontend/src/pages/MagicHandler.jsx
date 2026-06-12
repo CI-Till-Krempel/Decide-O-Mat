@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -15,7 +15,7 @@ function MagicHandler() {
     // We need to track if we've already checked the user status to avoid loops
     const [hasCheckedUser, setHasCheckedUser] = useState(false);
 
-    const performSignIn = async () => {
+    const performSignIn = useCallback(async () => {
         try {
             await signInWithCustomToken(auth, token);
             setStatus('success');
@@ -26,7 +26,7 @@ function MagicHandler() {
             console.error("Magic link failed", error);
             setStatus('error');
         }
-    };
+    }, [token, navigate]);
 
     useEffect(() => {
         if (!token) {
@@ -68,7 +68,7 @@ function MagicHandler() {
         // So currentUser is stable-ish.
         checkAndProcess();
 
-    }, [token, currentUser, hasCheckedUser, status]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [token, currentUser, hasCheckedUser, status, performSignIn]);
 
 
     const handleConfirmSwitch = () => {
