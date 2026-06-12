@@ -16,14 +16,16 @@ const animals = [
     "Wasp", "Weasel", "Whale", "Wolf", "Wombat", "Woodpecker", "Worm", "Yak", "Zebra"
 ];
 
+const animalsSet = new Set(animals);
+
 const NameGenerator = {
     generate: () => {
         const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
-        return `Anonymous ${randomAnimal}`;
+        return "Anonymous " + randomAnimal;
     },
 
     isGenerated: (name) => {
-        return name && name.startsWith("Anonymous ") && animals.includes(name.replace("Anonymous ", ""));
+        return !!(name && name.startsWith("Anonymous ") && animalsSet.has(name.substring(10)));
     }
 };
 
