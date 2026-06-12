@@ -69,4 +69,22 @@ describe('relativeTime', () => {
         expect(result).toMatch(/1/);
         expect(result).toMatch(/day|d/i);
     });
+
+    it('handles null and undefined gracefully', () => {
+        expect(relativeTime(null, 'en')).toBe('');
+        expect(relativeTime(undefined, 'en')).toBe('');
+    });
+
+    it('handles invalid date values gracefully', () => {
+        expect(relativeTime(NaN, 'en')).toBe('');
+        expect(relativeTime('invalid-date-string', 'en')).toBe('');
+        expect(relativeTime(new Date('invalid-date'), 'en')).toBe('');
+    });
+
+    it('handles ISO date strings gracefully', () => {
+        vi.spyOn(Date, 'now').mockReturnValue(60_000);
+        const result = relativeTime(new Date(0).toISOString(), 'en');
+        expect(result).toMatch(/1/);
+        expect(result).toMatch(/min|m/i);
+    });
 });
