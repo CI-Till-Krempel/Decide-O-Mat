@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Decision from './pages/Decision';
 import { UserProvider } from './contexts/UserContext';
+import { ensureAppCheck } from './services/firebase';
 
 import Header from './components/Header';
 import Login from './pages/Login';
@@ -15,17 +16,18 @@ function App() {
   const [isReady, setIsReady] = React.useState(false);
 
   useEffect(() => {
-    const version = typeof __APP_VERSION__ !== 'undefined' ? `v${__APP_VERSION__}` : 'v0.0.0';
+    const version = typeof __APP_VERSION__ !== 'undefined' ? 'v' + __APP_VERSION__ : 'v0.0.0';
     // Check various env naming conventions or defaults
     const mode = import.meta.env.MODE || 'production';
-    const stage = mode === 'production' ? '' : ` (${mode})`;
-    document.title = `Decide-O-Mat: ${version}${stage} - Group decisions made easy !`;
+    const stage = mode === 'production' ? '' : ' (' + mode + ')';
+    document.title = 'Decide-O-Mat: ' + version + stage + ' - Group decisions made easy !';
 
     // Wait for App Check logic
-    import('./services/firebase').then(async ({ ensureAppCheck }) => {
+    const initSecurity = async () => {
       await ensureAppCheck();
       setIsReady(true);
-    });
+    };
+    initSecurity();
   }, []);
 
   if (!isReady) {
