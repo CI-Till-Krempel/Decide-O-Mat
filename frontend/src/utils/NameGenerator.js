@@ -19,11 +19,11 @@ const animals = [
 const NameGenerator = {
     generate: () => {
         const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
-        return `Anonymous ${randomAnimal}`;
+        return "Anonymous " + randomAnimal;
     },
 
     isGenerated: (name) => {
-        return name && name.startsWith("Anonymous ") && animals.includes(name.replace("Anonymous ", ""));
+        return !!(name && name.startsWith("Anonymous ") && animals.includes(name.replace("Anonymous ", "")));
     }
 };
 

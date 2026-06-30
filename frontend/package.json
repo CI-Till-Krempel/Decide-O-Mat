@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "VITE_ENABLE_ENCRYPTION=true playwright test"
+    "test:e2e": "VITE_ENABLE_ENCRYPTION=true playwright test",
+    "create-pr": "node scripts/create-pr.js"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.1",
