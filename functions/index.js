@@ -587,13 +587,13 @@ exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{
     return;
   }
   const argument = snap.data();
-  // Safe navigation for authorId
-  const authorId = argument ? (argument.authorId || null) : null;
-
   if (!argument) {
     console.warn("No argument data found");
     return;
   }
+
+  // Safe navigation for authorId
+  const authorId = argument.authorId || null;
 
   const decisionRef = admin.firestore().collection("decisions").doc(decisionId);
   const decisionDoc = await decisionRef.get();
@@ -681,7 +681,7 @@ async function ensureParticipant(dbInstance, decisionId, userId, auth, displayNa
 
   // Create reference based on the global db (which we need properly scoped or passed)
   // For safety, we use admin.firestore() to create the ref, as 'db' might not be passed correctly if called as helper
-  const firestore = admin.firestore();
+  const firestore = dbInstance || admin.firestore();
   const participantRef = firestore.collection("decisions").doc(decisionId).collection("participants").doc(userId);
 
   const prepareData = () => {
