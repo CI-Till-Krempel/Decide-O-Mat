@@ -23,7 +23,7 @@ const NameGenerator = {
     },
 
     isGenerated: (name) => {
-        return name && name.startsWith("Anonymous ") && animals.includes(name.replace("Anonymous ", ""));
+        return typeof name === "string" && name.startsWith("Anonymous ") && animals.includes(name.replace("Anonymous ", ""));
     }
 };
 
