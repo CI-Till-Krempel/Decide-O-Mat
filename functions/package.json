@@ -14,7 +14,7 @@
     },
     "main": "index.js",
     "dependencies": {
-        "firebase-functions": "^7.2.5"
+        "firebase-functions": "^7.3.0"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.5",
