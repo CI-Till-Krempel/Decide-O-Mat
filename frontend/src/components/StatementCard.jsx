@@ -21,7 +21,7 @@ function HeartOutlineIcon() {
     );
 }
 
-export default function StatementCard({ argument, decisionId, readOnly, canVote, participantMap, encryptionKey, onVoteChange, onNameRequired, onError }) {
+export default function StatementCard({ argument, decisionId, readOnly, canVote, participantMap, encryptionKey, onVoteChange, onVotingStateChange, onNameRequired, onError }) {
     const { t } = useTranslation();
     const { user } = useUser();
     const [votes, setVotes] = useState([]);
@@ -52,6 +52,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
         }
 
         setVoting(true);
+        onVotingStateChange?.(argument.id, true);
         try {
             if (user.displayName && !participantMap.has(user.userId)) {
                 try {
@@ -68,6 +69,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
             if (onError) onError(t('argumentItem.errorVoteFailed'));
         } finally {
             setVoting(false);
+            onVotingStateChange?.(argument.id, false);
         }
     };
 

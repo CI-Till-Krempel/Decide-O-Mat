@@ -47,6 +47,7 @@ function Decision() {
     const [activeColumn, setActiveColumn] = useState(null); // null | 'pro' | 'con'
     const [submittingArgument, setSubmittingArgument] = useState(false);
     const [votedArgIds, setVotedArgIds] = useState(new Set());
+    const [votingArgIds, setVotingArgIds] = useState(new Set());
     const [notificationsEnabled, setNotificationsEnabled] = useState(
         () => 'Notification' in window && Notification.permission === 'granted'
     );
@@ -289,6 +290,15 @@ function Decision() {
         });
     }, []);
 
+    const handleVotingStateChange = useCallback((argId, isVoting) => {
+        setVotingArgIds(prev => {
+            const newSet = new Set(prev);
+            if (isVoting) newSet.add(argId);
+            else newSet.delete(argId);
+            return newSet;
+        });
+    }, []);
+
     const isOwner = decision?.ownerId === user?.userId;
 
     const handleToggleStatus = async () => {
@@ -339,6 +349,7 @@ function Decision() {
     if (!decision) return <div className={styles.notFound}>{t('decision.notFound')}</div>;
 
     const isClosed = decision.status === 'closed';
+    const isVotingInProgress = !!votingTarget || votingArgIds.size > 0;
     const yesVotes = decision.yesVotes || 0;
     const noVotes = decision.noVotes || 0;
     const totalVotes = yesVotes + noVotes;
@@ -428,6 +439,7 @@ function Decision() {
                         <button
                             className={styles.toolbarBtn}
                             onClick={handleToggleStatus}
+                            disabled={isVotingInProgress}
                             type="button"
                         >
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -487,6 +499,7 @@ function Decision() {
                                 participantMap={participantMap}
                                 encryptionKey={encryptionKey}
                                 onVoteChange={handleVoteChange}
+                                onVotingStateChange={handleVotingStateChange}
                                 onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
                                 onError={(msg) => setToast({ message: msg, type: 'error' })}
                             />
@@ -517,6 +530,7 @@ function Decision() {
                                 participantMap={participantMap}
                                 encryptionKey={encryptionKey}
                                 onVoteChange={handleVoteChange}
+                                onVotingStateChange={handleVotingStateChange}
                                 onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
                                 onError={(msg) => setToast({ message: msg, type: 'error' })}
                             />
@@ -537,6 +551,7 @@ function Decision() {
             <FAB
                 onClick={handleCopyLink}
                 label={t('decision.copyLinkButton')}
+                disabled={isVotingInProgress}
             />
 
             {showEditModal && (
