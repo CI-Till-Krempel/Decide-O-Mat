@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.5] - 2026-07-20
+
+### Fixed
+- **App Check (Production)**: Reverted the frontend App Check provider from `ReCaptchaEnterpriseProvider` back to `ReCaptchaV3Provider`. The Enterprise provider was incompatible with the provisioned classic reCAPTCHA v3 site key, causing `appCheck/recaptcha-error` failures and 401 Unauthenticated errors on `createDecision` and other callable functions in production.
+
+### Security
+- Resolved an npm audit moderate-severity vulnerability in `protobufjs` (frontend and Cloud Functions dependencies) via `npm audit fix`.
+
 ## [1.6.3] - 2026-05-22
 
 ### Fixed
