@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.6] - 2026-07-20
+
+### Fixed
+- **App Check (Production)**: Rotated `VITE_RECAPTCHA_SITE_KEY` to a genuine reCAPTCHA v3 site key. The key in place since v1.6.5 was Enterprise-only (never registered in the classic reCAPTCHA v2/v3 system), so `ReCaptchaV3Provider` still failed with `appCheck/recaptcha-error` and `createDecision` kept returning 401 even after the provider revert. No code changes — this release exists to trigger a rebuild that picks up the rotated secret.
+
 ## [1.6.5] - 2026-07-20
 
 ### Fixed
