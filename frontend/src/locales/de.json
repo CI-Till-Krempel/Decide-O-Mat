@@ -406,7 +406,10 @@
     "yourStatement": "Dein Statement",
     "approvalFrom": "Zustimmung von",
     "addedBy": "Hinzugefügt von {{name}}",
-    "errorVoteFailed": "Abstimmung fehlgeschlagen. Bitte versuche es erneut."
+    "errorVoteFailed": "Abstimmung fehlgeschlagen. Bitte versuche es erneut.",
+    "editButton": "Statement bearbeiten",
+    "editArgument": "Statement bearbeiten",
+    "errorEditFailed": "Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut."
   },
   "argumentList": {
     "titlePros": "Pro",

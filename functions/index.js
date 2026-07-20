@@ -121,6 +121,57 @@ exports.addArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asy
 });
 
 /**
+ * Updates the text of an existing argument. Author-only.
+ * @param {Object} request - The request object.
+ * @param {string} request.data.decisionId - The ID of the decision.
+ * @param {string} request.data.argumentId - The ID of the argument.
+ * @param {string} request.data.text - The new argument text.
+ * @return {Promise<Object>} Success status.
+ */
+exports.updateArgumentText = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
+  }
+
+  const {decisionId, argumentId, text} = request.data;
+  const userId = request.auth.uid;
+
+  if (!decisionId || !argumentId || !text || typeof text !== "string" || text.trim().length === 0) {
+    throw new HttpsError("invalid-argument", "Missing or invalid decisionId, argumentId, or text.");
+  }
+
+  if (text.length > 2000) {
+    throw new HttpsError("invalid-argument", "Text must be under 2000 characters.");
+  }
+
+  const decisionRef = db.collection("decisions").doc(decisionId);
+  const decisionDoc = await decisionRef.get();
+
+  if (!decisionDoc.exists) {
+    throw new HttpsError("not-found", "Decision not found.");
+  }
+
+  if (decisionDoc.data().status === "closed") {
+    throw new HttpsError("failed-precondition", "Decision is closed.");
+  }
+
+  const argumentRef = decisionRef.collection("arguments").doc(argumentId);
+  const argumentDoc = await argumentRef.get();
+
+  if (!argumentDoc.exists) {
+    throw new HttpsError("not-found", "Argument not found.");
+  }
+
+  if (argumentDoc.data().authorId !== userId) {
+    throw new HttpsError("permission-denied", "Only the author can edit this argument.");
+  }
+
+  await argumentRef.update({text: text.trim()});
+
+  return {success: true};
+});
+
+/**
  * Votes on an argument.
  * @param {Object} request - The request object.
  * @param {string} request.data.decisionId - The ID of the decision.

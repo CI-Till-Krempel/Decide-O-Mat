@@ -110,6 +110,11 @@ export const addArgument = async (decisionId, type, text, authorName, authorId) 
     return result.data.id;
 };
 
+export const updateArgumentText = async (decisionId, argumentId, text) => {
+    const updateFn = httpsCallable(functions, 'updateArgumentText');
+    return await updateFn({ decisionId, argumentId, text });
+};
+
 export const voteArgument = async (decisionId, argumentId, displayName) => {
     const voteArgumentFunction = httpsCallable(functions, 'voteArgument');
     return await voteArgumentFunction({ decisionId, argumentId, displayName });
