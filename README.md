@@ -104,12 +104,6 @@ The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOU
     VITE_RECAPTCHA_SITE_KEY=...
     ```
 
-5.  **Configure App Check (Local Debug Token)**:
-    *   Start the app (`npm run dev`).
-    *   Open the browser console to find the **App Check debug token**.
-    *   Add this token to the Firebase Console > App Check > Manage debug tokens.
-    *   *See [Environment Configuration](docs/environments.md) for details.*
-
 4.  **Start Development Server**:
     *   **Terminal 1 (Emulators)**:
         ```bash
@@ -120,6 +114,11 @@ The Service Account used for GitHub Actions deployments (`FIREBASE_SERVICE_ACCOU
         cd frontend
         npm run dev
         ```
+
+5.  **Configure App Check (Local Debug Token)**:
+    *   With the app running (from the previous step), open the browser console to find the **App Check debug token**.
+    *   Add this token to the Firebase Console > App Check > Manage debug tokens.
+    *   *See [Environment Configuration](docs/environments.md) for details.*
 
 ## Development Resources
 
