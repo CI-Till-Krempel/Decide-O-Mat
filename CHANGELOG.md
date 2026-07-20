@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.7] - 2026-07-20
+
+### Fixed
+- **App Check (Production)**: The reCAPTCHA site key rotation intended for v1.6.6 hadn't actually taken effect (the new Secret Manager version was destroyed before it could be used) — a valid v3 key is now confirmed live in the `VITE_RECAPTCHA_SITE_KEY` secret, fixing `createDecision` 401s.
+- **Footer/title version**: `frontend/package.json` and `functions/package.json` were stuck at `1.6.3` since before v1.6.4, so the app footer/title (`__APP_VERSION__`, baked from `package.json` at build time) never reflected the actual deployed release. Bumped to `1.6.7` to match this tag.
+
 ## [1.6.6] - 2026-07-20
 
 ### Fixed
