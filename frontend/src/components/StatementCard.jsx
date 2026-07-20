@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { voteArgument, subscribeToArgumentVotes } from '../services/firebase';
+import { voteArgument, updateArgumentText, subscribeToArgumentVotes } from '../services/firebase';
 import { useUser } from '../contexts/UserContext';
 import ParticipantService from '../services/ParticipantService';
+import EncryptionService from '../services/EncryptionService';
+import EditQuestionModal from './EditQuestionModal';
 import styles from './StatementCard.module.css';
 
 function HeartFilledIcon() {
@@ -21,11 +23,21 @@ function HeartOutlineIcon() {
     );
 }
 
+function PencilIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+        </svg>
+    );
+}
+
 export default function StatementCard({ argument, decisionId, readOnly, canVote, participantMap, encryptionKey, onVoteChange, onVotingStateChange, onNameRequired, onError }) {
     const { t } = useTranslation();
     const { user } = useUser();
     const [votes, setVotes] = useState([]);
     const [voting, setVoting] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editLoading, setEditLoading] = useState(false);
 
     useEffect(() => {
         const unsubscribe = subscribeToArgumentVotes(decisionId, argument.id, (newVotes) => {
@@ -73,6 +85,23 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
         }
     };
 
+    const handleEditSave = async (newText) => {
+        setEditLoading(true);
+        try {
+            let textToSend = newText;
+            if (encryptionKey) {
+                textToSend = await EncryptionService.encrypt(newText, encryptionKey);
+            }
+            await updateArgumentText(decisionId, argument.id, textToSend);
+            setShowEditModal(false);
+        } catch (error) {
+            console.error("Error editing argument:", error);
+            if (onError) onError(t('argumentItem.errorEditFailed'));
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
     const authorName = participantMap?.get(argument.authorId)?.name || argument.authorName;
 
     return (
@@ -84,7 +113,28 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
                         : t('argumentItem.statementBy', { name: authorName || t('decision.anonymous') })
                     }
                 </span>
+                {isOwn && !readOnly && (
+                    <button
+                        className={styles.editButton}
+                        onClick={() => setShowEditModal(true)}
+                        aria-label={t('argumentItem.editButton')}
+                        type="button"
+                    >
+                        <PencilIcon />
+                    </button>
+                )}
             </div>
+
+            {showEditModal && (
+                <EditQuestionModal
+                    question={argument.text}
+                    title={t('argumentItem.editArgument')}
+                    maxLength={2000}
+                    onSave={handleEditSave}
+                    onCancel={() => setShowEditModal(false)}
+                    isLoading={editLoading}
+                />
+            )}
 
             <div className={styles.body}>
                 <span className={styles.text}>{argument.text}</span>

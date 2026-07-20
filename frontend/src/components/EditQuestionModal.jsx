@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './EditQuestionModal.module.css';
 
-export default function EditQuestionModal({ question, onSave, onCancel, isLoading }) {
+export default function EditQuestionModal({ question, onSave, onCancel, isLoading, title, maxLength = 1000 }) {
     const { t } = useTranslation();
     const [value, setValue] = useState(question);
     const inputRef = useRef(null);
@@ -29,8 +29,8 @@ export default function EditQuestionModal({ question, onSave, onCancel, isLoadin
 
     return (
         <div className={styles.overlay} onClick={onCancel}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={t('decision.editQuestion')}>
-                <h2 className={styles.title}>{t('decision.editQuestion')}</h2>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={title || t('decision.editQuestion')}>
+                <h2 className={styles.title}>{title || t('decision.editQuestion')}</h2>
                 <form onSubmit={handleSubmit}>
                     <input
                         ref={inputRef}
@@ -38,7 +38,7 @@ export default function EditQuestionModal({ question, onSave, onCancel, isLoadin
                         type="text"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
-                        maxLength={1000}
+                        maxLength={maxLength}
                         disabled={isLoading}
                     />
                     <div className={styles.actions}>

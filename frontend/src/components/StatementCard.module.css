@@ -30,6 +30,23 @@
   font-weight: 600;
 }
 
+.editButton {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted-alt);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.editButton:hover {
+  color: var(--color-accent-secondary);
+}
+
 .body {
   display: flex;
   align-items: flex-start;
