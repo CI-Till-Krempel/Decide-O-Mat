@@ -406,7 +406,10 @@
     "yourStatement": "Your Statement",
     "approvalFrom": "Approval from",
     "addedBy": "Added by {{name}}",
-    "errorVoteFailed": "Failed to vote. Please try again."
+    "errorVoteFailed": "Failed to vote. Please try again.",
+    "editButton": "Edit statement",
+    "editArgument": "Edit Statement",
+    "errorEditFailed": "Failed to save changes. Please try again."
   },
   "argumentList": {
     "titlePros": "Pros",
