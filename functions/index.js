@@ -18,19 +18,6 @@ const db = admin.firestore();
  */
 const {enforceAppCheck} = require("./config");
 
-exports.debugAppCheck = onCall({cors: true, enforceAppCheck: false}, async (request) => {
-  // This endpoint is only available outside of production to prevent
-  // information disclosure of auth/App Check internals.
-  if (process.env.GCLOUD_PROJECT === "decide-o-mat") {
-    throw new HttpsError("not-found", "Not available.");
-  }
-  return {
-    app: request.app || null,
-    auth: request.auth || null,
-    enforceAppCheckConfig: enforceAppCheck,
-  };
-});
-
 exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
