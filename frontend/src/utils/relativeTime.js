@@ -1,12 +1,26 @@
 /**
  * Returns a localized relative time string (e.g. "2 min. ago", "3 hr. ago").
- * @param {Date|number} date - Date object or timestamp
+ * @param {Date|number|string} date - Date object, timestamp, or date string
  * @param {string} [locale] - BCP 47 locale string; defaults to browser locale
  * @returns {string} Relative time string
  */
 export function relativeTime(date, locale) {
+    if (date === null || date === undefined) return '';
+
+    let timestamp;
+    if (date instanceof Date) {
+        timestamp = date.getTime();
+    } else if (typeof date === 'string') {
+        timestamp = new Date(date).getTime();
+    } else {
+        timestamp = Number(date);
+    }
+
+    if (isNaN(timestamp)) {
+        return '';
+    }
+
     const now = Date.now();
-    const timestamp = date instanceof Date ? date.getTime() : date;
     const diffMs = now - timestamp;
     const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
 
