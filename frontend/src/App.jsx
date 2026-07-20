@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import MyDecisions from './pages/MyDecisions';
 import MagicHandler from './pages/MagicHandler';
 import LegalPage from './pages/LegalPage';
+import { ensureAppCheck } from './services/firebase';
 
 function App() {
   const [isReady, setIsReady] = useState(false);
@@ -22,10 +23,11 @@ function App() {
     document.title = `Decide-O-Mat: ${version}${stage} - Group decisions made easy!`;
 
     // Wait for App Check logic
-    import('./services/firebase').then(async ({ ensureAppCheck }) => {
+    const initAppCheck = async () => {
       await ensureAppCheck();
       setIsReady(true);
-    });
+    };
+    initAppCheck();
   }, []);
 
   if (!isReady) {
