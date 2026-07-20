@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Decision from './pages/Decision';
@@ -10,22 +10,24 @@ import Footer from './components/Footer';
 import MyDecisions from './pages/MyDecisions';
 import MagicHandler from './pages/MagicHandler';
 import LegalPage from './pages/LegalPage';
+import { ensureAppCheck } from './services/firebase';
 
 function App() {
-  const [isReady, setIsReady] = React.useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const version = typeof __APP_VERSION__ !== 'undefined' ? `v${__APP_VERSION__}` : 'v0.0.0';
     // Check various env naming conventions or defaults
     const mode = import.meta.env.MODE || 'production';
     const stage = mode === 'production' ? '' : ` (${mode})`;
-    document.title = `Decide-O-Mat: ${version}${stage} - Group decisions made easy !`;
+    document.title = `Decide-O-Mat: ${version}${stage} - Group decisions made easy!`;
 
     // Wait for App Check logic
-    import('./services/firebase').then(async ({ ensureAppCheck }) => {
+    const initAppCheck = async () => {
       await ensureAppCheck();
       setIsReady(true);
-    });
+    };
+    initAppCheck();
   }, []);
 
   if (!isReady) {
