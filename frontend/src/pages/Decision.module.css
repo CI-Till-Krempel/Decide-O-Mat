@@ -76,6 +76,11 @@
   color: var(--color-accent-secondary);
 }
 
+.toolbarBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .toolbarBtnActive {
   border-color: var(--color-accent-primary);
   color: var(--color-accent-primary);

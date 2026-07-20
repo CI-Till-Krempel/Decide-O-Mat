@@ -9,13 +9,14 @@ function ShareIcon() {
     );
 }
 
-export default function FAB({ onClick, label }) {
+export default function FAB({ onClick, label, disabled }) {
     return (
         <button
             className={styles.fab}
             onClick={onClick}
             aria-label={label}
             type="button"
+            disabled={disabled}
         >
             <ShareIcon />
         </button>

@@ -17,6 +17,11 @@
   transition: opacity 0.2s;
 }
 
-.fab:hover {
+.fab:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.fab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
