@@ -28,6 +28,9 @@ function escapeHtml(unsafe) {
  */
 export async function copyRichLink(url, title, creator) {
     try {
+        if (!window.ClipboardItem || !navigator.clipboard || typeof navigator.clipboard.write !== 'function') {
+            throw new Error('Rich clipboard copy is not supported by this environment.');
+        }
         const safeTitle = escapeHtml(title);
         const safeCreator = creator ? escapeHtml(creator) : null;
         
@@ -48,6 +51,10 @@ export async function copyRichLink(url, title, creator) {
         await navigator.clipboard.write(data);
     } catch (err) {
         console.warn("Rich text copy failed, falling back to basic text copy.", err);
-        await navigator.clipboard.writeText(url);
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            await navigator.clipboard.writeText(url);
+        } else {
+            throw err;
+        }
     }
 }
