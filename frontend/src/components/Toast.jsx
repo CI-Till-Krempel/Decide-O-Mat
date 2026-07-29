@@ -10,10 +10,20 @@ const Toast = ({ message, type = 'info', onClose, duration = 3000 }) => {
 
     const bgColor = type === 'error' ? 'var(--color-danger)' :
         type === 'success' ? 'var(--color-success)' :
-            'var(--color-text-main)';
+            'var(--color-bg-card)';
+
+    const textColor = type === 'success' ? 'var(--color-icon-on-primary)' :
+        type === 'error' ? 'var(--color-bg-base)' :
+            'var(--color-text-on-bg)';
 
     return (
-        <div className="toast-container" style={{ backgroundColor: bgColor }}>
+        <div 
+            className="toast-container" 
+            style={{ 
+                backgroundColor: bgColor,
+                color: textColor
+            }}
+        >
             {type === 'success' && '✅'}
             {type === 'error' && '❌'}
             {type === 'info' && 'ℹ️'}
