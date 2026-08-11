@@ -28,14 +28,15 @@ function escapeHtml(unsafe) {
  */
 export async function copyRichLink(url, title, creator) {
     try {
+        const safeUrl = escapeHtml(url);
         const safeTitle = escapeHtml(title);
         const safeCreator = creator ? escapeHtml(creator) : null;
         
-        const authorPartHtml = safeCreator ? ` (by ${safeCreator})` : '';
-        const authorPartText = creator ? ` (by ${creator})` : '';
+        const authorPartHtml = safeCreator ? ' (by ' + safeCreator + ')' : '';
+        const authorPartText = creator ? ' (by ' + creator + ')' : '';
         
-        const shareHtml = `<a href="${url}">${safeTitle}${authorPartHtml}</a>`;
-        const shareText = `${title}${authorPartText}\n${url}`;
+        const shareHtml = '<a href="' + safeUrl + '">' + safeTitle + authorPartHtml + '</a>';
+        const shareText = title + authorPartText + '\n' + url;
 
         const blobHtml = new Blob([shareHtml], { type: 'text/html' });
         const blobText = new Blob([shareText], { type: 'text/plain' });
