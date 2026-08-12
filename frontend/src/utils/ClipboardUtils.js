@@ -7,9 +7,9 @@
  * @param {string} unsafe The unsanitized string.
  * @returns {string} The sanitized HTML-safe string.
  */
-function escapeHtml(unsafe) {
+export function escapeHtml(unsafe) {
     if (!unsafe) return '';
-    return unsafe
+    return String(unsafe)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -28,14 +28,17 @@ function escapeHtml(unsafe) {
  */
 export async function copyRichLink(url, title, creator) {
     try {
+        const safeUrl = url ? escapeHtml(url) : '';
         const safeTitle = escapeHtml(title);
         const safeCreator = creator ? escapeHtml(creator) : null;
         
-        const authorPartHtml = safeCreator ? ` (by ${safeCreator})` : '';
-        const authorPartText = creator ? ` (by ${creator})` : '';
+        const authorPartHtml = safeCreator ? (' (by ' + safeCreator + ')') : '';
+        const authorPartText = creator ? (' (by ' + creator + ')') : '';
+        const plainTitle = title || '';
+        const plainUrl = url || '';
         
-        const shareHtml = `<a href="${url}">${safeTitle}${authorPartHtml}</a>`;
-        const shareText = `${title}${authorPartText}\n${url}`;
+        const shareHtml = '<a href="' + safeUrl + '">' + safeTitle + authorPartHtml + '</a>';
+        const shareText = plainTitle || authorPartText ? (plainTitle + authorPartText + '\n' + plainUrl) : plainUrl;
 
         const blobHtml = new Blob([shareHtml], { type: 'text/html' });
         const blobText = new Blob([shareText], { type: 'text/plain' });
@@ -48,6 +51,6 @@ export async function copyRichLink(url, title, creator) {
         await navigator.clipboard.write(data);
     } catch (err) {
         console.warn("Rich text copy failed, falling back to basic text copy.", err);
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(url || '');
     }
 }
