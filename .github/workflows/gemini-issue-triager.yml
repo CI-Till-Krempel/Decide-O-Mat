@@ -23,7 +23,7 @@ jobs:
           private-key: ${{ secrets.GEMINI_APP_PRIVATE_KEY }}
 
       - name: Gemini Issue Triager Action
-        uses: google-github-actions/run-gemini-cli@v0.1.18
+        uses: google-github-actions/run-gemini-cli
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
