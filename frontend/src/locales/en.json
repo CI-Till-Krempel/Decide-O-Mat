@@ -25,6 +25,7 @@
     "closeDecisionButton": "Close Decision",
     "reopenDecisionButton": "Re-open Decision",
     "exportButton": "Export as Image",
+    "exporting": "Exporting...",
     "decisionClosed": "Decision Closed: {{result}}",
     "resultApproved": "Approved",
     "resultRejected": "Rejected",
