@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toPng } from 'html-to-image';
 import { subscribeToDecision, subscribeToArguments, voteDecision, voteArgument, addArgument, subscribeToFinalVotes, toggleDecisionStatus, updateDecisionQuestion, deleteDecision } from '../services/firebase';
 
 import ElectionHero from '../components/ElectionHero';
@@ -56,6 +57,8 @@ function Decision() {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [editLoading, setEditLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [exporting, setExporting] = useState(false);
+    const exportRef = useRef(null);
 
     // Parse key from URL hash
     useEffect(() => {
@@ -164,6 +167,28 @@ function Decision() {
         setCopied(true);
         setToast({ message: t('decision.copyLinkSuccess'), type: 'success' });
     }, [decision, participantMap, t]);
+
+    const handleExport = useCallback(async () => {
+        if (!exportRef.current || exporting) return;
+
+        setExporting(true);
+        try {
+            const dataUrl = await toPng(exportRef.current, {
+                cacheBust: true,
+                backgroundColor: '#050509',
+                pixelRatio: 2,
+            });
+            const link = document.createElement('a');
+            link.download = `decision-${id}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (error) {
+            console.error('Error exporting image:', error);
+            setToast({ message: t('decision.errors.exportFailed'), type: 'error' });
+        } finally {
+            setExporting(false);
+        }
+    }, [id, exporting, t]);
 
     const handleToggleNotifications = async () => {
         if (notificationsEnabled || notificationsRequesting) return;
@@ -397,18 +422,84 @@ function Decision() {
                 />
             )}
 
-            <ElectionHero
-                question={decision.question || decision.text}
-                onVoteYes={() => handleFinalVote('yes')}
-                onVoteNo={() => handleFinalVote('no')}
-                isClosed={isClosed}
-                userVote={finalVote}
-                votingTarget={votingTarget}
-                finalResult={finalResult}
-                finalVotesList={finalVotesList}
-                participantMap={participantMap}
-                mode={isClosed ? HERO_MODES.RESULTS : HERO_MODES.VOTING}
-            />
+            <div ref={exportRef}>
+                <ElectionHero
+                    question={decision.question || decision.text}
+                    onVoteYes={() => handleFinalVote('yes')}
+                    onVoteNo={() => handleFinalVote('no')}
+                    isClosed={isClosed}
+                    userVote={finalVote}
+                    votingTarget={votingTarget}
+                    finalResult={finalResult}
+                    finalVotesList={finalVotesList}
+                    participantMap={participantMap}
+                    mode={isClosed ? HERO_MODES.RESULTS : HERO_MODES.VOTING}
+                />
+
+                <div className={styles.columns}>
+                    <div className={styles.column}>
+                        <ColumnHeader
+                            label={t('argumentList.addPro')}
+                            onAdd={() => setActiveColumn('pro')}
+                            disabled={isClosed}
+                        />
+                        {sortedPros.length === 0 ? (
+                            <div className={styles.emptyCard}>
+                                <svg className={styles.emptyIcon} viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                                </svg>
+                            </div>
+                        ) : (
+                            sortedPros.map(arg => (
+                                <StatementCard
+                                    key={arg.id}
+                                    argument={arg}
+                                    decisionId={id}
+                                    readOnly={isClosed}
+                                    canVote={canVote}
+                                    participantMap={participantMap}
+                                    encryptionKey={encryptionKey}
+                                    onVoteChange={handleVoteChange}
+                                    onVotingStateChange={handleVotingStateChange}
+                                    onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
+                                    onError={(msg) => setToast({ message: msg, type: 'error' })}
+                                />
+                            ))
+                        )}
+                    </div>
+
+                    <div className={styles.column}>
+                        <ColumnHeader
+                            label={t('argumentList.addCon')}
+                            onAdd={() => setActiveColumn('con')}
+                            disabled={isClosed}
+                        />
+                        {sortedCons.length === 0 ? (
+                            <div className={styles.emptyCard}>
+                                <svg className={styles.emptyIcon} viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                                </svg>
+                            </div>
+                        ) : (
+                            sortedCons.map(arg => (
+                                <StatementCard
+                                    key={arg.id}
+                                    argument={arg}
+                                    decisionId={id}
+                                    readOnly={isClosed}
+                                    canVote={canVote}
+                                    participantMap={participantMap}
+                                    encryptionKey={encryptionKey}
+                                    onVoteChange={handleVoteChange}
+                                    onVotingStateChange={handleVotingStateChange}
+                                    onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
+                                    onError={(msg) => setToast({ message: msg, type: 'error' })}
+                                />
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
 
             <div className={styles.toolbar}>
                 <button
@@ -433,6 +524,17 @@ function Decision() {
                         <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
                     </svg>
                     {notificationsEnabled ? t('decision.notifications.enabled') : t('decision.notifications.enableButton')}
+                </button>
+                <button
+                    className={styles.toolbarBtn}
+                    onClick={handleExport}
+                    disabled={exporting || isVotingInProgress}
+                    type="button"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
+                    </svg>
+                    {exporting ? t('decision.exporting') : t('decision.exportButton')}
                 </button>
                 {isOwner && (
                     <>
@@ -473,70 +575,6 @@ function Decision() {
                         </button>
                     </>
                 )}
-            </div>
-
-            <div className={styles.columns}>
-                <div className={styles.column}>
-                    <ColumnHeader
-                        label={t('argumentList.addPro')}
-                        onAdd={() => setActiveColumn('pro')}
-                        disabled={isClosed}
-                    />
-                    {sortedPros.length === 0 ? (
-                        <div className={styles.emptyCard}>
-                            <svg className={styles.emptyIcon} viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
-                            </svg>
-                        </div>
-                    ) : (
-                        sortedPros.map(arg => (
-                            <StatementCard
-                                key={arg.id}
-                                argument={arg}
-                                decisionId={id}
-                                readOnly={isClosed}
-                                canVote={canVote}
-                                participantMap={participantMap}
-                                encryptionKey={encryptionKey}
-                                onVoteChange={handleVoteChange}
-                                onVotingStateChange={handleVotingStateChange}
-                                onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
-                                onError={(msg) => setToast({ message: msg, type: 'error' })}
-                            />
-                        ))
-                    )}
-                </div>
-
-                <div className={styles.column}>
-                    <ColumnHeader
-                        label={t('argumentList.addCon')}
-                        onAdd={() => setActiveColumn('con')}
-                        disabled={isClosed}
-                    />
-                    {sortedCons.length === 0 ? (
-                        <div className={styles.emptyCard}>
-                            <svg className={styles.emptyIcon} viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
-                            </svg>
-                        </div>
-                    ) : (
-                        sortedCons.map(arg => (
-                            <StatementCard
-                                key={arg.id}
-                                argument={arg}
-                                decisionId={id}
-                                readOnly={isClosed}
-                                canVote={canVote}
-                                participantMap={participantMap}
-                                encryptionKey={encryptionKey}
-                                onVoteChange={handleVoteChange}
-                                onVotingStateChange={handleVotingStateChange}
-                                onNameRequired={(argId) => { setPendingAction({ type: 'argVote', argumentId: argId }); setShowNamePrompt(true); }}
-                                onError={(msg) => setToast({ message: msg, type: 'error' })}
-                            />
-                        ))
-                    )}
-                </div>
             </div>
 
             {activeColumn && (
