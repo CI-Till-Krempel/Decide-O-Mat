@@ -2,12 +2,15 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const {FieldValue} = require("firebase-admin/firestore");
+const {enforceAppCheck} = require("./config");
 
 const {setGlobalOptions} = require("firebase-functions/v2");
 
 setGlobalOptions({region: "europe-west3"});
 
-admin.initializeApp();
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
 
 /**
@@ -16,8 +19,6 @@ const db = admin.firestore();
  * @param {string} request.data.question - The question to decide on.
  * @return {Promise<Object>} The created decision ID.
  */
-const {enforceAppCheck} = require("./config");
-
 exports.createDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -703,7 +704,7 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
 
 /**
  * Helper to ensure a user is in the participants subcollection.
- * @param {Object} db - Firestore instance or transaction.
+ * @param {Object} dbInstance - Firestore instance or transaction.
  * @param {string} decisionId - The decision ID.
  * @param {string} userId - The user ID.
  * @param {Object} auth - Auth context.
@@ -711,12 +712,7 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
  * @param {Object} [transaction] - Optional transaction object.
  */
 async function ensureParticipant(dbInstance, decisionId, userId, auth, displayName = null, transaction = null) {
-  // If dbInstance is the global db (Firestore), getting a ref is normal.
-  // If we are passing the global 'db' variable from outer scope, that works.
-  // Note: logic in voteArgument/voteDecision uses 'db' or 'admin.firestore()' which is the app db.
-
-  // Create reference based on the global db (which we need properly scoped or passed)
-  // For safety, we use admin.firestore() to create the ref, as 'db' might not be passed correctly if called as helper
+  // Create reference based on the provided dbInstance (which can be the global Firestore instance or a transaction)
   const participantRef = dbInstance.collection("decisions").doc(decisionId).collection("participants").doc(userId);
 
   const prepareData = () => {
