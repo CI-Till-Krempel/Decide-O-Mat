@@ -74,7 +74,7 @@ const ParticipantList = ({ participantMap, isOpen, onClose, ownerId }) => {
                 </div>
 
                 <div className={styles.help}>
-                    <p>🟡 {t('participantList.helpAnonymous')}</p>
+                    <p>👤 {t('participantList.helpAnonymous')}</p>
                     <p>🟢 {t('participantList.helpVerified')}</p>
                 </div>
             </div>
