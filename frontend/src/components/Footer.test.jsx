@@ -44,6 +44,6 @@ describe('Footer Component', () => {
     it('renders app name and version', () => {
         renderFooter();
         expect(screen.getByText('Decide-O-Mat')).toBeInTheDocument();
-        expect(screen.getByText('v0.0.0')).toBeInTheDocument();
+        expect(screen.getByText('v1.6.7')).toBeInTheDocument();
     });
 });

@@ -2,138 +2,154 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { copyRichLink } from './ClipboardUtils';
 
 describe('ClipboardUtils', () => {
-    let originalClipboard;
+    let originalClipboardWrite;
+    let originalClipboardWriteText;
     let originalClipboardItem;
+    let originalConsoleWarn;
 
     beforeEach(() => {
-        // Save originals
-        originalClipboard = navigator.clipboard;
+        // Backup
+        originalClipboardWrite = navigator.clipboard.write;
+        originalClipboardWriteText = navigator.clipboard.writeText;
         originalClipboardItem = window.ClipboardItem;
+        originalConsoleWarn = console.warn;
 
-        // Mock ClipboardItem and clipboard using a standard constructor function
-        window.ClipboardItem = vi.fn().mockImplementation(function (obj) {
-            return obj;
-        });
-        Object.defineProperty(navigator, 'clipboard', {
-            value: {
-                write: vi.fn().mockResolvedValue(undefined),
-                writeText: vi.fn().mockResolvedValue(undefined),
-            },
-            writable: true,
-            configurable: true,
-        });
+        // Mock console.warn to keep test output clean
+        console.warn = vi.fn();
     });
 
     afterEach(() => {
-        // Restore originals
-        if (originalClipboard) {
-            Object.defineProperty(navigator, 'clipboard', {
-                value: originalClipboard,
-                writable: true,
-                configurable: true,
-            });
-        }
-        if (originalClipboardItem !== undefined) {
-            window.ClipboardItem = originalClipboardItem;
+        // Restore
+        if (originalClipboardWrite) {
+            navigator.clipboard.write = originalClipboardWrite;
         } else {
-            delete window.ClipboardItem;
+            delete navigator.clipboard.write;
         }
+        navigator.clipboard.writeText = originalClipboardWriteText;
+        window.ClipboardItem = originalClipboardItem;
+        console.warn = originalConsoleWarn;
         vi.restoreAllMocks();
     });
 
-    it('successfully copies rich text with both HTML and plain text', async () => {
-        const url = 'https://example.com/d/123';
-        const title = 'Should we use React?';
-        const creator = 'John Doe';
+    it('successfully copies rich link with a creator', async () => {
+        const writeMock = vi.fn().mockResolvedValue(undefined);
+        navigator.clipboard.write = writeMock;
 
-        await copyRichLink(url, title, creator);
+        const clipboardItemData = [];
+        class MockClipboardItem {
+            constructor(data) {
+                this.data = data;
+                clipboardItemData.push(data);
+            }
+        }
+        window.ClipboardItem = MockClipboardItem;
 
-        // Verify ClipboardItem was instantiated
-        expect(window.ClipboardItem).toHaveBeenCalled();
-        const callArg = vi.mocked(window.ClipboardItem).mock.calls[0][0];
+        await copyRichLink('https://example.com/decide', 'Test Title', 'John Doe');
 
-        // Retrieve blobs
-        const htmlBlob = callArg['text/html'];
-        const textBlob = callArg['text/plain'];
+        expect(writeMock).toHaveBeenCalledTimes(1);
+        expect(clipboardItemData).toHaveLength(1);
 
-        expect(htmlBlob).toBeInstanceOf(Blob);
-        expect(textBlob).toBeInstanceOf(Blob);
+        const item = clipboardItemData[0];
+        expect(item['text/html']).toBeInstanceOf(Blob);
+        expect(item['text/plain']).toBeInstanceOf(Blob);
 
-        // Read blob content
-        const htmlText = await htmlBlob.text();
-        const plainText = await textBlob.text();
+        // Read blob content to verify
+        const htmlText = await item['text/html'].text();
+        const plainText = await item['text/plain'].text();
 
-        expect(htmlText).toBe('<a href="https://example.com/d/123">Should we use React? (by John Doe)</a>');
-        expect(plainText).toBe('Should we use React? (by John Doe)\nhttps://example.com/d/123');
-
-        // Verify navigator.clipboard.write was called
-        expect(navigator.clipboard.write).toHaveBeenCalled();
-        expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
+        expect(htmlText).toBe('<a href="https://example.com/decide">Test Title (by John Doe)</a>');
+        expect(plainText).toBe('Test Title (by John Doe)\nhttps://example.com/decide');
     });
 
-    it('works without a creator', async () => {
-        const url = 'https://example.com/d/123';
-        const title = 'What is the answer?';
+    it('successfully copies rich link without a creator', async () => {
+        const writeMock = vi.fn().mockResolvedValue(undefined);
+        navigator.clipboard.write = writeMock;
 
-        await copyRichLink(url, title, null);
+        const clipboardItemData = [];
+        class MockClipboardItem {
+            constructor(data) {
+                this.data = data;
+                clipboardItemData.push(data);
+            }
+        }
+        window.ClipboardItem = MockClipboardItem;
 
-        const callArg = vi.mocked(window.ClipboardItem).mock.calls[0][0];
-        const htmlBlob = callArg['text/html'];
-        const textBlob = callArg['text/plain'];
+        await copyRichLink('https://example.com/decide', 'Test Title', null);
 
-        const htmlText = await htmlBlob.text();
-        const plainText = await textBlob.text();
+        expect(writeMock).toHaveBeenCalledTimes(1);
+        expect(clipboardItemData).toHaveLength(1);
 
-        expect(htmlText).toBe('<a href="https://example.com/d/123">What is the answer?</a>');
-        expect(plainText).toBe('What is the answer?\nhttps://example.com/d/123');
+        const item = clipboardItemData[0];
+        const htmlText = await item['text/html'].text();
+        const plainText = await item['text/plain'].text();
+
+        expect(htmlText).toBe('<a href="https://example.com/decide">Test Title</a>');
+        expect(plainText).toBe('Test Title\nhttps://example.com/decide');
     });
 
-    it('escapes HTML characters to prevent XSS injection', async () => {
-        const url = 'https://example.com/d/123';
-        const title = 'React <19> & "Vite" \'App\'';
-        const creator = 'Hacker <script>alert(1)</script>';
+    it('escapes unsafe HTML characters to prevent XSS', async () => {
+        const writeMock = vi.fn().mockResolvedValue(undefined);
+        navigator.clipboard.write = writeMock;
 
-        await copyRichLink(url, title, creator);
+        const clipboardItemData = [];
+        class MockClipboardItem {
+            constructor(data) {
+                this.data = data;
+                clipboardItemData.push(data);
+            }
+        }
+        window.ClipboardItem = MockClipboardItem;
 
-        const callArg = vi.mocked(window.ClipboardItem).mock.calls[0][0];
-        const htmlBlob = callArg['text/html'];
-        const textBlob = callArg['text/plain'];
+        const unsafeTitle = 'Title <script>alert("xss")</script> & more';
+        const unsafeCreator = 'Creator & <img src=x onerror=alert(1)>';
 
-        const htmlText = await htmlBlob.text();
-        const plainText = await textBlob.text();
+        await copyRichLink('https://example.com/decide', unsafeTitle, unsafeCreator);
 
-        // The HTML version MUST be escaped
-        expect(htmlText).toContain('React &lt;19&gt; &amp; &quot;Vite&quot; &#039;App&#039;');
-        expect(htmlText).toContain('Hacker &lt;script&gt;alert(1)&lt;/script&gt;');
+        expect(writeMock).toHaveBeenCalledTimes(1);
+        const htmlText = await clipboardItemData[0]['text/html'].text();
+        const plainText = await clipboardItemData[0]['text/plain'].text();
+
+        // HTML version must be escaped
+        expect(htmlText).toContain('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+        expect(htmlText).toContain('&amp; more');
+        expect(htmlText).toContain('Creator &amp; &lt;img src=x onerror=alert(1)&gt;');
         expect(htmlText).not.toContain('<script>');
+        expect(htmlText).not.toContain('<img');
 
-        // The plain text version should remain as-is for user readability
-        expect(plainText).toContain('React <19> & "Vite" \'App\'');
-        expect(plainText).toContain('Hacker <script>alert(1)</script>');
+        // Plain text version should be untouched/raw for normal text-based display
+        expect(plainText).toContain(unsafeTitle);
+        expect(plainText).toContain(unsafeCreator);
     });
 
-    it('falls back to basic text copy if ClipboardItem is not supported', async () => {
-        // Remove ClipboardItem
-        delete window.ClipboardItem;
+    it('falls back to writing plain text URL if ClipboardItem is not supported', async () => {
+        window.ClipboardItem = undefined;
+        const writeTextMock = vi.fn().mockResolvedValue(undefined);
+        navigator.clipboard.writeText = writeTextMock;
 
-        const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        await copyRichLink('https://example.com/decide', 'Test Title', 'John');
 
-        const url = 'https://example.com/d/123';
-        await copyRichLink(url, 'Title', 'Creator');
-
-        // Should call fallback writeText
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
-        expect(consoleWarnSpy).toHaveBeenCalled();
+        expect(writeTextMock).toHaveBeenCalledWith('https://example.com/decide');
+        expect(console.warn).toHaveBeenCalled();
     });
 
-    it('falls back to basic text copy if navigator.clipboard.write throws an error', async () => {
-        navigator.clipboard.write = vi.fn().mockRejectedValue(new Error('Write failed'));
-        const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    it('falls back to writing plain text URL if navigator.clipboard.write fails', async () => {
+        const writeMock = vi.fn().mockRejectedValue(new Error('Permission Denied'));
+        navigator.clipboard.write = writeMock;
 
-        const url = 'https://example.com/d/123';
-        await copyRichLink(url, 'Title', 'Creator');
+        const writeTextMock = vi.fn().mockResolvedValue(undefined);
+        navigator.clipboard.writeText = writeTextMock;
 
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
-        expect(consoleWarnSpy).toHaveBeenCalled();
+        class MockClipboardItem {
+            constructor(data) {
+                this.data = data;
+            }
+        }
+        window.ClipboardItem = MockClipboardItem;
+
+        await copyRichLink('https://example.com/decide', 'Test Title', 'John');
+
+        expect(writeMock).toHaveBeenCalled();
+        expect(writeTextMock).toHaveBeenCalledWith('https://example.com/decide');
+        expect(console.warn).toHaveBeenCalled();
     });
 });
