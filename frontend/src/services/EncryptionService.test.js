@@ -100,4 +100,36 @@ describe('EncryptionService', () => {
         const enabled = EncryptionService.isEnabled();
         expect(typeof enabled).toBe('boolean');
     });
+
+    describe('local storage key persistence', () => {
+        const decisionId = 'test-decision-id';
+        const keyString = 'test-key-string-jwk';
+
+        it('stores and retrieves a key string correctly', () => {
+            EncryptionService.storeKey(decisionId, keyString);
+            const retrieved = EncryptionService.getStoredKeyString(decisionId);
+            expect(retrieved).toBe(keyString);
+        });
+
+        it('returns null if key does not exist in store', () => {
+            const retrieved = EncryptionService.getStoredKeyString('non-existent-id');
+            expect(retrieved).toBeNull();
+        });
+
+        it('retrieves an imported CryptoKey object correctly', async () => {
+            const originalKey = await EncryptionService.generateKey();
+            const exportedKeyString = await EncryptionService.exportKey(originalKey);
+
+            EncryptionService.storeKey(decisionId, exportedKeyString);
+            const importedKey = await EncryptionService.getStoredKey(decisionId);
+
+            expect(importedKey).toBeDefined();
+            expect(importedKey.algorithm.name).toBe('AES-GCM');
+        });
+
+        it('returns null if getting stored key for non-existent decisionId', async () => {
+            const key = await EncryptionService.getStoredKey('non-existent');
+            expect(key).toBeNull();
+        });
+    });
 });
