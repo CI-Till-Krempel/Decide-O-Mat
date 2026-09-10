@@ -198,12 +198,30 @@ exports.voteArgument = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
     throw new HttpsError("not-found", "Argument not found.");
   }
 
+  const allArgsSnapshot = await decisionRef.collection("arguments").get();
+
   // Check if user has already voted for this argument
   const voteRef = argumentRef.collection("votes").doc(userId);
 
   // Use a transaction to ensure atomic updates
   await db.runTransaction(async (transaction) => {
     const existingVote = await transaction.get(voteRef);
+
+    if (!existingVote.exists) {
+      // Enforce dot-voting limit: user may vote on at most ceil(totalArgs / 2) arguments
+      const userVoteDocs = await Promise.all(
+          allArgsSnapshot.docs.map((doc) => transaction.get(doc.ref.collection("votes").doc(userId))),
+      );
+      const currentVoteCount = userVoteDocs.filter((d) => d.exists).length;
+      const maxVotes = allArgsSnapshot.size > 0 ? Math.ceil(allArgsSnapshot.size / 2) : 0;
+
+      if (currentVoteCount >= maxVotes) {
+        throw new HttpsError(
+            "failed-precondition",
+            `Vote limit reached. You may only vote on up to ${maxVotes} arguments.`,
+        );
+      }
+    }
 
     // Ensure participant exists
     await ensureParticipant(db, decisionId, userId, request.auth, request.data.displayName, transaction);
