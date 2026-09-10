@@ -375,6 +375,30 @@ describe('Decision Component', () => {
                 expect(ParticipantService.subscribeToParticipants).toHaveBeenCalled();
             });
         });
+
+        it('preserves argument text when authorName is from a deleted user (#401)', async () => {
+            const encryptedDecision = { ...mockDecision, question: 'encrypted-Encrypted Topic' };
+            const argsWithDeletedAuthor = [
+                { id: 'arg-1', text: 'encrypted-Valid Pro Text', type: 'pro', votes: 1, authorId: 'deleted', authorName: 'Deleted Fox' }
+            ];
+
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(encryptedDecision);
+                return () => { };
+            });
+            mockSubscribeToArguments.mockImplementation((id, callback) => {
+                callback(argsWithDeletedAuthor);
+                return () => { };
+            });
+
+            renderDecision('/d/test-id#key=mock-key-string');
+
+            await waitFor(() => {
+                expect(screen.getByText('Valid Pro Text')).toBeInTheDocument();
+                expect(screen.queryByText('[Decryption Failed]')).not.toBeInTheDocument();
+                expect(EncryptionService.decrypt).not.toHaveBeenCalledWith('Deleted Fox', expect.anything());
+            });
+        });
     });
 
     describe('Share Decision (US-002)', () => {

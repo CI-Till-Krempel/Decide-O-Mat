@@ -101,10 +101,18 @@ function Decision() {
                     if (currentKey) {
                         try {
                             if (arg.text) arg.text = await EncryptionService.decrypt(arg.text, currentKey);
-                            if (arg.authorName) arg.authorName = await EncryptionService.decrypt(arg.authorName, currentKey);
                         } catch (e) {
-                            console.error("Failed to decrypt argument", e);
+                            console.error("Failed to decrypt argument text", e);
                             arg.text = t('decision.decryptionFailed');
+                        }
+
+                        try {
+                            if (arg.authorName && !arg.authorName.startsWith("Deleted ")) {
+                                arg.authorName = await EncryptionService.decrypt(arg.authorName, currentKey);
+                            }
+                        } catch (e) {
+                            console.error("Failed to decrypt argument author", e);
+                            arg.authorName = t('participantList.unknown', 'Unknown');
                         }
                     }
                     return arg;

@@ -120,6 +120,7 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
       const participantRef = decisionDoc.ref.collection("participants").doc(uid);
       batch.set(participantRef, {
         plainDisplayName: deletedName,
+        encryptedDisplayName: FieldValue.delete(),
         fcmToken: FieldValue.delete(),
         photoURL: FieldValue.delete(),
       }, {merge: true});
@@ -127,6 +128,77 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
       if (operationCount >= BATCH_LIMIT) {
         batch = await flushBatch(batch);
         operationCount = 0;
+      }
+    }
+
+    // E. Decisions Owned by this user (#402)
+    const ownedDecisionsQuery = db.collection("decisions").where("ownerId", "==", uid);
+    const ownedDecisionsSnapshot = await ownedDecisionsQuery.get();
+
+    for (const decisionDoc of ownedDecisionsSnapshot.docs) {
+      const decisionData = decisionDoc.data();
+      const otherParticipants = (decisionData.participantIds || []).filter((id) => id !== uid);
+
+      if (otherParticipants.length === 0) {
+        // Solo decision: cascade delete all subcollections and document
+        const argsSnapshot = await decisionDoc.ref.collection("arguments").get();
+        for (const argDoc of argsSnapshot.docs) {
+          const votesSnapshot = await argDoc.ref.collection("votes").get();
+          for (const voteDoc of votesSnapshot.docs) {
+            batch.delete(voteDoc.ref);
+            operationCount++;
+            if (operationCount >= BATCH_LIMIT) {
+              batch = await flushBatch(batch);
+              operationCount = 0;
+            }
+          }
+          batch.delete(argDoc.ref);
+          operationCount++;
+          if (operationCount >= BATCH_LIMIT) {
+            batch = await flushBatch(batch);
+            operationCount = 0;
+          }
+        }
+
+        const finalVotesSnapshot = await decisionDoc.ref.collection("finalVotes").get();
+        for (const voteDoc of finalVotesSnapshot.docs) {
+          batch.delete(voteDoc.ref);
+          operationCount++;
+          if (operationCount >= BATCH_LIMIT) {
+            batch = await flushBatch(batch);
+            operationCount = 0;
+          }
+        }
+
+        const participantsSnapshot = await decisionDoc.ref.collection("participants").get();
+        for (const participantDoc of participantsSnapshot.docs) {
+          batch.delete(participantDoc.ref);
+          operationCount++;
+          if (operationCount >= BATCH_LIMIT) {
+            batch = await flushBatch(batch);
+            operationCount = 0;
+          }
+        }
+
+        batch.delete(decisionDoc.ref);
+        operationCount++;
+        if (operationCount >= BATCH_LIMIT) {
+          batch = await flushBatch(batch);
+          operationCount = 0;
+        }
+      } else {
+        // Shared decision: freeze/close decision and anonymize ownerId
+        batch.update(decisionDoc.ref, {
+          ownerId: "deleted",
+          isClosed: true,
+          closedAt: FieldValue.serverTimestamp(),
+          ownerDisplayName: deletedName,
+        });
+        operationCount++;
+        if (operationCount >= BATCH_LIMIT) {
+          batch = await flushBatch(batch);
+          operationCount = 0;
+        }
       }
     }
 
