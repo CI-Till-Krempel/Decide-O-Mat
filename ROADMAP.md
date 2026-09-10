@@ -67,6 +67,7 @@
     - [x] [US-035](stories/US-035-Decision-Management-Actions.md): Decision Management Actions (edit question, delete decision, statistics)
 
 ## v2.0: QR Code Sharing, Mobile Experience & Repository Stabilization (Next Major Release)
+- **Release Plan**: [RELEASE-v2.0-Plan.md](plans/RELEASE-v2.0-Plan.md)
 - **Goal**: Enable frictionless in-person and hybrid decision sharing via client-side QR codes, provide a first-class mobile-friendly experience across all screens, and resolve all outstanding defects, security gaps, and technical debt across the repository.
 - **Features & Scope** *(Exclusive content for this release)*:
     - [ ] [US-037](stories/US-037-QR-Code-Decision.md): Show QR Code for Decision Sharing
