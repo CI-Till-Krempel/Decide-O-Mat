@@ -299,10 +299,10 @@ exports.voteDecision = onCall({cors: true, enforceAppCheck: enforceAppCheck}, as
 
   // Use a transaction to ensure atomic updates
   await db.runTransaction(async (transaction) => {
+    const existingVote = await transaction.get(voteRef);
+
     // Ensure participant exists
     await ensureParticipant(db, decisionId, userId, request.auth, request.data.displayName, transaction);
-
-    const existingVote = await transaction.get(voteRef);
     let yesChange = 0;
     let noChange = 0;
 
