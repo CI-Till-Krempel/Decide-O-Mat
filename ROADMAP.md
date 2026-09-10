@@ -66,10 +66,11 @@
     - [x] [US-034](stories/US-034-Archive-Page-Redesign.md): Archive / My Decisions Page Redesign (Aktivitaeten)
     - [x] [US-035](stories/US-035-Decision-Management-Actions.md): Decision Management Actions (edit question, delete decision, statistics)
 
-## v2.0: QR Code Sharing & Repository Stabilization (Next Major Release)
-- **Goal**: Enable frictionless in-person and hybrid decision sharing via client-side QR codes, and resolve all outstanding defects, security gaps, and technical debt across the repository.
+## v2.0: QR Code Sharing, Mobile Experience & Repository Stabilization (Next Major Release)
+- **Goal**: Enable frictionless in-person and hybrid decision sharing via client-side QR codes, provide a first-class mobile-friendly experience across all screens, and resolve all outstanding defects, security gaps, and technical debt across the repository.
 - **Features & Scope** *(Exclusive content for this release)*:
     - [ ] [US-037](stories/US-037-QR-Code-Decision.md): Show QR Code for Decision Sharing
+    - [ ] [US-038](stories/US-038-Mobile-Friendly-Experience.md): Mobile-Friendly Navigation & Responsive Experience
     - **Repository Issue Fixes & Quality Hardening**:
         - [ ] [#399](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/399): Non-owner participants blocked from reading participants subcollection in Firestore rules
         - [ ] [#400](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/400): Direct client writes permitted on participants subcollection without schema validation
