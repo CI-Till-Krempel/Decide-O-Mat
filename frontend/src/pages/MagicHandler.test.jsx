@@ -21,6 +21,29 @@ vi.mock('../contexts/UserContext', () => ({
     useUser: vi.fn(() => ({ user: null })),
 }));
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => {
+            const translations = {
+                'magicHandler.processing': 'Processing...',
+                'magicHandler.confirmTitle': 'Switch Account?',
+                'magicHandler.confirmCurrentUser': 'You are currently logged in as:',
+                'magicHandler.confirmWarning': 'Using this link will overwrite your current session on this device.',
+                'magicHandler.buttonCancel': 'Cancel',
+                'magicHandler.buttonConfirm': 'Yes, Switch',
+                'magicHandler.successTitle': 'Transfer Successful!',
+                'magicHandler.successMessage': 'You are now logged in with your original identity.',
+                'magicHandler.redirecting': 'Redirecting...',
+                'magicHandler.errorTitle': 'Transfer Failed',
+                'magicHandler.errorMessage': 'The link may be invalid or expired.',
+                'magicHandler.buttonGoHome': 'Go Home'
+            };
+            return translations[key] || key;
+        },
+    }),
+}));
+
 const renderWithRouter = (initialEntry) => {
     return render(
         <MemoryRouter initialEntries={[initialEntry]}>
