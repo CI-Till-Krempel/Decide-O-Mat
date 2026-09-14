@@ -124,7 +124,8 @@
     "appName": "Decide-O-Mat",
     "navDecision": "Decision",
     "navActivities": "Activities",
-    "navLogin": "Log in"
+    "navLogin": "Log in",
+    "switchLanguage": "Switch language"
   },
   "footer": {
     "encrypted": "End-to-End Encrypted",

@@ -22,14 +22,31 @@ function EditIcon() {
     );
 }
 
+function GlobeIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+    );
+}
+
 export default function Header() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { user } = useUser();
     const { id: routeParamsId } = useParams();
     const location = useLocation();
     const [encryptionKey, setEncryptionKey] = useState(null);
     const [decisionId, setDecisionId] = useState(null);
     const [showSettings, setShowSettings] = useState(false);
+
+    const currentLang = (i18n?.resolvedLanguage || i18n?.language || 'en').startsWith('de') ? 'de' : 'en';
+
+    const handleLanguageToggle = () => {
+        const nextLang = currentLang === 'de' ? 'en' : 'de';
+        i18n?.changeLanguage?.(nextLang);
+    };
 
     useEffect(() => {
         const parseUrl = async () => {
@@ -91,6 +108,18 @@ export default function Header() {
             </div>
 
             <div className={styles.meta}>
+                <button
+                    type="button"
+                    className={styles.langButton}
+                    onClick={handleLanguageToggle}
+                    aria-label={t('header.switchLanguage')}
+                    title={currentLang === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'}
+                    data-testid="language-toggle"
+                >
+                    <GlobeIcon />
+                    <span className={styles.langLabel}>{currentLang.toUpperCase()}</span>
+                </button>
+
                 {user && (
                     <>
                         <button

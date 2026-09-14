@@ -94,6 +94,31 @@
   color: var(--color-accent-secondary);
 }
 
+.langButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-label-md, 0.875rem);
+  color: var(--color-text-on-surface);
+  background: transparent;
+  border: var(--stroke-xs, 1px) solid var(--color-border-outline, var(--color-border));
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.langButton:hover {
+  color: var(--color-accent-secondary);
+  border-color: var(--color-accent-secondary);
+}
+
+.langLabel {
+  letter-spacing: var(--tracking-sm, 0.02em);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .navbar {
