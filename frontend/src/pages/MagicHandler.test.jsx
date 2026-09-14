@@ -106,4 +106,50 @@ describe('MagicHandler', () => {
 
         expect(signInWithCustomToken).not.toHaveBeenCalled();
     });
+
+    it('imports transferred decision keys upon successful sign in', async () => {
+        const sampleKeys = { 'dec-123': 'test-secret-key' };
+        const encodedKeys = btoa(encodeURIComponent(JSON.stringify(sampleKeys)));
+        signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
+
+        renderWithRouter(`/magic?token=valid-token&keys=${encodedKeys}`);
+
+        await waitFor(() => {
+            expect(signInWithCustomToken).toHaveBeenCalledWith(expect.anything(), 'valid-token');
+        });
+
+        const storedInLocalStorage = JSON.parse(localStorage.getItem('dom_decision_keys') || '{}');
+        expect(storedInLocalStorage['dec-123']).toBe('test-secret-key');
+    });
+
+    it('cleans up token and keys from URL history immediately upon mount', async () => {
+        const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
+        signInWithCustomToken.mockReturnValue(new Promise(() => { }));
+
+        renderWithRouter('/magic?token=secret-token&keys=secret-keys');
+
+        expect(replaceStateSpy).toHaveBeenCalledWith({}, document.title, window.location.pathname);
+        replaceStateSpy.mockRestore();
+    });
+
+    it('accepts and imports token and keys passed via hash fragment', async () => {
+        const sampleKeys = { 'dec-hash': 'hash-secret-key' };
+        const encodedKeys = btoa(encodeURIComponent(JSON.stringify(sampleKeys)));
+        window.location.hash = `#token=hash-token&keys=${encodedKeys}`;
+        const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
+        signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
+
+        renderWithRouter('/magic');
+
+        await waitFor(() => {
+            expect(signInWithCustomToken).toHaveBeenCalledWith(expect.anything(), 'hash-token');
+        });
+
+        const storedInLocalStorage = JSON.parse(localStorage.getItem('dom_decision_keys') || '{}');
+        expect(storedInLocalStorage['dec-hash']).toBe('hash-secret-key');
+        expect(replaceStateSpy).toHaveBeenCalledWith({}, document.title, window.location.pathname);
+
+        window.location.hash = '';
+        replaceStateSpy.mockRestore();
+    });
 });

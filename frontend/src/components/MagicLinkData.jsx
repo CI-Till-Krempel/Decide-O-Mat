@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { generateMagicLink } from '../services/firebase';
+import EncryptionService from '../services/EncryptionService';
 import Spinner from './Spinner';
 
 function MagicLinkData() {
@@ -13,8 +14,17 @@ function MagicLinkData() {
         setError(null);
         try {
             const token = await generateMagicLink();
-            // Construct the full URL
-            const url = `${window.location.origin}/magic?token=${token}`;
+            const storedKeys = EncryptionService.getAllStoredKeys();
+            const encodedKeys = EncryptionService.encodeKeysPayload(storedKeys);
+
+            const params = new URLSearchParams();
+            params.set('token', token);
+            if (encodedKeys) {
+                params.set('keys', encodedKeys);
+            }
+
+            // Construct the full URL using hash fragment to prevent leakage in referers or server logs
+            const url = `${window.location.origin}/magic#${params.toString()}`;
             setMagicLink(url);
         } catch (err) {
             console.error("Failed to generate magic link", err);

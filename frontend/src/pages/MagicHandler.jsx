@@ -4,15 +4,40 @@ import { useTranslation } from 'react-i18next';
 import { signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useUser } from '../contexts/UserContext';
+import EncryptionService from '../services/EncryptionService';
 import Spinner from '../components/Spinner';
+
+function getParamsFromUrl(searchParams) {
+    let token = searchParams.get('token');
+    let keys = searchParams.get('keys');
+
+    if (typeof window !== 'undefined' && window.location.hash) {
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        if (!token) token = hashParams.get('token');
+        if (!keys) keys = hashParams.get('keys');
+    }
+
+    return { token, keys };
+}
 
 function MagicHandler() {
     const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const token = searchParams.get('token');
+    const [{ token, keys }] = useState(() => getParamsFromUrl(searchParams));
     const { user: currentUser } = useUser(); // Get current context user for display name
     const [status, setStatus] = useState(token ? 'processing' : 'error'); // processing, confirming, success, error
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && (
+            searchParams.get('token') ||
+            searchParams.get('keys') ||
+            window.location.hash.includes('token=') ||
+            window.location.hash.includes('keys=')
+        )) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, [searchParams]);
 
     // We need to track if we've already checked the user status to avoid loops
     const [hasCheckedUser, setHasCheckedUser] = useState(false);
@@ -20,6 +45,10 @@ function MagicHandler() {
     const performSignIn = useCallback(async () => {
         try {
             await signInWithCustomToken(auth, token);
+            if (keys) {
+                const parsedKeys = EncryptionService.decodeKeysPayload(keys);
+                EncryptionService.importStoredKeys(parsedKeys);
+            }
             setStatus('success');
             setTimeout(() => {
                 navigate('/');
@@ -28,7 +57,7 @@ function MagicHandler() {
             console.error("Magic link failed", error);
             setStatus('error');
         }
-    }, [token, navigate]);
+    }, [token, keys, navigate]);
 
     useEffect(() => {
         if (!token) {
