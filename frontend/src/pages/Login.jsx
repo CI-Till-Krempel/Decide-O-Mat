@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
+    const { t } = useTranslation();
     const { loginWithGoogle, loginEmail, registerEmail, resetPassword, user } = useUser();
     const navigate = useNavigate();
     const [mode, setMode] = useState('login'); // 'login', 'register', 'reset'
@@ -27,7 +29,7 @@ function Login() {
             await loginWithGoogle(shouldLink);
             navigate(-1); // Go back to where they came from
         } catch {
-            setError('Failed to sign in with Google');
+            setError(t('login.errors.googleFailed'));
         } finally {
             setLoading(false);
         }
@@ -48,16 +50,17 @@ function Login() {
                 navigate(-1);
             } else if (mode === 'reset') {
                 await resetPassword(email);
-                setMessage('Check your email for instructions.');
+                setMessage(t('login.resetMessage'));
             }
         } catch (err) {
             console.error(err);
-            let msg = 'Failed to perform action.';
-            if (err.code === 'auth/wrong-password') msg = 'Incorrect password.';
-            if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
-            if (err.code === 'auth/email-already-in-use') msg = 'Email already in use.';
-            if (err.code === 'auth/weak-password') msg = 'Password is too weak.';
-            if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
+            let msg = t('login.errors.genericFailed');
+            if (err.code === 'auth/wrong-password') msg = t('login.errors.wrongPassword');
+            if (err.code === 'auth/user-not-found') msg = t('login.errors.userNotFound');
+            if (err.code === 'auth/invalid-credential') msg = t('login.errors.invalidCredential');
+            if (err.code === 'auth/email-already-in-use') msg = t('login.errors.emailInUse');
+            if (err.code === 'auth/weak-password') msg = t('login.errors.weakPassword');
+            if (err.code === 'auth/invalid-email') msg = t('login.errors.invalidEmail');
             setError(msg);
         } finally {
             setLoading(false);
@@ -68,9 +71,9 @@ function Login() {
         <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
             <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
                 <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                    {mode === 'login' && 'Welcome Back'}
-                    {mode === 'register' && 'Create Account'}
-                    {mode === 'reset' && 'Reset Password'}
+                    {mode === 'login' && t('login.titleWelcome')}
+                    {mode === 'register' && t('login.titleRegister')}
+                    {mode === 'reset' && t('login.titleReset')}
                 </h2>
 
                 {error && <div style={{ color: 'var(--color-danger)', marginBottom: '1rem', background: '#fee2e2', padding: '0.5rem', borderRadius: '4px' }}>{error}</div>}
@@ -91,7 +94,7 @@ function Login() {
                             fontWeight: mode === 'login' ? '600' : '400'
                         }}
                     >
-                        Sign In
+                        {t('login.tabSignIn')}
                     </button>
                     <button
                         type="button"
@@ -106,26 +109,26 @@ function Login() {
                             fontWeight: mode === 'register' ? '600' : '400'
                         }}
                     >
-                        Register
+                        {t('login.tabRegister')}
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>Email</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>{t('login.labelEmail')}</label>
                         <input
                             type="email"
                             className="input"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            placeholder="you@example.com"
+                            placeholder={t('login.placeholderEmail')}
                         />
                     </div>
 
                     {mode !== 'reset' && (
                         <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>Password</label>
+                            <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>{t('login.labelPassword')}</label>
                             <input
                                 type="password"
                                 className="input"
@@ -148,7 +151,7 @@ function Login() {
                                 style={{ marginRight: '0.5rem' }}
                             />
                             <label htmlFor="link-account" style={{ fontSize: '0.875rem', color: 'var(--color-text-main)' }}>
-                                Link to my current guest account
+                                {t('login.linkAccountCheckbox')}
                             </label>
                         </div>
                     )}
@@ -159,11 +162,11 @@ function Login() {
                         className="btn btn-primary"
                         style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem' }}
                     >
-                        {loading ? 'Processing...' : (
+                        {loading ? t('login.buttonProcessing') : (
                             <>
-                                {mode === 'login' && 'Sign In'}
-                                {mode === 'register' && 'Create Account'}
-                                {mode === 'reset' && 'Send Reset Link'}
+                                {mode === 'login' && t('login.buttonSignIn')}
+                                {mode === 'register' && t('login.buttonCreateAccount')}
+                                {mode === 'reset' && t('login.buttonSendReset')}
                             </>
                         )}
                     </button>
@@ -175,7 +178,7 @@ function Login() {
                             onClick={() => setMode('reset')}
                             style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline' }}
                         >
-                            Forgot Password?
+                            {t('login.forgotPassword')}
                         </button>
                     </div>
                 )}
@@ -184,7 +187,7 @@ function Login() {
                     <>
                         <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0' }}>
                             <div style={{ flex: 1, height: '1px', background: 'var(--color-border)' }}></div>
-                            <span style={{ padding: '0 0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>OR</span>
+                            <span style={{ padding: '0 0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>{t('login.dividerOr')}</span>
                             <div style={{ flex: 1, height: '1px', background: 'var(--color-border)' }}></div>
                         </div>
 
@@ -201,7 +204,7 @@ function Login() {
                             }}
                         >
                             <span style={{ marginRight: '0.5rem' }}>G</span>
-                            {mode === 'register' ? 'Sign up with Google' : 'Sign in with Google'}
+                            {mode === 'register' ? t('login.googleSignUp') : t('login.googleSignIn')}
                         </button>
                     </>
                 )}
@@ -212,7 +215,7 @@ function Login() {
                             onClick={() => setMode('login')}
                             style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline' }}
                         >
-                            Back to Login
+                            {t('login.backToLogin')}
                         </button>
                     </div>
                 )}

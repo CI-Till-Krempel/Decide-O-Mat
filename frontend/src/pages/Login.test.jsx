@@ -5,6 +5,26 @@ import Login from '../pages/Login';
 import { UserProvider } from '../contexts/UserContext';
 import { BrowserRouter } from 'react-router-dom';
 
+import en from '../locales/en.json';
+
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => {
+            const parts = key.split('.');
+            let curr = en;
+            for (const part of parts) {
+                if (curr && typeof curr === 'object') {
+                    curr = curr[part];
+                } else {
+                    return key;
+                }
+            }
+            return curr || key;
+        }
+    })
+}));
+
 // Mock services/firebase to prevent initialization error
 vi.mock('../services/firebase', () => ({
     auth: {},
