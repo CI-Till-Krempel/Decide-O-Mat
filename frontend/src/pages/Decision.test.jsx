@@ -590,6 +590,22 @@ describe('Decision Component', () => {
             });
         });
 
+        it('synchronizes userVote directly from Firestore finalVotesList (Issue #408)', async () => {
+            mockSubscribeToFinalVotes.mockImplementation((id, callback) => {
+                callback([
+                    { userId: 'other-user', vote: 'no', displayName: 'Bob' },
+                    { userId: 'test-user-id', vote: 'yes', displayName: 'Test User' },
+                ]);
+                return vi.fn();
+            });
+
+            renderDecision();
+
+            await waitFor(() => {
+                expect(screen.getByTestId('user-vote')).toHaveTextContent('yes');
+            });
+        });
+
         it('disables voting when decision is closed', async () => {
             mockSubscribeToDecision.mockImplementation((id, callback) => {
                 callback({ ...mockDecision, status: 'closed' });
