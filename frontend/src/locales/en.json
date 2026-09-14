@@ -468,7 +468,11 @@
     "avatarAlt": "Avatar",
     "helpCipherLabel": "Cipher",
     "helpNoLoginLabel": "No Login",
-    "helpTransferLabel": "Transfer"
+    "helpTransferLabel": "Transfer",
+    "buttonResetPassword": "Reset Password",
+    "resetPasswordSent": "Password reset link sent to your email.",
+    "resetPasswordError": "Failed to send reset email.",
+    "emailLabel": "Email"
   },
   "magicLinkData": {
     "title": "Transfer Identity",

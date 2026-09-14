@@ -468,7 +468,11 @@
     "avatarAlt": "Profilbild",
     "helpCipherLabel": "Verschlüsselung",
     "helpNoLoginLabel": "Kein Login",
-    "helpTransferLabel": "Übertragen"
+    "helpTransferLabel": "Übertragen",
+    "buttonResetPassword": "Passwort zurücksetzen",
+    "resetPasswordSent": "Link zum Zurücksetzen wurde per E-Mail gesendet.",
+    "resetPasswordError": "E-Mail konnte nicht gesendet werden.",
+    "emailLabel": "E-Mail"
   },
   "magicLinkData": {
     "title": "Identität übertragen",
