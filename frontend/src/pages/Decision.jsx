@@ -60,18 +60,37 @@ function Decision() {
     const [exporting, setExporting] = useState(false);
     const exportRef = useRef(null);
 
-    // Parse key from URL hash
+    // Parse key from URL hash or fallback to localStorage
     useEffect(() => {
+        let isMounted = true;
         const hash = location.hash;
         if (hash && hash.includes('key=')) {
             const keyString = hash.split('key=')[1];
             if (keyString) {
                 EncryptionService.storeKey(id, keyString);
                 EncryptionService.importKey(keyString)
-                    .then(key => setEncryptionKey(key))
+                    .then(key => {
+                        if (isMounted) setEncryptionKey(key);
+                    })
                     .catch(err => console.error("Failed to import key", err));
+                return () => {
+                    isMounted = false;
+                };
             }
         }
+
+        // Fall back to key stored in localStorage
+        EncryptionService.getStoredKey(id)
+            .then(storedKey => {
+                if (isMounted && storedKey) {
+                    setEncryptionKey(storedKey);
+                }
+            })
+            .catch(err => console.error("Failed to retrieve stored key", err));
+
+        return () => {
+            isMounted = false;
+        };
     }, [location, id]);
 
     useEffect(() => {
