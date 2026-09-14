@@ -16,6 +16,7 @@ import ParticipantList from '../components/ParticipantList';
 import Toast from '../components/Toast';
 import EditQuestionModal from '../components/EditQuestionModal';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
+import StatisticsModal from '../components/StatisticsModal';
 
 import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
@@ -58,6 +59,9 @@ function Decision() {
     const [editLoading, setEditLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [exporting, setExporting] = useState(false);
+    const [isStatsOpen, setIsStatsOpen] = useState(
+        () => Boolean(location.state?.openStats || (typeof window !== 'undefined' && window.location.hash.includes('stats=true')))
+    );
     const exportRef = useRef(null);
 
     // Parse key from URL hash
@@ -442,6 +446,7 @@ function Decision() {
                     finalVotesList={finalVotesList}
                     participantMap={participantMap}
                     mode={isClosed ? HERO_MODES.RESULTS : HERO_MODES.VOTING}
+                    onOpenStats={() => setIsStatsOpen(true)}
                 />
 
                 <div className={styles.columns}>
@@ -615,6 +620,16 @@ function Decision() {
                     onConfirm={handleDeleteConfirm}
                     onCancel={() => setShowDeleteDialog(false)}
                     isLoading={deleteLoading}
+                />
+            )}
+
+            {isStatsOpen && (
+                <StatisticsModal
+                    question={decision.question || decision.text}
+                    finalVotesList={finalVotesList}
+                    argumentsList={[...sortedPros, ...sortedCons]}
+                    decision={decision}
+                    onClose={() => setIsStatsOpen(false)}
                 />
             )}
         </div>

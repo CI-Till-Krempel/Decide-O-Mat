@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BallotIcon from './icons/BallotIcon';
+import StatsIcon from './icons/StatsIcon';
 import { HERO_MODES } from './ElectionHero.modes';
 import styles from './ElectionHero.module.css';
 
@@ -20,15 +21,7 @@ function ThumbsDownIcon() {
     );
 }
 
-function StatsIcon() {
-    return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-        </svg>
-    );
-}
-
-export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, userVote, votingTarget, finalResult, finalVotesList, participantMap, mode = HERO_MODES.VOTING }) {
+export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, userVote, votingTarget, finalResult, finalVotesList, participantMap, mode = HERO_MODES.VOTING, onOpenStats }) {
     const { t } = useTranslation();
 
     const yesVoters = (finalVotesList || []).filter(v => v.vote === 'yes');
@@ -38,11 +31,15 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
         if (voters.length === 0) return null;
         return (
             <div className={styles.voterChips}>
-                {voters.map(vote => (
-                    <span key={vote.userId} className={styles.chip}>
-                        {participantMap?.get(vote.userId)?.name || vote.displayName || t('decision.anonymous')}
-                    </span>
-                ))}
+                {voters.map(vote => {
+                    const participant = participantMap?.get ? participantMap.get(vote.userId) : participantMap?.[vote.userId];
+                    const name = participant?.name || vote.displayName || t('decision.anonymous');
+                    return (
+                        <span key={vote.userId} className={styles.chip}>
+                            {name}
+                        </span>
+                    );
+                })}
             </div>
         );
     };
@@ -61,9 +58,14 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
 
     return (
         <div className={styles.hero}>
-            <span className={styles.statsButton} aria-hidden="true">
+            <button
+                type="button"
+                className={styles.statsButton}
+                onClick={onOpenStats}
+                aria-label={t('decision.statistics')}
+            >
                 <StatsIcon />
-            </span>
+            </button>
 
             <h1 className={styles.question}>{question}</h1>
 
