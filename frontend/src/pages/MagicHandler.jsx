@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useUser } from '../contexts/UserContext';
 import Spinner from '../components/Spinner';
 
 function MagicHandler() {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const token = searchParams.get('token');
@@ -84,24 +86,24 @@ function MagicHandler() {
         <div className="container" style={{ textAlign: 'center', marginTop: '4rem' }}>
             {status === 'processing' && (
                 <div>
-                    <h2>Processing...</h2>
+                    <h2>{t('magicHandler.processing')}</h2>
                     <Spinner size="lg" color="var(--color-primary)" />
                 </div>
             )}
 
             {status === 'confirming' && (
                 <div style={{ maxWidth: '400px', margin: '0 auto', border: '1px solid var(--color-border)', padding: '2rem', borderRadius: '8px', background: 'white' }}>
-                    <h2 style={{ color: 'var(--color-warning)' }}>Switch Account?</h2>
-                    <p>You are currently logged in as:</p>
+                    <h2 style={{ color: 'var(--color-warning)' }}>{t('magicHandler.confirmTitle')}</h2>
+                    <p>{t('magicHandler.confirmCurrentUser')}</p>
                     <p style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{currentUser?.displayName || 'Anonymous User'}</p>
-                    <p style={{ margin: '1.5rem 0' }}>Using this link will <strong>overwrite</strong> your current session on this device.</p>
+                    <p style={{ margin: '1.5rem 0' }}>{t('magicHandler.confirmWarning')}</p>
 
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                         <button onClick={handleCancel} className="btn btn-secondary">
-                            Cancel
+                            {t('magicHandler.buttonCancel')}
                         </button>
                         <button onClick={handleConfirmSwitch} className="btn btn-primary">
-                            Yes, Switch
+                            {t('magicHandler.buttonConfirm')}
                         </button>
                     </div>
                 </div>
@@ -109,17 +111,17 @@ function MagicHandler() {
 
             {status === 'success' && (
                 <div style={{ color: 'var(--color-success)' }}>
-                    <h2>Transfer Successful!</h2>
-                    <p>You are now logged in with your original identity.</p>
-                    <p>Redirecting...</p>
+                    <h2>{t('magicHandler.successTitle')}</h2>
+                    <p>{t('magicHandler.successMessage')}</p>
+                    <p>{t('magicHandler.redirecting')}</p>
                 </div>
             )}
 
             {status === 'error' && (
                 <div style={{ color: 'var(--color-danger)' }}>
-                    <h2>Transfer Failed</h2>
-                    <p>The link may be invalid or expired.</p>
-                    <button onClick={() => navigate('/')} className="btn">Go Home</button>
+                    <h2>{t('magicHandler.errorTitle')}</h2>
+                    <p>{t('magicHandler.errorMessage')}</p>
+                    <button onClick={() => navigate('/')} className="btn">{t('magicHandler.buttonGoHome')}</button>
                 </div>
             )}
         </div>
