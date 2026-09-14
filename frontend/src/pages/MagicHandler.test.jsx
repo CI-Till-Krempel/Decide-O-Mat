@@ -106,4 +106,30 @@ describe('MagicHandler', () => {
 
         expect(signInWithCustomToken).not.toHaveBeenCalled();
     });
+
+    it('cleans up token from URL history immediately upon mount', async () => {
+        const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
+        signInWithCustomToken.mockReturnValue(new Promise(() => { }));
+
+        renderWithRouter('/magic?token=secret-token');
+
+        expect(replaceStateSpy).toHaveBeenCalledWith({}, document.title, window.location.pathname);
+        replaceStateSpy.mockRestore();
+    });
+
+    it('accepts and cleans up token passed via hash fragment', async () => {
+        window.location.hash = '#token=hash-token';
+        const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
+        signInWithCustomToken.mockResolvedValue({ user: { uid: 'test-uid' } });
+
+        renderWithRouter('/magic');
+
+        await waitFor(() => {
+            expect(signInWithCustomToken).toHaveBeenCalledWith(expect.anything(), 'hash-token');
+        });
+        expect(replaceStateSpy).toHaveBeenCalledWith({}, document.title, window.location.pathname);
+
+        window.location.hash = '';
+        replaceStateSpy.mockRestore();
+    });
 });
