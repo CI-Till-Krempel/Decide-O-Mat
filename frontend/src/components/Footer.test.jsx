@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Footer from './Footer';
+import { OPEN_COOKIE_PREFERENCES_EVENT } from '../services/ConsentService';
 
 // Mock i18next
 vi.mock('react-i18next', () => ({
@@ -11,6 +12,7 @@ vi.mock('react-i18next', () => ({
                 'footer.termsOfService': 'Terms of Service',
                 'footer.privacyPolicy': 'Privacy Policy',
                 'footer.imprint': 'Imprint',
+                'footer.cookieSettings': 'Cookie Settings',
                 'header.appName': 'Decide-O-Mat',
             };
             return translations[key] || key;
@@ -45,5 +47,20 @@ describe('Footer Component', () => {
         renderFooter();
         expect(screen.getByText('Decide-O-Mat')).toBeInTheDocument();
         expect(screen.getByText('v1.6.7')).toBeInTheDocument();
+    });
+
+    it('renders cookie settings button and dispatches event on click', () => {
+        const spyEvent = vi.fn();
+        window.addEventListener(OPEN_COOKIE_PREFERENCES_EVENT, spyEvent);
+
+        renderFooter();
+        const cookieBtn = screen.getByTestId('cookie-settings-button');
+        expect(cookieBtn).toBeInTheDocument();
+        expect(cookieBtn).toHaveTextContent('Cookie Settings');
+
+        cookieBtn.click();
+        expect(spyEvent).toHaveBeenCalledTimes(1);
+
+        window.removeEventListener(OPEN_COOKIE_PREFERENCES_EVENT, spyEvent);
     });
 });
