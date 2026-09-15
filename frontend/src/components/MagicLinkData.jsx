@@ -13,8 +13,8 @@ function MagicLinkData() {
         setError(null);
         try {
             const token = await generateMagicLink();
-            // Construct the full URL
-            const url = `${window.location.origin}/magic?token=${token}`;
+            // Construct the full URL using hash fragment to prevent leakage in referers or server logs
+            const url = `${window.location.origin}/magic#token=${token}`;
             setMagicLink(url);
         } catch (err) {
             console.error("Failed to generate magic link", err);

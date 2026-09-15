@@ -9,7 +9,7 @@ import styles from './UserSettings.module.css';
 
 function UserSettings({ decisionId, encryptionKey, onClose }) {
     const { t } = useTranslation();
-    const { user, logout, deleteAccount, setDisplayName, resetToInitialName, getInitialName } = useUser();
+    const { user, logout, deleteAccount, setDisplayName, resetToInitialName, getInitialName, resetPassword } = useUser();
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [showTransfer, setShowTransfer] = useState(false);
@@ -18,6 +18,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deletePassword, setDeletePassword] = useState('');
     const [deleteError, setDeleteError] = useState('');
+    const [resetStatus, setResetStatus] = useState(null); // null | 'sending' | 'success' | 'error'
     const [editedName, setEditedName] = useState(user?.displayName || '');
     const panelRef = useRef(null);
 
@@ -29,6 +30,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
         setShowDeleteConfirm(false);
         setDeletePassword('');
         setDeleteError('');
+        setResetStatus(null);
         if (onClose) onClose();
     }, [onClose]);
 
@@ -76,6 +78,19 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
         setShowDeleteConfirm(false);
         setDeletePassword('');
         setDeleteError('');
+        setResetStatus(null);
+    };
+
+    const handlePasswordReset = async () => {
+        if (!user?.email) return;
+        setResetStatus('sending');
+        try {
+            await resetPassword(user.email);
+            setResetStatus('success');
+        } catch (error) {
+            console.error("Password reset failed:", error);
+            setResetStatus('error');
+        }
     };
 
     const confirmReset = async () => {
@@ -151,26 +166,98 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
         );
     }
 
+    // Edit name panel (available for both registered and anonymous users)
+    if (isEditing) {
+        return (
+            <div ref={panelRef} className={styles.panel}>
+                <div className={styles.editTitle}>
+                    {t('userSettings.editTitle')}
+                </div>
+                <input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    placeholder={t('userSettings.editPlaceholder')}
+                    autoFocus
+                    className="input"
+                    style={{ marginBottom: '0.5rem' }}
+                />
+                <div className={styles.editActions}>
+                    <button onClick={handleCancel} className={styles.btnSecondary}>{t('userSettings.buttonCancel')}</button>
+                    <button
+                        onClick={handleSave}
+                        disabled={!editedName.trim()}
+                        className={`${styles.saveButton} ${editedName.trim() ? styles.saveButtonEnabled : styles.saveButtonDisabled}`}
+                    >
+                        {t('userSettings.buttonSave')}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     // Authenticated (non-anonymous) user
     if (!user.isAnonymous) {
+        const hasPasswordProvider = user.providers && user.providers.includes('password');
         return (
-            <div ref={panelRef} className={`${styles.panel} ${styles.panelRow}`}>
-                {user.photoURL && (
-                    <img
-                        src={user.photoURL}
-                        alt={t('userSettings.avatarAlt')}
-                        className={styles.avatar}
-                    />
+            <div ref={panelRef} className={`${styles.panel} ${styles.panelColumn}`}>
+                <div className={styles.identityHeader}>
+                    <div className={styles.identityInfo}>
+                        <div className={styles.nameRow}>
+                            {user.photoURL && (
+                                <img
+                                    src={user.photoURL}
+                                    alt={t('userSettings.avatarAlt')}
+                                    className={styles.avatar}
+                                />
+                            )}
+                            <span className={styles.displayName}>
+                                {user.displayName}
+                            </span>
+                        </div>
+                        {user.email && (
+                            <span className={styles.emailText} title={user.email}>
+                                {user.email}
+                            </span>
+                        )}
+                    </div>
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className={styles.editButton}
+                        title={t('userSettings.editNameButton')}
+                    >
+                        ✏️
+                    </button>
+                </div>
+
+                {hasPasswordProvider && user.email && (
+                    <div>
+                        <button
+                            onClick={handlePasswordReset}
+                            className={`${styles.btnSecondary} ${styles.fullWidthBtn}`}
+                            disabled={resetStatus === 'sending'}
+                        >
+                            {t('userSettings.buttonResetPassword')}
+                        </button>
+                        {resetStatus === 'success' && (
+                            <div className={styles.successText}>{t('userSettings.resetPasswordSent')}</div>
+                        )}
+                        {resetStatus === 'error' && (
+                            <div className={styles.errorText}>{t('userSettings.resetPasswordError')}</div>
+                        )}
+                    </div>
                 )}
-                <span className={styles.displayName}>
-                    {user.displayName}
-                </span>
-                <button onClick={handleLogout} className={styles.btnSecondary}>
-                    {t('userSettings.buttonLogout')}
-                </button>
-                <button onClick={() => setShowDeleteConfirm(true)} className={styles.btnDanger}>
-                    {t('userSettings.buttonDelete')}
-                </button>
+
+                <div className={styles.divider} />
+
+                <div className={styles.actionRow}>
+                    <button onClick={handleLogout} className={`${styles.btnSecondary} ${styles.flexOne}`}>
+                        {t('userSettings.buttonLogout')}
+                    </button>
+                    <button onClick={() => setShowDeleteConfirm(true)} className={`${styles.btnDanger} ${styles.flexOne}`}>
+                        {t('userSettings.buttonDelete')}
+                    </button>
+                </div>
             </div>
         );
     }
@@ -228,76 +315,46 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
     }
 
     // Default panel (anonymous user controls)
-    if (!isEditing) {
-        return (
-            <div ref={panelRef} className={`${styles.panel} ${styles.panelColumn}`}>
-                {/* Identity Header */}
-                <div className={styles.identityHeader}>
-                    <div className={styles.identityInfo}>
-                        <span className={styles.youAreLabel}>{t('userSettings.youAre')}</span>
-                        <span title={user.displayName}>{user.displayName || t('userSettings.guestLabel')}</span>
-                    </div>
-                    <button
-                        onClick={() => setIsEditing(true)}
-                        className={styles.editButton}
-                        title={t('userSettings.editNameButton')}
-                    >
-                        ✏️
-                    </button>
-                </div>
-
-                {/* Actions */}
-                <div className={styles.actionRow}>
-                    <button onClick={() => setShowResetConfirm(true)} className={`${styles.btnSecondary} ${styles.flexOne}`} title={t('userSettings.resetDescription')}>
-                        {t('userSettings.buttonReset')}
-                    </button>
-                    <button onClick={() => setShowTransfer(true)} className={`${styles.btnSecondary} ${styles.flexOne}`} title={t('userSettings.titleTransfer')}>
-                        {t('userSettings.buttonTransfer')}
-                    </button>
-                </div>
-
-                <div className={styles.divider} />
-
-                {/* Footer Actions */}
-                <div className={styles.footerRow}>
-                    <button onClick={handleLogin} className={styles.loginButton}>
-                        {t('userSettings.buttonLogin')}
-                    </button>
-                    <button
-                        onClick={() => setShowHelp(true)}
-                        className={styles.helpButton}
-                        title={t('userSettings.buttonHelp')}
-                    >
-                        ?
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // Edit name panel
     return (
-        <div ref={panelRef} className={styles.panel}>
-            <div className={styles.editTitle}>
-                {t('userSettings.editTitle')}
-            </div>
-            <input
-                type="text"
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                placeholder={t('userSettings.editPlaceholder')}
-                autoFocus
-                className="input"
-                style={{ marginBottom: '0.5rem' }}
-            />
-            <div className={styles.editActions}>
-                <button onClick={handleCancel} className={styles.btnSecondary}>{t('userSettings.buttonCancel')}</button>
+        <div ref={panelRef} className={`${styles.panel} ${styles.panelColumn}`}>
+            {/* Identity Header */}
+            <div className={styles.identityHeader}>
+                <div className={styles.identityInfo}>
+                    <span className={styles.youAreLabel}>{t('userSettings.youAre')}</span>
+                    <span title={user.displayName}>{user.displayName || t('userSettings.guestLabel')}</span>
+                </div>
                 <button
-                    onClick={handleSave}
-                    disabled={!editedName.trim()}
-                    className={`${styles.saveButton} ${editedName.trim() ? styles.saveButtonEnabled : styles.saveButtonDisabled}`}
+                    onClick={() => setIsEditing(true)}
+                    className={styles.editButton}
+                    title={t('userSettings.editNameButton')}
                 >
-                    {t('userSettings.buttonSave')}
+                    ✏️
+                </button>
+            </div>
+
+            {/* Actions */}
+            <div className={styles.actionRow}>
+                <button onClick={() => setShowResetConfirm(true)} className={`${styles.btnSecondary} ${styles.flexOne}`} title={t('userSettings.resetDescription')}>
+                    {t('userSettings.buttonReset')}
+                </button>
+                <button onClick={() => setShowTransfer(true)} className={`${styles.btnSecondary} ${styles.flexOne}`} title={t('userSettings.titleTransfer')}>
+                    {t('userSettings.buttonTransfer')}
+                </button>
+            </div>
+
+            <div className={styles.divider} />
+
+            {/* Footer Actions */}
+            <div className={styles.footerRow}>
+                <button onClick={handleLogin} className={styles.loginButton}>
+                    {t('userSettings.buttonLogin')}
+                </button>
+                <button
+                    onClick={() => setShowHelp(true)}
+                    className={styles.helpButton}
+                    title={t('userSettings.buttonHelp')}
+                >
+                    ?
                 </button>
             </div>
         </div>

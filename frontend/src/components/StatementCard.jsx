@@ -46,8 +46,8 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
         return () => unsubscribe();
     }, [decisionId, argument.id]);
 
-    const hasVoted = votes.some(v => v.userId === user.userId);
-    const isOwn = argument.authorId === user.userId;
+    const hasVoted = votes.some(v => v.userId === user?.userId);
+    const isOwn = !!user?.userId && argument.authorId === user.userId;
 
     useEffect(() => {
         if (onVoteChange) {
@@ -58,7 +58,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
     const handleVote = async () => {
         if (readOnly || voting || (!hasVoted && !canVote)) return;
 
-        if (!user.displayName) {
+        if (!user?.displayName) {
             if (onNameRequired) onNameRequired(argument.id);
             return;
         }
@@ -66,7 +66,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
         setVoting(true);
         onVotingStateChange?.(argument.id, true);
         try {
-            if (user.displayName && !participantMap.has(user.userId)) {
+            if (user?.displayName && user?.userId && !participantMap?.has?.(user.userId)) {
                 try {
                     await ParticipantService.registerParticipant(decisionId, user.displayName, encryptionKey || null);
                 } catch (e) {
@@ -74,7 +74,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
                     if (onError) onError(t('argumentItem.errorVoteFailed'));
                 }
             }
-            const nameToSend = encryptionKey ? null : user.displayName;
+            const nameToSend = encryptionKey ? null : user?.displayName;
             await voteArgument(decisionId, argument.id, nameToSend);
         } catch (error) {
             console.error("Error voting:", error);
@@ -102,7 +102,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
         }
     };
 
-    const authorName = participantMap?.get(argument.authorId)?.name || argument.authorName;
+    const authorName = participantMap?.get?.(argument.authorId)?.name || argument.authorName;
 
     return (
         <div className={`${styles.card} ${isOwn ? styles.ownCard : ''}`}>
@@ -155,7 +155,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
                     <div className={styles.voterChips}>
                         {votes.map(vote => (
                             <span key={vote.userId} className={styles.chip}>
-                                {participantMap?.get(vote.userId)?.name || vote.displayName || t('decision.anonymous')}
+                                {participantMap?.get?.(vote.userId)?.name || vote.displayName || t('decision.anonymous')}
                             </span>
                         ))}
                     </div>

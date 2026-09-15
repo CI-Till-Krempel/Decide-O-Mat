@@ -13,6 +13,7 @@ vi.mock('react-i18next', () => {
         'decision.resultApproved': 'Approved',
         'decision.resultRejected': 'Rejected',
         'decision.resultNoVotes': 'No Votes',
+        'decision.statistics': 'Statistics',
     };
     return {
         useTranslation: () => ({ t: (key) => translations[key] || key }),
@@ -82,6 +83,14 @@ describe('ElectionHero', () => {
             render(<ElectionHero {...defaultProps} onVoteNo={onVoteNo} />);
             await user.click(screen.getByLabelText('No'));
             expect(onVoteNo).toHaveBeenCalledTimes(1);
+        });
+
+        it('calls onOpenStats when statistics button is clicked', async () => {
+            const onOpenStats = vi.fn();
+            const user = userEvent.setup();
+            render(<ElectionHero {...defaultProps} onOpenStats={onOpenStats} />);
+            await user.click(screen.getByLabelText('Statistics'));
+            expect(onOpenStats).toHaveBeenCalledTimes(1);
         });
     });
 

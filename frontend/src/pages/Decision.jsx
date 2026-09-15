@@ -16,6 +16,7 @@ import ParticipantList from '../components/ParticipantList';
 import Toast from '../components/Toast';
 import EditQuestionModal from '../components/EditQuestionModal';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
+import StatisticsModal from '../components/StatisticsModal';
 
 import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
@@ -36,9 +37,20 @@ function Decision() {
     const [pros, setPros] = useState([]);
     const [cons, setCons] = useState([]);
     const [copied, setCopied] = useState(false);
-    const [finalVote, setFinalVote] = useState(null);
+    const [optimisticVote, setOptimisticVote] = useState(() => {
+        try {
+            return localStorage.getItem(`decision_vote_${id}`) || null;
+        } catch {
+            return null;
+        }
+    });
     const [votingTarget, setVotingTarget] = useState(null);
     const [finalVotesList, setFinalVotesList] = useState([]);
+    const [finalVotesLoaded, setFinalVotesLoaded] = useState(false);
+
+    const finalVote = finalVotesLoaded
+        ? (finalVotesList.find(v => v.userId === user?.userId)?.vote || null)
+        : (finalVotesList.find(v => v.userId === user?.userId)?.vote || optimisticVote);
     const [participantMap, setParticipantMap] = useState(new Map());
     const [showNamePrompt, setShowNamePrompt] = useState(false);
     const [pendingAction, setPendingAction] = useState(null); // { type: 'vote', voteType } or { type: 'argument', argType, text }
@@ -58,20 +70,42 @@ function Decision() {
     const [editLoading, setEditLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [exporting, setExporting] = useState(false);
+    const [isStatsOpen, setIsStatsOpen] = useState(
+        () => Boolean(location.state?.openStats || (typeof window !== 'undefined' && window.location.hash.includes('stats=true')))
+    );
     const exportRef = useRef(null);
 
-    // Parse key from URL hash
+    // Parse key from URL hash or fallback to localStorage
     useEffect(() => {
+        let isMounted = true;
         const hash = location.hash;
         if (hash && hash.includes('key=')) {
             const keyString = hash.split('key=')[1];
             if (keyString) {
                 EncryptionService.storeKey(id, keyString);
                 EncryptionService.importKey(keyString)
-                    .then(key => setEncryptionKey(key))
+                    .then(key => {
+                        if (isMounted) setEncryptionKey(key);
+                    })
                     .catch(err => console.error("Failed to import key", err));
+                return () => {
+                    isMounted = false;
+                };
             }
         }
+
+        // Fall back to key stored in localStorage
+        EncryptionService.getStoredKey(id)
+            .then(storedKey => {
+                if (isMounted && storedKey) {
+                    setEncryptionKey(storedKey);
+                }
+            })
+            .catch(err => console.error("Failed to retrieve stored key", err));
+
+        return () => {
+            isMounted = false;
+        };
     }, [location, id]);
 
     useEffect(() => {
@@ -135,6 +169,17 @@ function Decision() {
                     return v;
                 }));
                 setFinalVotesList(decryptedVotes);
+                setFinalVotesLoaded(true);
+                const matchingVote = decryptedVotes.find(v => v.userId === user?.userId);
+                try {
+                    if (matchingVote) {
+                        localStorage.setItem(`decision_vote_${id}`, matchingVote.vote);
+                    } else {
+                        localStorage.removeItem(`decision_vote_${id}`);
+                    }
+                } catch {
+                    // Ignore storage errors
+                }
             });
 
             unsubscribeParticipants = ParticipantService.subscribeToParticipants(id, currentKey, (map) => {
@@ -144,17 +189,13 @@ function Decision() {
 
         setupSubscriptions();
 
-        const storedVote = localStorage.getItem(`decision_vote_${id}`);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (storedVote) setFinalVote(storedVote);
-
         return () => {
             unsubscribeDecision();
             unsubscribeArguments();
             unsubscribeFinalVotes();
             unsubscribeParticipants();
         };
-    }, [id, encryptionKey, t]);
+    }, [id, encryptionKey, user?.userId, t]);
 
     useEffect(() => {
         if (copied) {
@@ -232,7 +273,7 @@ function Decision() {
             const nameToSend = encryptionKey ? null : user.displayName;
             await voteDecision(id, voteType, nameToSend);
 
-            setFinalVote(voteType);
+            setOptimisticVote(voteType);
             localStorage.setItem(`decision_vote_${id}`, voteType);
         } catch (error) {
             console.error("Error voting:", error);
@@ -442,6 +483,7 @@ function Decision() {
                     finalVotesList={finalVotesList}
                     participantMap={participantMap}
                     mode={isClosed ? HERO_MODES.RESULTS : HERO_MODES.VOTING}
+                    onOpenStats={() => setIsStatsOpen(true)}
                 />
 
                 <div className={styles.columns}>
@@ -615,6 +657,16 @@ function Decision() {
                     onConfirm={handleDeleteConfirm}
                     onCancel={() => setShowDeleteDialog(false)}
                     isLoading={deleteLoading}
+                />
+            )}
+
+            {isStatsOpen && (
+                <StatisticsModal
+                    question={decision.question || decision.text}
+                    finalVotesList={finalVotesList}
+                    argumentsList={[...sortedPros, ...sortedCons]}
+                    decision={decision}
+                    onClose={() => setIsStatsOpen(false)}
                 />
             )}
         </div>

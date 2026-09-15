@@ -22,6 +22,7 @@ vi.mock('react-i18next', () => {
         'myDecisions.contextMenu.open': 'Options',
         'myDecisions.contextMenu.view': 'View',
         'myDecisions.contextMenu.copyLink': 'Copy Link',
+        'myDecisions.contextMenu.viewStatistics': 'View Statistics',
         'myDecisions.contextMenu.close': 'Close Decision',
         'myDecisions.contextMenu.reopen': 'Reopen Decision',
         'myDecisions.contextMenu.edit': 'Edit Question',
@@ -165,6 +166,7 @@ describe('MyDecisions', () => {
                 expect(screen.getByRole('menu')).toBeInTheDocument();
                 expect(screen.getByText('View')).toBeInTheDocument();
                 expect(screen.getByText('Copy Link')).toBeInTheDocument();
+                expect(screen.getByText('View Statistics')).toBeInTheDocument();
             });
         });
 
@@ -205,6 +207,7 @@ describe('MyDecisions', () => {
 
             await waitFor(() => {
                 expect(screen.getByText('View')).toBeInTheDocument();
+                expect(screen.getByText('View Statistics')).toBeInTheDocument();
                 expect(screen.queryByText('Delete')).not.toBeInTheDocument();
             });
         });
