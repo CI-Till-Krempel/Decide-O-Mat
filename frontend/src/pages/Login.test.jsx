@@ -179,4 +179,13 @@ describe('Login Page', () => {
             expect(screen.getByText('Invalid email or password.')).toBeInTheDocument();
         });
     });
+
+    it('renders Google login button with icon and contrasting text color', () => {
+        renderLogin();
+        const googleButton = screen.getByRole('button', { name: /sign in with google/i });
+        expect(googleButton).toBeInTheDocument();
+        expect(screen.getByTestId('google-icon')).toBeInTheDocument();
+        // Ensure text color is dark (#1f1f1f) and not white (#ffffff)
+        expect(googleButton).toHaveStyle({ color: '#1f1f1f', backgroundColor: '#ffffff' });
+    });
 });
