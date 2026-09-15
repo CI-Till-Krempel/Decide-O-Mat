@@ -32,6 +32,22 @@ function GlobeIcon() {
     );
 }
 
+function MenuIcon() {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+        </svg>
+    );
+}
+
+function MenuCloseIcon() {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+        </svg>
+    );
+}
+
 export default function Header() {
     const { t, i18n } = useTranslation();
     const { user } = useUser();
@@ -40,6 +56,7 @@ export default function Header() {
     const [encryptionKey, setEncryptionKey] = useState(null);
     const [decisionId, setDecisionId] = useState(null);
     const [showSettings, setShowSettings] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const currentLang = (i18n?.resolvedLanguage || i18n?.language || 'en').startsWith('de') ? 'de' : 'en';
 
@@ -47,6 +64,12 @@ export default function Header() {
         const nextLang = currentLang === 'de' ? 'en' : 'de';
         i18n?.changeLanguage?.(nextLang);
     };
+
+    const [prevPath, setPrevPath] = useState(location.pathname);
+    if (location.pathname !== prevPath) {
+        setPrevPath(location.pathname);
+        setIsMobileMenuOpen(false);
+    }
 
     useEffect(() => {
         const parseUrl = async () => {
@@ -138,7 +161,7 @@ export default function Header() {
                         </button>
 
                         {user.isAnonymous && (
-                            <Link to="/login" className={styles.textButton}>
+                            <Link to="/login" className={`${styles.textButton} ${styles.desktopLogin}`}>
                                 {t('header.navLogin')}
                             </Link>
                         )}
@@ -146,11 +169,61 @@ export default function Header() {
                 )}
 
                 {!user && (
-                    <Link to="/login" className={styles.textButton}>
+                    <Link to="/login" className={`${styles.textButton} ${styles.desktopLogin}`}>
                         {t('header.navLogin')}
                     </Link>
                 )}
+
+                <button
+                    type="button"
+                    className={styles.mobileMenuButton}
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    aria-label={t('header.toggleMenu', 'Toggle navigation menu')}
+                    aria-expanded={isMobileMenuOpen}
+                    data-testid="mobile-menu-toggle"
+                >
+                    {isMobileMenuOpen ? <MenuCloseIcon /> : <MenuIcon />}
+                </button>
             </div>
+
+            {isMobileMenuOpen && (
+                <nav className={styles.mobileDrawer} data-testid="mobile-drawer">
+                    <Link
+                        to="/"
+                        className={`${styles.mobileNavLink} ${isActive('/') ? styles.navLinkActive : ''}`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        {t('header.navDecision')}
+                    </Link>
+                    {user && (
+                        <Link
+                            to="/my-decisions"
+                            className={`${styles.mobileNavLink} ${isActive('/my-decisions') ? styles.navLinkActive : ''}`}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            {t('header.navActivities')}
+                        </Link>
+                    )}
+                    {user?.isAnonymous && (
+                        <Link
+                            to="/login"
+                            className={styles.mobileNavLink}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            {t('header.navLogin')}
+                        </Link>
+                    )}
+                    {!user && (
+                        <Link
+                            to="/login"
+                            className={styles.mobileNavLink}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            {t('header.navLogin')}
+                        </Link>
+                    )}
+                </nav>
+            )}
 
             {showSettings && user && (
                 <UserSettings

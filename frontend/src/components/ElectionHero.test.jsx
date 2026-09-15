@@ -107,6 +107,21 @@ describe('ElectionHero', () => {
             render(<ElectionHero {...defaultProps} />);
             expect(screen.queryByTestId('qr-code-button')).not.toBeInTheDocument();
         });
+
+        it('renders participants button and calls onOpenParticipants when clicked', async () => {
+            const onOpenParticipants = vi.fn();
+            const user = userEvent.setup();
+            render(<ElectionHero {...defaultProps} onOpenParticipants={onOpenParticipants} />);
+            const partBtn = screen.getByTestId('participants-button');
+            expect(partBtn).toBeInTheDocument();
+            await user.click(partBtn);
+            expect(onOpenParticipants).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not render participants button when onOpenParticipants is not passed', () => {
+            render(<ElectionHero {...defaultProps} />);
+            expect(screen.queryByTestId('participants-button')).not.toBeInTheDocument();
+        });
     });
 
     describe('results mode', () => {

@@ -198,8 +198,11 @@ vi.mock('../components/FloatingArgumentInput', () => ({
 
 // Mock FAB
 vi.mock('../components/FAB', () => ({
-    default: ({ onClick, label }) => (
-        <button aria-label={label} onClick={onClick} data-testid="fab">{label}</button>
+    default: ({ onClick, onCopyLink, onShowQRCode, label }) => (
+        <div>
+            <button aria-label={label} onClick={onCopyLink || onClick} data-testid="fab">{label}</button>
+            {onShowQRCode && <button data-testid="fab-qr" onClick={onShowQRCode}>QR Code</button>}
+        </div>
     )
 }));
 

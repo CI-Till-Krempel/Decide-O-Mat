@@ -488,6 +488,7 @@ function Decision() {
                     mode={isClosed ? HERO_MODES.RESULTS : HERO_MODES.VOTING}
                     onOpenStats={() => setIsStatsOpen(true)}
                     onShowQRCode={() => setShowQRModal(true)}
+                    onOpenParticipants={() => setShowParticipants(true)}
                 />
 
                 <div className={styles.columns}>
@@ -650,7 +651,8 @@ function Decision() {
             )}
 
             <FAB
-                onClick={handleCopyLink}
+                onCopyLink={handleCopyLink}
+                onShowQRCode={() => setShowQRModal(true)}
                 label={t('decision.copyLinkButton')}
                 disabled={isVotingInProgress}
             />
