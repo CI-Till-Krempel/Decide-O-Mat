@@ -179,4 +179,34 @@ describe('Header Component', () => {
         const activitiesLink = screen.getByText('Activities');
         expect(activitiesLink.className).toContain('navLinkActive');
     });
+
+    it('toggles mobile menu drawer open and closed when mobile menu button is clicked', () => {
+        useUser.mockReturnValue({
+            user: { userId: 'u1', displayName: 'Alice', isAnonymous: true },
+        });
+        renderHeader();
+        const toggleBtn = screen.getByTestId('mobile-menu-toggle');
+        expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
+
+        fireEvent.click(toggleBtn);
+        expect(screen.getByTestId('mobile-drawer')).toBeInTheDocument();
+        expect(screen.getByTestId('mobile-drawer')).toHaveTextContent('Decision');
+        expect(screen.getByTestId('mobile-drawer')).toHaveTextContent('Activities');
+
+        fireEvent.click(toggleBtn);
+        expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
+    });
+
+    it('closes mobile drawer when a mobile link is clicked', () => {
+        useUser.mockReturnValue({
+            user: { userId: 'u1', displayName: 'Alice', isAnonymous: true },
+        });
+        renderHeader();
+        fireEvent.click(screen.getByTestId('mobile-menu-toggle'));
+        expect(screen.getByTestId('mobile-drawer')).toBeInTheDocument();
+
+        const decisionLink = screen.getAllByText('Decision')[1];
+        fireEvent.click(decisionLink);
+        expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
+    });
 });
