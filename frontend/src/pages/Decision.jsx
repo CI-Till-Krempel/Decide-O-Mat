@@ -36,9 +36,20 @@ function Decision() {
     const [pros, setPros] = useState([]);
     const [cons, setCons] = useState([]);
     const [copied, setCopied] = useState(false);
-    const [finalVote, setFinalVote] = useState(null);
+    const [optimisticVote, setOptimisticVote] = useState(() => {
+        try {
+            return localStorage.getItem(`decision_vote_${id}`) || null;
+        } catch {
+            return null;
+        }
+    });
     const [votingTarget, setVotingTarget] = useState(null);
     const [finalVotesList, setFinalVotesList] = useState([]);
+    const [finalVotesLoaded, setFinalVotesLoaded] = useState(false);
+
+    const finalVote = finalVotesLoaded
+        ? (finalVotesList.find(v => v.userId === user?.userId)?.vote || null)
+        : (finalVotesList.find(v => v.userId === user?.userId)?.vote || optimisticVote);
     const [participantMap, setParticipantMap] = useState(new Map());
     const [showNamePrompt, setShowNamePrompt] = useState(false);
     const [pendingAction, setPendingAction] = useState(null); // { type: 'vote', voteType } or { type: 'argument', argType, text }
@@ -154,6 +165,17 @@ function Decision() {
                     return v;
                 }));
                 setFinalVotesList(decryptedVotes);
+                setFinalVotesLoaded(true);
+                const matchingVote = decryptedVotes.find(v => v.userId === user?.userId);
+                try {
+                    if (matchingVote) {
+                        localStorage.setItem(`decision_vote_${id}`, matchingVote.vote);
+                    } else {
+                        localStorage.removeItem(`decision_vote_${id}`);
+                    }
+                } catch {
+                    // Ignore storage errors
+                }
             });
 
             unsubscribeParticipants = ParticipantService.subscribeToParticipants(id, currentKey, (map) => {
@@ -163,17 +185,13 @@ function Decision() {
 
         setupSubscriptions();
 
-        const storedVote = localStorage.getItem(`decision_vote_${id}`);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (storedVote) setFinalVote(storedVote);
-
         return () => {
             unsubscribeDecision();
             unsubscribeArguments();
             unsubscribeFinalVotes();
             unsubscribeParticipants();
         };
-    }, [id, encryptionKey, t]);
+    }, [id, encryptionKey, user?.userId, t]);
 
     useEffect(() => {
         if (copied) {
@@ -251,7 +269,7 @@ function Decision() {
             const nameToSend = encryptionKey ? null : user.displayName;
             await voteDecision(id, voteType, nameToSend);
 
-            setFinalVote(voteType);
+            setOptimisticVote(voteType);
             localStorage.setItem(`decision_vote_${id}`, voteType);
         } catch (error) {
             console.error("Error voting:", error);
