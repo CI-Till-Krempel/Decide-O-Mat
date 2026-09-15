@@ -97,9 +97,21 @@
         - [x] [#459](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/459): The icons in the header gets overlapped if there is a longer title on mobile devices
         - [x] [#460](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/460): The Activity and Participants menu items are not accessible on mobile
 
+## v2.1: Microsoft 365, Teams & Azure Enterprise Integration
+- **Epic**: [EPIC-001](stories/EPIC-001-Microsoft-Azure-Teams-Integration.md): Microsoft Azure, Entra ID (Azure AD) & Microsoft Teams Integration
+- **Goal**: Enable seamless corporate enterprise adoption with Microsoft Entra ID (Azure AD) single sign-on and full Microsoft Teams integration across personal tabs, collaborative channel tabs, live meeting side panels, messaging extensions, and interactive Adaptive Cards.
+- **Features & Stories**:
+    - [ ] [US-039](stories/US-039-Entra-ID-Authentication.md): Microsoft Entra ID (Azure AD) Web Authentication
+    - [ ] [US-040](stories/US-040-Enterprise-Tenant-Restrictions.md): Enterprise Tenant Isolation & Scoping
+    - [ ] [US-041](stories/US-041-Teams-App-Foundation.md): Microsoft Teams App Manifest & SDK Integration
+    - [ ] [US-042](stories/US-042-Teams-Silent-SSO.md): Microsoft Teams Silent Single Sign-On (SSO)
+    - [ ] [US-043](stories/US-043-Teams-Channel-Meeting-Tabs.md): Teams Channel Tabs & Live Meeting Extension
+    - [ ] [US-044](stories/US-044-Teams-Messaging-Extension.md): Teams Messaging Extension & Link Unfurling
+    - [ ] [US-045](stories/US-045-Teams-Adaptive-Cards.md): Teams Bot & Interactive Adaptive Cards
+
 ---
 
-## Deferred & Future Releases (Post-v2.0)
+## Deferred & Future Releases (Post-v2.1)
 
 ### Private Decisions & Participation Controls (Deferred)
 - [ ] [US-012](stories/US-012-Private-Decisions.md): Private Decisions (Choose open/private, participant list)
