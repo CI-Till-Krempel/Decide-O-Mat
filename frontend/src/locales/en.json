@@ -105,7 +105,10 @@
       "emailInUse": "Email already in use.",
       "weakPassword": "Password is too weak.",
       "invalidEmail": "Invalid email address.",
-      "googleFailed": "Failed to sign in with Google."
+      "googleFailed": "Failed to sign in with Google.",
+      "popupBlocked": "Pop-up was blocked by your browser. Please allow pop-ups for this site.",
+      "unauthorizedDomain": "This domain is not authorized for Google Sign-In.",
+      "networkError": "Network error. Please check your connection."
     }
   },
   "magicHandler": {

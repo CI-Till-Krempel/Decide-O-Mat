@@ -15,7 +15,9 @@ const mockCreateUser = vi.fn(() => Promise.resolve({ user: { uid: 'new-user', is
 vi.mock('firebase/auth', () => ({
     getAuth: vi.fn(),
     connectAuthEmulator: vi.fn(),
-    GoogleAuthProvider: class { },
+    GoogleAuthProvider: class {
+        setCustomParameters = vi.fn();
+    },
     EmailAuthProvider: { credential: vi.fn() },
     signInWithPopup: (...args) => mockSignInWithPopup(...args),
     signInAnonymously: (...args) => mockSignInAnonymously(...args),
