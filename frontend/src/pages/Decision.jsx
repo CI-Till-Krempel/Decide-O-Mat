@@ -17,6 +17,8 @@ import Toast from '../components/Toast';
 import EditQuestionModal from '../components/EditQuestionModal';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 import StatisticsModal from '../components/StatisticsModal';
+import QRCodeModal from '../components/QRCodeModal';
+import QRCodeIcon from '../components/icons/QRCodeIcon';
 
 import { useUser } from '../contexts/UserContext';
 import EncryptionService from '../services/EncryptionService';
@@ -70,6 +72,7 @@ function Decision() {
     const [editLoading, setEditLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [exporting, setExporting] = useState(false);
+    const [showQRModal, setShowQRModal] = useState(false);
     const [isStatsOpen, setIsStatsOpen] = useState(
         () => Boolean(location.state?.openStats || (typeof window !== 'undefined' && window.location.hash.includes('stats=true')))
     );
@@ -484,6 +487,7 @@ function Decision() {
                     participantMap={participantMap}
                     mode={isClosed ? HERO_MODES.RESULTS : HERO_MODES.VOTING}
                     onOpenStats={() => setIsStatsOpen(true)}
+                    onShowQRCode={() => setShowQRModal(true)}
                 />
 
                 <div className={styles.columns}>
@@ -563,6 +567,15 @@ function Decision() {
                         <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
                     </svg>
                     {t('decision.participantsButton')}
+                </button>
+                <button
+                    className={styles.toolbarBtn}
+                    onClick={() => setShowQRModal(true)}
+                    type="button"
+                    data-testid="toolbar-qr-btn"
+                >
+                    <QRCodeIcon size={18} />
+                    {t('decision.showQRCode')}
                 </button>
                 <button
                     className={`${styles.toolbarBtn} ${notificationsEnabled ? styles.toolbarBtnActive : ''}`}
@@ -667,6 +680,15 @@ function Decision() {
                     argumentsList={[...sortedPros, ...sortedCons]}
                     decision={decision}
                     onClose={() => setIsStatsOpen(false)}
+                />
+            )}
+
+            {showQRModal && (
+                <QRCodeModal
+                    question={decision.question || decision.text}
+                    url={window.location.href}
+                    decisionId={id}
+                    onClose={() => setShowQRModal(false)}
                 />
             )}
         </div>

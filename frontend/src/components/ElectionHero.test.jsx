@@ -92,6 +92,21 @@ describe('ElectionHero', () => {
             await user.click(screen.getByLabelText('Statistics'));
             expect(onOpenStats).toHaveBeenCalledTimes(1);
         });
+
+        it('renders QR code button and calls onShowQRCode when clicked', async () => {
+            const onShowQRCode = vi.fn();
+            const user = userEvent.setup();
+            render(<ElectionHero {...defaultProps} onShowQRCode={onShowQRCode} />);
+            const qrBtn = screen.getByTestId('qr-code-button');
+            expect(qrBtn).toBeInTheDocument();
+            await user.click(qrBtn);
+            expect(onShowQRCode).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not render QR code button when onShowQRCode is not passed', () => {
+            render(<ElectionHero {...defaultProps} />);
+            expect(screen.queryByTestId('qr-code-button')).not.toBeInTheDocument();
+        });
     });
 
     describe('results mode', () => {

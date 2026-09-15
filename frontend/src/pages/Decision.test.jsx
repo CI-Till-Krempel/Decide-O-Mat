@@ -33,6 +33,7 @@ vi.mock('react-i18next', () => {
         'decision.deleteConfirmMessage': 'This action cannot be undone.',
         'decision.deleteSuccess': 'Decision deleted successfully.',
         'decision.participantsButton': 'Participants',
+        'decision.showQRCode': 'Show QR Code',
         'decision.notifications.enableButton': 'Enable Notifications',
         'decision.notifications.enabled': 'Notifications enabled!',
         'decision.notifications.failed': 'Could not enable notifications.',
@@ -143,7 +144,7 @@ vi.mock('../components/NamePrompt', () => ({
 
 // Mock ElectionHero — lightweight version that exposes the same prop interface
 vi.mock('../components/ElectionHero', () => ({
-    default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult, mode }) => (
+    default: ({ question, onVoteYes, onVoteNo, isClosed, userVote, finalResult, mode, onShowQRCode }) => (
         <div data-testid="election-hero" data-mode={mode || 'voting'}>
             <h1>{question}</h1>
             {mode === 'results' && finalResult && (
@@ -154,7 +155,19 @@ vi.mock('../components/ElectionHero', () => ({
             )}
             <button aria-label="Yes" onClick={onVoteYes} disabled={isClosed}>Yes</button>
             <button aria-label="No" onClick={onVoteNo} disabled={isClosed}>No</button>
+            {onShowQRCode && <button data-testid="hero-qr-btn" onClick={onShowQRCode}>Hero QR</button>}
             {userVote && <span data-testid="user-vote">{userVote}</span>}
+        </div>
+    )
+}));
+
+// Mock QRCodeModal
+vi.mock('../components/QRCodeModal', () => ({
+    default: ({ onClose, url }) => (
+        <div data-testid="qr-code-modal">
+            <span>QR Modal</span>
+            <span data-testid="qr-modal-url">{url}</span>
+            <button onClick={onClose}>Close QR</button>
         </div>
     )
 }));
@@ -954,4 +967,45 @@ describe('Decision Component', () => {
             expect(unsubscribeParticipants).toHaveBeenCalled();
         });
     });
+
+    describe('QR Code Sharing (US-037)', () => {
+        it('opens QR modal when clicking toolbar QR button and closes on close button', async () => {
+            const user = userEvent.setup();
+            renderDecision();
+
+            await waitFor(() => {
+                expect(screen.getByTestId('toolbar-qr-btn')).toBeInTheDocument();
+            });
+
+            expect(screen.queryByTestId('qr-code-modal')).not.toBeInTheDocument();
+
+            await user.click(screen.getByTestId('toolbar-qr-btn'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('qr-code-modal')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Close QR'));
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('qr-code-modal')).not.toBeInTheDocument();
+            });
+        });
+
+        it('opens QR modal when clicking hero QR button', async () => {
+            const user = userEvent.setup();
+            renderDecision();
+
+            await waitFor(() => {
+                expect(screen.getByTestId('hero-qr-btn')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByTestId('hero-qr-btn'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('qr-code-modal')).toBeInTheDocument();
+            });
+        });
+    });
 });
+
