@@ -101,6 +101,7 @@
       "genericFailed": "Failed to perform action.",
       "wrongPassword": "Incorrect password.",
       "userNotFound": "No account found with this email.",
+      "invalidCredential": "Invalid email or password.",
       "emailInUse": "Email already in use.",
       "weakPassword": "Password is too weak.",
       "invalidEmail": "Invalid email address.",
