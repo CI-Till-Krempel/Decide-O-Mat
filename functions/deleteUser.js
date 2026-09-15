@@ -1,8 +1,10 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const {FieldValue} = require("firebase-admin/firestore");
+const {getApps} = require("firebase-admin/app");
+const {FieldValue, getFirestore} = require("firebase-admin/firestore");
+const {getAuth} = require("firebase-admin/auth");
 
-if (admin.apps.length === 0) {
+if (getApps().length === 0) {
   admin.initializeApp();
 }
 
@@ -34,7 +36,7 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
   }
 
   const uid = request.auth.uid;
-  const db = admin.firestore();
+  const db = getFirestore();
   const BATCH_LIMIT = 490;
 
   // Helper: commit the current batch and return a fresh one.
@@ -45,7 +47,7 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
 
   try {
     // 2. Determine "Deleted Name"
-    const userRecord = await admin.auth().getUser(uid);
+    const userRecord = await getAuth().getUser(uid);
     let deletedName = "Deleted Bear"; // Default fallback
 
     if (userRecord.displayName && userRecord.displayName.startsWith("Anonymous ")) {
@@ -208,7 +210,7 @@ exports.deleteUser = onCall({cors: true, enforceAppCheck: enforceAppCheck}, asyn
     }
 
     // 4. Delete Auth User — done last so anonymization always completes first
-    await admin.auth().deleteUser(uid);
+    await getAuth().deleteUser(uid);
 
     return {success: true, anonymizedName: deletedName};
   } catch (error) {
