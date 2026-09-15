@@ -6,13 +6,29 @@ import { auth } from '../services/firebase';
 import { useUser } from '../contexts/UserContext';
 import Spinner from '../components/Spinner';
 
+function getTokenFromUrl(searchParams) {
+    const queryToken = searchParams.get('token');
+    if (queryToken) return queryToken;
+    if (typeof window !== 'undefined' && window.location.hash) {
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        return hashParams.get('token');
+    }
+    return null;
+}
+
 function MagicHandler() {
     const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const token = searchParams.get('token');
+    const [token] = useState(() => getTokenFromUrl(searchParams));
     const { user: currentUser } = useUser(); // Get current context user for display name
     const [status, setStatus] = useState(token ? 'processing' : 'error'); // processing, confirming, success, error
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && (searchParams.get('token') || window.location.hash.includes('token='))) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, [searchParams]);
 
     // We need to track if we've already checked the user status to avoid loops
     const [hasCheckedUser, setHasCheckedUser] = useState(false);
