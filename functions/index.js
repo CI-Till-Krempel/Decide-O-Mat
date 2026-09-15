@@ -1,17 +1,20 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
-const {FieldValue} = require("firebase-admin/firestore");
+const {getApps} = require("firebase-admin/app");
+const {FieldValue, getFirestore} = require("firebase-admin/firestore");
+const {getAuth} = require("firebase-admin/auth");
+const {getMessaging} = require("firebase-admin/messaging");
 const {enforceAppCheck} = require("./config");
 
 const {setGlobalOptions} = require("firebase-functions/v2");
 
 setGlobalOptions({region: "europe-west3"});
 
-if (admin.apps.length === 0) {
+if (getApps().length === 0) {
   admin.initializeApp();
 }
-const db = admin.firestore();
+const db = getFirestore();
 
 /**
  * Creates a new decision.
@@ -461,7 +464,7 @@ exports.registerParticipant = onCall({cors: true, enforceAppCheck: enforceAppChe
     throw new HttpsError("invalid-argument", "Missing decisionId or display name.");
   }
 
-  const db = admin.firestore();
+  const db = getFirestore();
   const decisionRef = db.collection("decisions").doc(decisionId);
   const decisionDoc = await decisionRef.get();
 
@@ -512,7 +515,7 @@ exports.generateMagicLink = onCall({cors: true, enforceAppCheck: enforceAppCheck
   const userId = request.auth.uid;
 
   try {
-    const customToken = await admin.auth().createCustomToken(userId);
+    const customToken = await getAuth().createCustomToken(userId);
     return {token: customToken};
   } catch (error) {
     console.error("Error creating custom token:", error);
@@ -679,7 +682,7 @@ exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{
   });
 
   if (tokens.length > 0) {
-    const response = await admin.messaging().sendEachForMulticast({
+    const response = await getMessaging().sendEachForMulticast({
       tokens,
       notification: payload.notification,
     });
@@ -710,7 +713,7 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
   });
 
   if (tokens.length > 0) {
-    await admin.messaging().sendEachForMulticast({
+    await getMessaging().sendEachForMulticast({
       tokens,
       notification: {
         title: title,
