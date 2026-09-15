@@ -8,6 +8,7 @@ import DecisionCard from '../components/DecisionCard';
 import ContextMenu from '../components/ContextMenu';
 import EditQuestionModal from '../components/EditQuestionModal';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
+import QRCodeModal from '../components/QRCodeModal';
 import Toast from '../components/Toast';
 import Spinner from '../components/Spinner';
 import { copyRichLink } from '../utils/ClipboardUtils';
@@ -22,6 +23,7 @@ const MyDecisions = () => {
     const [error, setError] = useState(null);
     const [contextMenu, setContextMenu] = useState(null); // { decisionId, position }
     const [toast, setToast] = useState(null);
+    const [qrTarget, setQrTarget] = useState(null); // decision object for QR Code modal
     const [editTarget, setEditTarget] = useState(null); // decision object to edit
     const [deleteTarget, setDeleteTarget] = useState(null); // decision object to delete
     const [editLoading, setEditLoading] = useState(false);
@@ -163,10 +165,15 @@ const MyDecisions = () => {
         }
     }, [deleteTarget, t]);
 
+    const handleShowQR = useCallback((decision) => {
+        setQrTarget(decision);
+    }, []);
+
     const getContextMenuItems = useCallback((decision) => {
         const items = [
             { label: t('myDecisions.contextMenu.view'), onClick: () => navigateToDecision(decision) },
             { label: t('myDecisions.contextMenu.copyLink'), onClick: () => handleCopyLink(decision) },
+            { label: t('myDecisions.contextMenu.showQRCode'), onClick: () => handleShowQR(decision) },
             { label: t('myDecisions.contextMenu.viewStatistics'), onClick: () => navigateToDecision(decision, { openStats: true }) },
         ];
 
@@ -190,7 +197,7 @@ const MyDecisions = () => {
         }
 
         return items;
-    }, [t, navigateToDecision, handleCopyLink, handleToggleStatus, handleEdit, handleDelete]);
+    }, [t, navigateToDecision, handleCopyLink, handleShowQR, handleToggleStatus, handleEdit, handleDelete]);
 
     const activeDecision = contextMenu
         ? decisions.find(d => d.id === contextMenu.decisionId)
@@ -296,6 +303,19 @@ const MyDecisions = () => {
                     onConfirm={handleDeleteConfirm}
                     onCancel={() => setDeleteTarget(null)}
                     isLoading={deleteLoading}
+                />
+            )}
+
+            {qrTarget && (
+                <QRCodeModal
+                    question={qrTarget.question || qrTarget.text}
+                    url={(() => {
+                        const key = EncryptionService.getStoredKeyString(qrTarget.id);
+                        const hash = key ? `#key=${key}` : '';
+                        return `${window.location.origin}/d/${qrTarget.id}${hash}`;
+                    })()}
+                    decisionId={qrTarget.id}
+                    onClose={() => setQrTarget(null)}
                 />
             )}
         </div>

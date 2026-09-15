@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BallotIcon from './icons/BallotIcon';
 import StatsIcon from './icons/StatsIcon';
+import QRCodeIcon from './icons/QRCodeIcon';
 import { HERO_MODES } from './ElectionHero.modes';
 import styles from './ElectionHero.module.css';
 
@@ -21,7 +22,7 @@ function ThumbsDownIcon() {
     );
 }
 
-export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, userVote, votingTarget, finalResult, finalVotesList, participantMap, mode = HERO_MODES.VOTING, onOpenStats }) {
+export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, userVote, votingTarget, finalResult, finalVotesList, participantMap, mode = HERO_MODES.VOTING, onOpenStats, onShowQRCode }) {
     const { t } = useTranslation();
 
     const yesVoters = (finalVotesList || []).filter(v => v.vote === 'yes');
@@ -58,14 +59,29 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
 
     return (
         <div className={styles.hero}>
-            <button
-                type="button"
-                className={styles.statsButton}
-                onClick={onOpenStats}
-                aria-label={t('decision.statistics')}
-            >
-                <StatsIcon />
-            </button>
+            <div className={styles.topActions}>
+                {onShowQRCode && (
+                    <button
+                        type="button"
+                        className={styles.actionButton}
+                        onClick={onShowQRCode}
+                        aria-label={t('decision.showQRCode')}
+                        title={t('decision.showQRCode')}
+                        data-testid="qr-code-button"
+                    >
+                        <QRCodeIcon />
+                    </button>
+                )}
+                <button
+                    type="button"
+                    className={`${styles.actionButton} ${styles.statsButton}`}
+                    onClick={onOpenStats}
+                    aria-label={t('decision.statistics')}
+                    title={t('decision.statistics')}
+                >
+                    <StatsIcon />
+                </button>
+            </div>
 
             <h1 className={styles.question}>{question}</h1>
 

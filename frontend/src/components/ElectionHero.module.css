@@ -11,10 +11,17 @@
   gap: var(--space-lg);
 }
 
-.statsButton {
+.topActions {
   position: absolute;
   top: var(--space-md);
   right: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.actionButton,
+.statsButton {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-full);
@@ -25,11 +32,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, color 0.2s;
 }
 
+.actionButton:hover,
 .statsButton:hover {
   border-color: var(--color-accent-secondary);
+  color: var(--color-accent-secondary);
 }
 
 .question {

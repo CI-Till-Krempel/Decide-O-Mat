@@ -22,6 +22,7 @@ vi.mock('react-i18next', () => {
         'myDecisions.contextMenu.open': 'Options',
         'myDecisions.contextMenu.view': 'View',
         'myDecisions.contextMenu.copyLink': 'Copy Link',
+        'myDecisions.contextMenu.showQRCode': 'Show QR Code',
         'myDecisions.contextMenu.viewStatistics': 'View Statistics',
         'myDecisions.contextMenu.close': 'Close Decision',
         'myDecisions.contextMenu.reopen': 'Reopen Decision',
@@ -58,6 +59,17 @@ vi.mock('../contexts/UserContext', () => ({
 
 vi.mock('../components/Toast', () => ({
     default: ({ message }) => <div data-testid="toast">{message}</div>
+}));
+
+vi.mock('../components/QRCodeModal', () => ({
+    default: ({ onClose, url, question }) => (
+        <div data-testid="qr-code-modal">
+            <span>QR Modal</span>
+            <span data-testid="qr-modal-url">{url}</span>
+            <span data-testid="qr-modal-question">{question}</span>
+            <button onClick={onClose}>Close QR</button>
+        </div>
+    )
 }));
 
 vi.mock('../components/Spinner', () => ({
@@ -228,6 +240,38 @@ describe('MyDecisions', () => {
 
             await waitFor(() => {
                 expect(screen.getByText('Reopen Decision')).toBeInTheDocument();
+            });
+        });
+
+        it('opens QR code modal when Show QR Code is clicked and closes on close button', async () => {
+            const user = userEvent.setup();
+            const mockDecisions = [
+                { id: '1', question: 'Test Decision', role: 'owner', status: 'open', createdAt: new Date() }
+            ];
+            firebaseService.getUserDecisions.mockResolvedValue(mockDecisions);
+
+            renderMyDecisions();
+            await waitFor(() => {
+                expect(screen.getByText('Test Decision')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByLabelText('Options'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Show QR Code')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Show QR Code'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('qr-code-modal')).toBeInTheDocument();
+                expect(screen.getByTestId('qr-modal-question')).toHaveTextContent('Test Decision');
+            });
+
+            await user.click(screen.getByText('Close QR'));
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('qr-code-modal')).not.toBeInTheDocument();
             });
         });
     });

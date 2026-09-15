@@ -1,0 +1,180 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: var(--space-md);
+}
+
+.modal {
+  background: var(--color-bg-card);
+  border: var(--stroke-sm) solid var(--color-border-card);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--color-text-on-surface);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.title {
+  font-family: var(--font-family);
+  font-size: var(--text-headline-sm);
+  font-weight: 600;
+  color: var(--color-text-on-surface);
+  margin: 0;
+  text-align: left;
+}
+
+.closeIconBtn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.closeIconBtn:hover {
+  color: var(--color-text-on-surface);
+}
+
+.questionText {
+  width: 100%;
+  text-align: left;
+  font-size: var(--text-body-md);
+  font-weight: 500;
+  color: var(--color-text-on-surface);
+  margin: 0 0 var(--space-md);
+  word-break: break-word;
+}
+
+.qrContainer {
+  background: #ffffff;
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+}
+
+.instructions {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-md);
+  line-height: var(--leading-body-sm);
+}
+
+.linkRow {
+  width: 100%;
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.urlInput {
+  flex: 1;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-bg-base);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  border-radius: var(--radius-xs);
+  color: var(--color-text-on-bg);
+  font-size: var(--text-body-sm);
+  outline: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.urlInput:focus {
+  border-color: var(--color-accent-secondary);
+}
+
+.btnCopy {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-xs);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-on-surface);
+  font-size: var(--text-label-sm, 0.75rem);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btnCopy:hover {
+  border-color: var(--color-accent-secondary);
+  color: var(--color-accent-secondary);
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.btnDownload {
+  flex: 1;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-accent-secondary);
+  color: var(--color-text-on-secondary);
+  font-weight: 600;
+  font-size: var(--text-label-lg);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnDownload:hover {
+  opacity: 0.9;
+}
+
+.btnClose {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  border: var(--stroke-xs) solid var(--color-border-outline);
+  background: transparent;
+  color: var(--color-text-on-surface);
+  font-weight: 600;
+  font-size: var(--text-label-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnClose:hover {
+  border-color: var(--color-accent-secondary);
+}
