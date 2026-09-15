@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-15
+
+### Added
+- **QR Code Sharing (US-037, #458)**: Client-side QR code generator modal dialog preserving End-to-End Encryption hash fragments (`#key=...`) for instant scanning and participation, plus PNG image export and clipboard fallback.
+- **Expandable Speed-Dial FAB (#458)**: Floating action button with standard Share icon and expandable menu for Copy Link and Show QR Code actions.
+- **Mobile-Friendly Navigation & Drawer (US-038, #460)**: Added hamburger menu and drawer for viewports `<= 768px` enabling mobile navigation between Decision and Activities.
+- **Top-Level Participants Access (US-038, #460)**: Added direct participants trigger button in `ElectionHero`.
+- **Zero-Overlap Safe Spacing (#459)**: Protected question title from overlapping action icons across all device widths.
+- **Self-Hosted Local Fonts & Consent Banner (#417)**: Self-hosted Alfa Slab One and Open Sans fonts locally to eliminate third-party tracking, plus cookie & privacy consent management.
+- **Bilingual Interface (#410, #416)**: Added full German and English translations across all pages and an interactive language toggle switch.
+- **Statistics View (#405)**: Added statistics trigger in ElectionHero and MyDecisions.
+- **User Profile Self-Service (#412)**: Name editing, email display, and password reset in User Settings.
+
+### Fixed
+- **E2EE Key Persistence (#407)**: Transparently recover decision encryption keys from localStorage on page refresh or direct URL visit.
+- **Magic Link Key Transfer (#413)**: Seamlessly preserve and migrate decision encryption keys across devices during identity transfer.
+- **Magic Link Token Cleanup (#414)**: Immediately scrub custom tokens from browser URL and history upon redemption.
+- **Firestore Rules & Participant Subcollections (#399, #400)**: Authorized non-owners to read participants and enforced strict schema validation on participant writes.
+- **Account Deletion Decryption (#401, #402)**: Anonymized display names and cleanly reassigned/removed owned decisions without breaking decryption for others.
+- **Dot-Voting Server Enforcement (#415)**: Enforced argument voting limits server-side in Cloud Functions.
+- **Service Worker Push Handling (#406)**: Added notification destination URLs and `notificationclick` navigation handlers.
+- **Error Handling (#411, #418)**: Gracefully handle `auth/invalid-credential` and prevent null-reference TypeErrors in statement cards.
+
+### Security
+- Missing `firebase-admin` dependency added to Cloud Functions (`#403`).
+- Hardened E2EE auditor workflow project configuration (`#404`).
+
 ## [1.6.7] - 2026-07-20
 
 ### Fixed
