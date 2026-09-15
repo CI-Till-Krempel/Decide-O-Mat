@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { openCookiePreferences } from '../services/ConsentService';
 import styles from './Footer.module.css';
 
 const Footer = () => {
@@ -19,6 +20,14 @@ const Footer = () => {
                 <Link to="/legal/imprint" className={styles.legalLink}>
                     {t('footer.imprint')}
                 </Link>
+                <button
+                    type="button"
+                    className={styles.legalButton}
+                    onClick={openCookiePreferences}
+                    data-testid="cookie-settings-button"
+                >
+                    {t('footer.cookieSettings')}
+                </button>
             </nav>
             <div className={styles.branding}>
                 <span>{t('header.appName')}</span>

@@ -134,7 +134,22 @@
     "unencrypted": "Unencrypted ({{env}})",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
-    "imprint": "Imprint"
+    "imprint": "Imprint",
+    "cookieSettings": "Cookie Settings"
+  },
+  "cookieConsent": {
+    "title": "Privacy & Cookie Preferences",
+    "description": "We use strictly necessary cookies and local storage to enable essential features like end-to-end encryption and authentication. We would also like your consent for optional analytics to help improve Decide-O-Mat.",
+    "privacyPolicyLink": "Read our Privacy Policy",
+    "acceptAll": "Accept All",
+    "essentialOnly": "Essential Only",
+    "customize": "Customize",
+    "savePreferences": "Save Preferences",
+    "essentialCategory": "Strictly Necessary",
+    "essentialDesc": "Required for core functionality, security, and end-to-end encryption. Always active.",
+    "analyticsCategory": "Analytics & Performance",
+    "analyticsDesc": "Helps us understand how the application is used so we can make improvements.",
+    "close": "Close"
   },
   "legal": {
     "lastUpdatedLabel": "Last updated",

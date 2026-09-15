@@ -134,7 +134,22 @@
     "unencrypted": "Unverschlüsselt ({{env}})",
     "termsOfService": "AGB",
     "privacyPolicy": "Datenschutz",
-    "imprint": "Impressum"
+    "imprint": "Impressum",
+    "cookieSettings": "Cookie-Einstellungen"
+  },
+  "cookieConsent": {
+    "title": "Privatsphäre & Cookie-Einstellungen",
+    "description": "Wir verwenden technisch notwendige Cookies und lokalen Speicher für Kernfunktionen wie Ende-zu-Ende-Verschlüsselung und Authentifizierung. Zudem bitten wir um Ihre Einwilligung für optionale Analysen, um Decide-O-Mat zu verbessern.",
+    "privacyPolicyLink": "Datenschutzerklärung lesen",
+    "acceptAll": "Alle akzeptieren",
+    "essentialOnly": "Nur notwendige",
+    "customize": "Anpassen",
+    "savePreferences": "Einstellungen speichern",
+    "essentialCategory": "Technisch notwendig",
+    "essentialDesc": "Erforderlich für Kernfunktionen, Sicherheit und Ende-zu-Ende-Verschlüsselung. Immer aktiv.",
+    "analyticsCategory": "Analyse & Performance",
+    "analyticsDesc": "Hilft uns zu verstehen, wie die Anwendung genutzt wird, um Verbesserungen vorzunehmen.",
+    "close": "Schließen"
   },
   "legal": {
     "lastUpdatedLabel": "Zuletzt aktualisiert",

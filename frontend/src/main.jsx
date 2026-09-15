@@ -1,5 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@fontsource/alfa-slab-one';
+import '@fontsource/open-sans/400.css';
+import '@fontsource/open-sans/600.css';
 import './i18n.js'
 import './index.css'
 import App from './App.jsx'

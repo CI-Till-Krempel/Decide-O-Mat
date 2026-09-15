@@ -32,6 +32,25 @@
   color: var(--color-accent-secondary);
 }
 
+.legalButton {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: var(--text-label-lg);
+  line-height: var(--leading-label-lg);
+  letter-spacing: var(--tracking-sm);
+  color: var(--color-text-on-surface);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  transition: color 0.2s;
+}
+
+.legalButton:hover {
+  color: var(--color-accent-secondary);
+}
+
 /* Right section: branding */
 .branding {
   display: flex;

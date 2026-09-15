@@ -5,6 +5,7 @@ import { UserProvider } from './contexts/UserContext';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
+import CookieConsent from './components/CookieConsent';
 import Spinner from './components/Spinner';
 import { ensureAppCheck } from './services/firebase';
 
@@ -56,6 +57,7 @@ function App() {
             </Suspense>
           </div>
           <Footer />
+          <CookieConsent />
         </div>
       </Router>
     </UserProvider>
