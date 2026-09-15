@@ -1,5 +1,6 @@
 {
     "name": "functions",
+    "version": "2.0.0",
     "description": "Cloud Functions for Decide-O-Mat",
     "scripts": {
         "lint": "eslint .",

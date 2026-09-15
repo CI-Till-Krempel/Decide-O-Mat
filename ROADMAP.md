@@ -66,33 +66,36 @@
     - [x] [US-034](stories/US-034-Archive-Page-Redesign.md): Archive / My Decisions Page Redesign (Aktivitaeten)
     - [x] [US-035](stories/US-035-Decision-Management-Actions.md): Decision Management Actions (edit question, delete decision, statistics)
 
-## v2.0: QR Code Sharing, Mobile Experience & Repository Stabilization (Next Major Release)
+## v2.0: QR Code Sharing, Mobile Experience & Repository Stabilization
 - **Release Plan**: [RELEASE-v2.0-Plan.md](plans/RELEASE-v2.0-Plan.md)
 - **Goal**: Enable frictionless in-person and hybrid decision sharing via client-side QR codes, provide a first-class mobile-friendly experience across all screens, and resolve all outstanding defects, security gaps, and technical debt across the repository.
 - **Features & Scope** *(Exclusive content for this release)*:
     - [x] [US-037](stories/US-037-QR-Code-Decision.md): Show QR Code for Decision Sharing
-    - [ ] [US-038](stories/US-038-Mobile-Friendly-Experience.md): Mobile-Friendly Navigation & Responsive Experience
+    - [x] [US-038](stories/US-038-Mobile-Friendly-Experience.md): Mobile-Friendly Navigation & Responsive Experience
     - **Repository Issue Fixes & Quality Hardening**:
-        - [ ] [#399](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/399): Non-owner participants blocked from reading participants subcollection in Firestore rules
-        - [ ] [#400](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/400): Direct client writes permitted on participants subcollection without schema validation
-        - [ ] [#401](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/401): deleteUser fails to remove encryptedDisplayName and breaks argument decryption for others
-        - [ ] [#402](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/402): Account deletion does not handle owned decisions, creating orphaned and unmanageable decisions
-        - [ ] [#403](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/403): firebase-admin is missing from functions/package.json dependencies
-        - [ ] [#404](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/404): E2EE Auditor workflow passes mismatched project ID demo-test, causing CORS failure in CI
-        - [ ] [#405](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/405): Statistics View (US-036) is unimplemented in ElectionHero and MyDecisions context menu
-        - [ ] [#406](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/406): Push notifications lack destination URL and Service Worker notificationclick handler
-        - [ ] [#407](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/407): Decision.jsx does not recover encryption key from localStorage on direct visit or page refresh
-        - [ ] [#408](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/408): Final vote state relies on localStorage instead of synchronizing with Firestore subcollection
-        - [ ] [#409](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/409): NamePrompt component uses hardcoded English text and breaks dark theme styling
-        - [ ] [#410](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/410): Login page completely lacks internationalization support
-        - [ ] [#411](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/411): Login page does not handle auth/invalid-credential, displaying generic error
-        - [ ] [#412](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/412): User Profile settings panel lacks email display, name editing, and password change for registered users
-        - [ ] [#413](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/413): Magic Link identity transfer does not transfer decision encryption keys
-        - [ ] [#414](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/414): Magic Link custom token is exposed in URL query string without history cleanup
-        - [ ] [#415](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/415): Dot-voting argument limit is client-side only and not enforced in voteArgument Cloud Function
-        - [ ] [#416](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/416): No UI control to switch between English and German languages
-        - [ ] [#417](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/417): Google Fonts loaded unconditionally without prior consent or cookie consent banner
-        - [ ] [#418](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/418): StatementCard crashes with TypeError if participantMap or user is null/undefined
+        - [x] [#399](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/399): Non-owner participants blocked from reading participants subcollection in Firestore rules
+        - [x] [#400](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/400): Direct client writes permitted on participants subcollection without schema validation
+        - [x] [#401](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/401): deleteUser fails to remove encryptedDisplayName and breaks argument decryption for others
+        - [x] [#402](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/402): Account deletion does not handle owned decisions, creating orphaned and unmanageable decisions
+        - [x] [#403](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/403): firebase-admin is missing from functions/package.json dependencies
+        - [x] [#404](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/404): E2EE Auditor workflow passes mismatched project ID demo-test, causing CORS failure in CI
+        - [x] [#405](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/405): Statistics View (US-036) is unimplemented in ElectionHero and MyDecisions context menu
+        - [x] [#406](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/406): Push notifications lack destination URL and Service Worker notificationclick handler
+        - [x] [#407](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/407): Decision.jsx does not recover encryption key from localStorage on direct visit or page refresh
+        - [x] [#408](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/408): Final vote state relies on localStorage instead of synchronizing with Firestore subcollection
+        - [x] [#409](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/409): NamePrompt component uses hardcoded English text and breaks dark theme styling
+        - [x] [#410](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/410): Login page completely lacks internationalization support
+        - [x] [#411](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/411): Login page does not handle auth/invalid-credential, displaying generic error
+        - [x] [#412](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/412): User Profile settings panel lacks email display, name editing, and password change for registered users
+        - [x] [#413](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/413): Magic Link identity transfer does not transfer decision encryption keys
+        - [x] [#414](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/414): Magic Link custom token is exposed in URL query string without history cleanup
+        - [x] [#415](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/415): Dot-voting argument limit is client-side only and not enforced in voteArgument Cloud Function
+        - [x] [#416](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/416): No UI control to switch between English and German languages
+        - [x] [#417](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/417): Google Fonts loaded unconditionally without prior consent or cookie consent banner
+        - [x] [#418](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/418): StatementCard crashes with TypeError if participantMap or user is null/undefined
+        - [x] [#458](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/458): QR Code sharing should also be accessible in the share button
+        - [x] [#459](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/459): The icons in the header gets overlapped if there is a longer title on mobile devices
+        - [x] [#460](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/460): The Activity and Participants menu items are not accessible on mobile
 
 ---
 
