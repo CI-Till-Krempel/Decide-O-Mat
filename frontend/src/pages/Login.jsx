@@ -55,6 +55,7 @@ function Login() {
             let msg = 'Failed to perform action.';
             if (err.code === 'auth/wrong-password') msg = 'Incorrect password.';
             if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+            if (err.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
             if (err.code === 'auth/email-already-in-use') msg = 'Email already in use.';
             if (err.code === 'auth/weak-password') msg = 'Password is too weak.';
             if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
