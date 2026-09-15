@@ -22,6 +22,15 @@ test.describe('E2EE Auditor Agent', () => {
         page.on('console', msg => console.log(`BROWSER: ${msg.text()}`));
         page.on('pageerror', err => console.log(`BROWSER ERROR: ${err}`));
 
+        // Pre-accept the cookie consent banner so it doesn't intercept clicks below
+        await page.addInitScript(() => {
+            localStorage.setItem('decideomat_cookie_consent', JSON.stringify({
+                essential: true,
+                analytics: false,
+                decidedAt: new Date().toISOString(),
+            }));
+        });
+
         await page.goto('/');
         await page.getByPlaceholder('Enter your question here').fill(decisionQuestion);
         await page.getByRole('button', { name: 'Start Deciding' }).click();
