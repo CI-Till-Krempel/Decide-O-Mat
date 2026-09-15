@@ -105,7 +105,10 @@
       "emailInUse": "E-Mail wird bereits verwendet.",
       "weakPassword": "Passwort ist zu schwach.",
       "invalidEmail": "Ungültige E-Mail-Adresse.",
-      "googleFailed": "Anmeldung mit Google fehlgeschlagen."
+      "googleFailed": "Anmeldung mit Google fehlgeschlagen.",
+      "popupBlocked": "Das Pop-up wurde vom Browser blockiert. Bitte erlaube Pop-ups für diese Website.",
+      "unauthorizedDomain": "Diese Domain ist nicht für die Google-Anmeldung autorisiert.",
+      "networkError": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung."
     }
   },
   "magicHandler": {

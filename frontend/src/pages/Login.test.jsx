@@ -179,4 +179,44 @@ describe('Login Page', () => {
             expect(screen.getByText('Invalid email or password.')).toBeInTheDocument();
         });
     });
+
+    it('does not display error when user closes Google popup', async () => {
+        const cancelError = new Error('Popup closed by user');
+        cancelError.code = 'auth/popup-closed-by-user';
+        mockLoginWithGoogle.mockRejectedValue(cancelError);
+
+        renderLogin();
+        fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }));
+
+        await waitFor(() => {
+            expect(mockLoginWithGoogle).toHaveBeenCalled();
+        });
+        expect(screen.queryByText(/Failed to sign in with Google/i)).not.toBeInTheDocument();
+    });
+
+    it('displays helpful error message when Google popup is blocked', async () => {
+        const blockedError = new Error('Popup blocked');
+        blockedError.code = 'auth/popup-blocked';
+        mockLoginWithGoogle.mockRejectedValue(blockedError);
+
+        renderLogin();
+        fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/Pop-up was blocked by your browser/i)).toBeInTheDocument();
+        });
+    });
+
+    it('displays helpful error message when domain is unauthorized', async () => {
+        const domainError = new Error('Unauthorized domain');
+        domainError.code = 'auth/unauthorized-domain';
+        mockLoginWithGoogle.mockRejectedValue(domainError);
+
+        renderLogin();
+        fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/domain is not authorized/i)).toBeInTheDocument();
+        });
+    });
 });

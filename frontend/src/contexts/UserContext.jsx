@@ -94,19 +94,33 @@ export function UserProvider({ children }) {
 
     const loginWithGoogle = async (shouldLink = false) => {
         const provider = new GoogleAuthProvider();
+        if (typeof provider.setCustomParameters === 'function') {
+            provider.setCustomParameters({ prompt: 'select_account' });
+        }
         try {
             if (shouldLink && auth.currentUser && auth.currentUser.isAnonymous) {
                 // Try to upgrade the anonymous account
                 try {
                     const result = await linkWithPopup(auth.currentUser, provider);
                     setFirebaseUser(result.user);
-                    return; // Success
-                } catch {
-                    // If link fails (e.g. email already in use), fall back to normal sign in
-                    // This will switch the user, effectively "logging out" the anonymous session
+                    return result.user; // Success
+                } catch (linkError) {
+                    // Only fall back to sign in if the account already exists with this credential
+                    if (linkError.code === 'auth/credential-already-in-use' || linkError.code === 'auth/email-already-in-use') {
+                        const result = await signInWithPopup(auth, provider);
+                        if (result?.user) {
+                            setFirebaseUser(result.user);
+                        }
+                        return result?.user;
+                    }
+                    throw linkError;
                 }
             }
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            if (result?.user) {
+                setFirebaseUser(result.user);
+            }
+            return result?.user;
         } catch (error) {
             console.error("Google Login failed:", error);
             if (error.code === 'auth/user-token-expired') {

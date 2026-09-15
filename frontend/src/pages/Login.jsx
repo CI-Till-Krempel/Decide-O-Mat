@@ -28,7 +28,28 @@ function Login() {
         try {
             await loginWithGoogle(shouldLink);
             navigate(-1); // Go back to where they came from
-        } catch {
+        } catch (err) {
+            console.error("Google Login error:", err);
+            // Ignore intentional cancellation when user closes the popup
+            if (err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request') {
+                return;
+            }
+            if (err?.code === 'auth/popup-blocked') {
+                setError(t('login.errors.popupBlocked'));
+                return;
+            }
+            if (err?.code === 'auth/unauthorized-domain') {
+                setError(t('login.errors.unauthorizedDomain'));
+                return;
+            }
+            if (err?.code === 'auth/account-exists-with-different-credential' || err?.code === 'auth/credential-already-in-use') {
+                setError(t('login.errors.emailInUse'));
+                return;
+            }
+            if (err?.code === 'auth/network-request-failed') {
+                setError(t('login.errors.networkError'));
+                return;
+            }
             setError(t('login.errors.googleFailed'));
         } finally {
             setLoading(false);
