@@ -7,6 +7,8 @@
   width: 100%;
   gap: var(--space-2xl);
   min-height: var(--header-height);
+  position: relative;
+  z-index: 1000;
 }
 
 /* Left section: logo + nav links */
