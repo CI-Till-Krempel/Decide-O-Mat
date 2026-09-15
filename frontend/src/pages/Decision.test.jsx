@@ -273,6 +273,7 @@ describe('Decision Component', () => {
         });
 
         EncryptionService.importKey.mockResolvedValue('mock-key');
+        EncryptionService.getStoredKey.mockResolvedValue(null);
         EncryptionService.decrypt.mockImplementation((text) => Promise.resolve(text.replace('encrypted-', '')));
         EncryptionService.encrypt.mockImplementation((text) => Promise.resolve('encrypted-' + text));
 
@@ -346,6 +347,24 @@ describe('Decision Component', () => {
                 expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Secret Question', 'mock-key');
                 expect(screen.getByText('Secret Question')).toBeInTheDocument();
                 expect(screen.getByText('Secret Arg')).toBeInTheDocument();
+            });
+        });
+
+        it('recovers encryption key from localStorage when URL hash is absent (Issue #407)', async () => {
+            EncryptionService.getStoredKey.mockResolvedValue('mock-stored-key');
+            const encryptedDecision = { ...mockDecision, question: 'encrypted-Stored Secret Question' };
+
+            mockSubscribeToDecision.mockImplementation((id, callback) => {
+                callback(encryptedDecision);
+                return () => { };
+            });
+
+            renderDecision('/d/test-id');
+
+            await waitFor(() => {
+                expect(EncryptionService.getStoredKey).toHaveBeenCalledWith('test-id');
+                expect(EncryptionService.decrypt).toHaveBeenCalledWith('encrypted-Stored Secret Question', 'mock-stored-key');
+                expect(screen.getByText('Stored Secret Question')).toBeInTheDocument();
             });
         });
 
