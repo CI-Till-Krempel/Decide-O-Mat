@@ -69,6 +69,7 @@
       "open": "Optionen",
       "view": "Anzeigen",
       "copyLink": "Link kopieren",
+      "viewStatistics": "Statistiken anzeigen",
       "close": "Entscheidung schließen",
       "reopen": "Entscheidung öffnen",
       "edit": "Frage bearbeiten",
@@ -124,7 +125,8 @@
     "appName": "Decide-O-Mat",
     "navDecision": "Entscheidung",
     "navActivities": "Aktivitäten",
-    "navLogin": "Anmelden"
+    "navLogin": "Anmelden",
+    "switchLanguage": "Sprache wechseln"
   },
   "footer": {
     "encrypted": "Ende-zu-Ende-verschlüsselt",
@@ -468,7 +470,11 @@
     "avatarAlt": "Profilbild",
     "helpCipherLabel": "Verschlüsselung",
     "helpNoLoginLabel": "Kein Login",
-    "helpTransferLabel": "Übertragen"
+    "helpTransferLabel": "Übertragen",
+    "buttonResetPassword": "Passwort zurücksetzen",
+    "resetPasswordSent": "Link zum Zurücksetzen wurde per E-Mail gesendet.",
+    "resetPasswordError": "E-Mail konnte nicht gesendet werden.",
+    "emailLabel": "E-Mail"
   },
   "magicLinkData": {
     "title": "Identität übertragen",
@@ -476,8 +482,24 @@
     "buttonGenerate": "Magic Link erstellen",
     "buttonCopy": "Link kopieren",
     "buttonCopied": "Kopiert!",
-    "warning": "ACHTUNG: Teile diesen Link nicht. Er gewährt vollen Zugriff auf dein Konto.",
-    "errorFailed": "Link konnte nicht erstellt werden. Bitte versuche es erneut."
+    "warning": "ACHTUNG: Diesen Link niemals öffentlich teilen. Er gewährt vollen Zugriff auf das Konto.",
+    "errorFailed": "Link konnte nicht generiert werden. Bitte erneut versuchen."
+  },
+  "statisticsModal": {
+    "title": "Entscheidungsstatistiken",
+    "totalVotes": "Stimmen insgesamt",
+    "yesVotes": "Ja",
+    "noVotes": "Nein",
+    "voteBalance": "Stimmverhältnis",
+    "arguments": "Argumente",
+    "proArguments": "Pro",
+    "conArguments": "Contra",
+    "topArgument": "Stärkstes Argument",
+    "topScore": "Punkte",
+    "noVotesYet": "Es wurden noch keine Stimmen abgegeben.",
+    "noArgumentsYet": "Es wurden noch keine Argumente hinzugefügt.",
+    "emptyState": "Für diese Entscheidung liegen noch keine Aktivitäten vor.",
+    "close": "Schließen"
   },
   "common": {
     "loading": "Wird geladen...",

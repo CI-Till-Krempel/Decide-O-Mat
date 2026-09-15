@@ -204,6 +204,7 @@ export function UserProvider({ children }) {
         userId: firebaseUser.uid,
         displayName: localDisplayName || firebaseUser.displayName,
         photoURL: firebaseUser.photoURL,
+        email: firebaseUser.email || null,
         // Treat as anonymous if explicit flag OR if no providers
         isAnonymous: firebaseUser.isAnonymous || firebaseUser.providerData.length === 0,
         providers: firebaseUser.providerData.map(p => p.providerId)

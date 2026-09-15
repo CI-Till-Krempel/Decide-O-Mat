@@ -18,6 +18,12 @@ vi.mock('react-i18next', () => {
         'userSettings.buttonLogout': 'Logout',
         'userSettings.buttonClose': 'Close',
         'userSettings.avatarAlt': 'Avatar',
+        'userSettings.buttonResetPassword': 'Reset Password',
+        'userSettings.resetPasswordSent': 'Password reset link sent to your email.',
+        'userSettings.resetPasswordError': 'Failed to send reset email.',
+        'userSettings.editNameButton': 'Edit Name',
+        'userSettings.editTitle': 'Change Display Name',
+        'userSettings.buttonSave': 'Save',
     };
     const t = (key) => translations[key] || key;
     return { useTranslation: () => ({ t }) };
@@ -26,22 +32,6 @@ vi.mock('../contexts/UserContext');
 vi.mock('react-router-dom', () => ({
     useNavigate: vi.fn()
 }));
-vi.mock('react-i18next', () => {
-    const translations = {
-        'userSettings.deleteTitle': 'Delete Account?',
-        'userSettings.deleteWarning': 'This action is irreversible. Not even we can undo this.',
-        'userSettings.deleteVotesWarning': 'Your votes will be anonymized to preserve decision integrity.',
-        'userSettings.deletePasswordLabel': 'Confirm Password:',
-        'userSettings.deleteError': 'Failed to delete account. Check password.',
-        'userSettings.buttonCancel': 'Cancel',
-        'userSettings.buttonDelete': 'Delete',
-        'userSettings.buttonLogout': 'Logout',
-        'userSettings.buttonClose': 'Close',
-        'userSettings.avatarAlt': 'Avatar',
-    };
-    const t = (key) => translations[key] || key;
-    return { useTranslation: () => ({ t }) };
-});
 vi.mock('../services/firebase', () => ({
     updateUserDisplayName: vi.fn()
 }));
@@ -63,6 +53,7 @@ describe('UserSettings Integration', () => {
     const mockSetDisplayName = vi.fn();
     const mockResetToInitialName = vi.fn();
     const mockGetInitialName = vi.fn(() => 'Initial Name');
+    const mockResetPassword = vi.fn();
     const mockNavigate = vi.fn();
 
     beforeEach(() => {
@@ -74,7 +65,8 @@ describe('UserSettings Integration', () => {
             deleteAccount: mockDeleteAccount,
             setDisplayName: mockSetDisplayName,
             resetToInitialName: mockResetToInitialName,
-            getInitialName: mockGetInitialName
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
         });
     });
 
@@ -83,7 +75,8 @@ describe('UserSettings Integration', () => {
             user: { isAnonymous: false, displayName: 'Verified User', providers: ['google.com'] },
             logout: mockLogout,
             deleteAccount: mockDeleteAccount,
-            getInitialName: mockGetInitialName
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
         });
 
         render(<UserSettings />);
@@ -95,7 +88,8 @@ describe('UserSettings Integration', () => {
             user: { isAnonymous: false, displayName: 'Verified User', providers: ['google.com'] },
             logout: mockLogout,
             deleteAccount: mockDeleteAccount,
-            getInitialName: mockGetInitialName
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
         });
 
         render(<UserSettings />);
@@ -108,7 +102,8 @@ describe('UserSettings Integration', () => {
             user: { isAnonymous: false, displayName: 'Verified User', providers: ['password'] },
             logout: mockLogout,
             deleteAccount: mockDeleteAccount,
-            getInitialName: mockGetInitialName
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
         });
 
         render(<UserSettings />);
@@ -121,7 +116,8 @@ describe('UserSettings Integration', () => {
             user: { isAnonymous: false, displayName: 'Verified User', providers: ['google.com'] },
             logout: mockLogout,
             deleteAccount: mockDeleteAccount,
-            getInitialName: mockGetInitialName
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
         });
 
         render(<UserSettings />);
@@ -134,7 +130,8 @@ describe('UserSettings Integration', () => {
             user: { isAnonymous: false, displayName: 'Verified User', providers: ['google.com'] },
             logout: mockLogout,
             deleteAccount: mockDeleteAccount,
-            getInitialName: mockGetInitialName
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
         });
 
         render(<UserSettings />);
@@ -147,5 +144,75 @@ describe('UserSettings Integration', () => {
         await waitFor(() => {
             expect(mockDeleteAccount).toHaveBeenCalled();
         });
+    });
+
+    it('renders email and display name for registered users', () => {
+        useUser.mockReturnValue({
+            user: { isAnonymous: false, displayName: 'Jane Doe', email: 'jane@example.com', providers: ['password'] },
+            logout: mockLogout,
+            deleteAccount: mockDeleteAccount,
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
+        });
+
+        render(<UserSettings />);
+        expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+        expect(screen.getByText('jane@example.com')).toBeInTheDocument();
+    });
+
+    it('allows registered users to edit their display name', async () => {
+        useUser.mockReturnValue({
+            user: { isAnonymous: false, displayName: 'Jane Doe', email: 'jane@example.com', providers: ['password'] },
+            logout: mockLogout,
+            deleteAccount: mockDeleteAccount,
+            setDisplayName: mockSetDisplayName,
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
+        });
+
+        render(<UserSettings />);
+        const editBtn = screen.getByTitle('Edit Name');
+        fireEvent.click(editBtn);
+
+        expect(screen.getByText('Change Display Name')).toBeInTheDocument();
+        const input = screen.getByRole('textbox');
+        fireEvent.change(input, { target: { value: 'Jane Updated' } });
+        fireEvent.click(screen.getByText('Save'));
+
+        expect(mockSetDisplayName).toHaveBeenCalledWith('Jane Updated');
+    });
+
+    it('shows Reset Password button for password-registered users and sends reset email', async () => {
+        mockResetPassword.mockResolvedValue();
+        useUser.mockReturnValue({
+            user: { isAnonymous: false, displayName: 'Jane Doe', email: 'jane@example.com', providers: ['password'] },
+            logout: mockLogout,
+            deleteAccount: mockDeleteAccount,
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
+        });
+
+        render(<UserSettings />);
+        const resetBtn = screen.getByText('Reset Password');
+        expect(resetBtn).toBeInTheDocument();
+
+        fireEvent.click(resetBtn);
+        await waitFor(() => {
+            expect(mockResetPassword).toHaveBeenCalledWith('jane@example.com');
+            expect(screen.getByText('Password reset link sent to your email.')).toBeInTheDocument();
+        });
+    });
+
+    it('does not show Reset Password button for Google-registered users without password provider', () => {
+        useUser.mockReturnValue({
+            user: { isAnonymous: false, displayName: 'Google User', email: 'google@example.com', providers: ['google.com'] },
+            logout: mockLogout,
+            deleteAccount: mockDeleteAccount,
+            getInitialName: mockGetInitialName,
+            resetPassword: mockResetPassword
+        });
+
+        render(<UserSettings />);
+        expect(screen.queryByText('Reset Password')).not.toBeInTheDocument();
     });
 });

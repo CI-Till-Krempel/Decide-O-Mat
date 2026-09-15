@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Header from './Header';
+
+const mockChangeLanguage = vi.fn();
+let currentLanguage = 'en';
 
 // Mock i18next
 vi.mock('react-i18next', () => ({
@@ -12,11 +15,17 @@ vi.mock('react-i18next', () => ({
                 'header.navDecision': 'Decision',
                 'header.navActivities': 'Activities',
                 'header.navLogin': 'Log in',
+                'header.switchLanguage': 'Switch language',
                 'userSettings.guestLabel': 'Guest',
                 'common.edit': 'Edit',
             };
             return translations[key] || key;
         },
+        i18n: {
+            get language() { return currentLanguage; },
+            get resolvedLanguage() { return currentLanguage; },
+            changeLanguage: mockChangeLanguage,
+        }
     }),
 }));
 
@@ -35,7 +44,11 @@ vi.mock('../services/EncryptionService', () => ({
 
 // Mock UserSettings
 vi.mock('./UserSettings', () => ({
-    default: () => <div data-testid="user-settings-panel">UserSettings</div>,
+    default: ({ onClose }) => (
+        <div data-testid="user-settings-panel">
+            <button onClick={onClose}>Close</button>
+        </div>
+    ),
 }));
 
 import { useUser } from '../contexts/UserContext';
@@ -96,6 +109,42 @@ describe('Header Component', () => {
         });
         renderHeader();
         expect(screen.getByText('Guest')).toBeInTheDocument();
+    });
+
+    it('closes UserSettings modal when onClose callback is triggered', () => {
+        useUser.mockReturnValue({
+            user: { userId: 'u1', displayName: 'Alice', isAnonymous: true },
+        });
+        renderHeader();
+        fireEvent.click(screen.getByTestId('settings-toggle'));
+        expect(screen.getByTestId('user-settings-panel')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Close'));
+        expect(screen.queryByTestId('user-settings-panel')).not.toBeInTheDocument();
+    });
+
+    it('renders the language toggle button with current language', () => {
+        renderHeader();
+        const langToggle = screen.getByTestId('language-toggle');
+        expect(langToggle).toBeInTheDocument();
+        expect(langToggle).toHaveTextContent('EN');
+    });
+
+    it('toggles language from EN to DE when clicked', () => {
+        renderHeader();
+        const langToggle = screen.getByTestId('language-toggle');
+        fireEvent.click(langToggle);
+        expect(mockChangeLanguage).toHaveBeenCalledWith('de');
+    });
+
+    it('toggles language from DE to EN when clicked in German mode', () => {
+        currentLanguage = 'de';
+        renderHeader();
+        const langToggle = screen.getByTestId('language-toggle');
+        expect(langToggle).toHaveTextContent('DE');
+        fireEvent.click(langToggle);
+        expect(mockChangeLanguage).toHaveBeenCalledWith('en');
+        currentLanguage = 'en';
     });
 
     it('shows Log in link for anonymous user alongside their name', () => {

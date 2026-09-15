@@ -25,12 +25,31 @@ const ICON_URL = '/vite.svg'; // Use generic app icon
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
     // Customize notification here
-    const notificationTitle = payload.notification.title;
+    const notificationTitle = payload.notification?.title || 'Decide-O-Mat';
     const notificationOptions = {
-        body: payload.notification.body,
+        body: payload.notification?.body,
         icon: ICON_URL,
-        data: payload.data
+        data: payload.data || {}
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+
+    const targetUrl = event.notification.data?.url || '/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            for (const client of windowClients) {
+                if (client.url.includes(targetUrl) && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
+    );
 });

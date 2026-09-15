@@ -69,6 +69,7 @@
       "open": "Options",
       "view": "View",
       "copyLink": "Copy Link",
+      "viewStatistics": "View Statistics",
       "close": "Close Decision",
       "reopen": "Reopen Decision",
       "edit": "Edit Question",
@@ -124,7 +125,8 @@
     "appName": "Decide-O-Mat",
     "navDecision": "Decision",
     "navActivities": "Activities",
-    "navLogin": "Log in"
+    "navLogin": "Log in",
+    "switchLanguage": "Switch language"
   },
   "footer": {
     "encrypted": "End-to-End Encrypted",
@@ -468,7 +470,11 @@
     "avatarAlt": "Avatar",
     "helpCipherLabel": "Cipher",
     "helpNoLoginLabel": "No Login",
-    "helpTransferLabel": "Transfer"
+    "helpTransferLabel": "Transfer",
+    "buttonResetPassword": "Reset Password",
+    "resetPasswordSent": "Password reset link sent to your email.",
+    "resetPasswordError": "Failed to send reset email.",
+    "emailLabel": "Email"
   },
   "magicLinkData": {
     "title": "Transfer Identity",
@@ -478,6 +484,22 @@
     "buttonCopied": "Copied!",
     "warning": "CAUTION: Do not share this link. It provides full access to your account.",
     "errorFailed": "Failed to generate link. Please try again."
+  },
+  "statisticsModal": {
+    "title": "Decision Statistics",
+    "totalVotes": "Total Votes",
+    "yesVotes": "Yes",
+    "noVotes": "No",
+    "voteBalance": "Vote Balance",
+    "arguments": "Arguments",
+    "proArguments": "Pro",
+    "conArguments": "Con",
+    "topArgument": "Highest Scoring Argument",
+    "topScore": "Score",
+    "noVotesYet": "No votes have been cast yet.",
+    "noArgumentsYet": "No arguments added yet.",
+    "emptyState": "No activity recorded for this decision yet.",
+    "close": "Close"
   },
   "common": {
     "loading": "Loading...",

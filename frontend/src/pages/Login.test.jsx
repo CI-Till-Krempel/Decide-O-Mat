@@ -142,4 +142,21 @@ describe('Login Page', () => {
             expect(mockLoginWithGoogle).toHaveBeenCalledWith(true);
         });
     });
+
+    it('displays specific error message when auth/invalid-credential is returned', async () => {
+        const error = new Error('Invalid credential');
+        error.code = 'auth/invalid-credential';
+        mockLoginEmail.mockRejectedValue(error);
+
+        renderLogin();
+        fireEvent.change(screen.getByPlaceholderText(/you@example.com/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'wrongpass' } });
+
+        const submitBtn = getSubmitButton();
+        fireEvent.click(submitBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText('Invalid email or password.')).toBeInTheDocument();
+        });
+    });
 });

@@ -658,10 +658,20 @@ exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{
   // Truncate quite aggressively
   const displayQuestion = question.length > 50 ? question.substring(0, 47) + "..." : question;
 
+  const decisionUrl = `/d/${decisionId}`;
   const payload = {
     notification: {
       title: "New Argument",
       body: `New argument in: ${displayQuestion}`,
+    },
+    data: {
+      url: decisionUrl,
+      decisionId: decisionId,
+    },
+    webpush: {
+      fcmOptions: {
+        link: decisionUrl,
+      },
     },
   };
 
@@ -682,6 +692,8 @@ exports.onArgumentCreate = onDocumentCreated("decisions/{decisionId}/arguments/{
     const response = await admin.messaging().sendEachForMulticast({
       tokens,
       notification: payload.notification,
+      data: payload.data,
+      webpush: payload.webpush,
     });
     console.info(`Sent ${response.successCount} messages. Failed: ${response.failureCount}`);
   }
@@ -697,6 +709,7 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
   const newStatus = after.status;
   const title = newStatus === "closed" ? "Decision Closed" : "Decision Re-opened";
   const body = newStatus === "closed" ? "A decision has been reached." : "Additional input is requested.";
+  const decisionUrl = `/d/${decisionId}`;
 
   const decisionRef = db.collection("decisions").doc(decisionId);
   const participantsSnapshot = await decisionRef.collection("participants").get();
@@ -715,6 +728,15 @@ exports.onDecisionStatusChange = onDocumentUpdated("decisions/{decisionId}", asy
       notification: {
         title: title,
         body: body,
+      },
+      data: {
+        url: decisionUrl,
+        decisionId: decisionId,
+      },
+      webpush: {
+        fcmOptions: {
+          link: decisionUrl,
+        },
       },
     });
   }

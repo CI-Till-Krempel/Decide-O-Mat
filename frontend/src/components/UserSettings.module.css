@@ -61,7 +61,26 @@
 
 .displayName {
   font-size: 0.875rem;
+  color: var(--color-text-on-surface);
+  font-weight: 600;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.emailText {
+  font-size: 0.75rem;
   color: var(--color-text-muted);
+  word-break: break-all;
+}
+
+.successText {
+  color: var(--color-success);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 
 .sectionTitle {
