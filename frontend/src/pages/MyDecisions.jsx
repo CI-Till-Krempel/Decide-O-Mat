@@ -66,10 +66,13 @@ const MyDecisions = () => {
         fetchDecisions();
     }, [user, t]);
 
-    const navigateToDecision = useCallback((decision) => {
+    const navigateToDecision = useCallback((decision, options = {}) => {
         const key = EncryptionService.getStoredKeyString(decision.id);
         const hash = key ? `#key=${key}` : '';
-        navigate(`/d/${decision.id}${hash}`);
+        const finalHash = options.openStats
+            ? (hash ? `${hash}&stats=true` : '#stats=true')
+            : hash;
+        navigate(`/d/${decision.id}${finalHash}`, { state: { openStats: !!options.openStats } });
     }, [navigate]);
 
     const handleContextMenu = useCallback((decision, event) => {
@@ -164,6 +167,7 @@ const MyDecisions = () => {
         const items = [
             { label: t('myDecisions.contextMenu.view'), onClick: () => navigateToDecision(decision) },
             { label: t('myDecisions.contextMenu.copyLink'), onClick: () => handleCopyLink(decision) },
+            { label: t('myDecisions.contextMenu.viewStatistics'), onClick: () => navigateToDecision(decision, { openStats: true }) },
         ];
 
         if (decision.role === 'owner') {
