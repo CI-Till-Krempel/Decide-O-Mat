@@ -25,6 +25,19 @@ const base64ToArrayBuffer = (base64) => {
 
 
 
+// Safe base64 helpers for browser and node/test environments
+const safeBtoa = (str) => {
+    if (typeof window !== 'undefined' && window.btoa) return window.btoa(str);
+    if (typeof globalThis !== 'undefined' && globalThis.btoa) return globalThis.btoa(str);
+    return '';
+};
+
+const safeAtob = (b64) => {
+    if (typeof window !== 'undefined' && window.atob) return window.atob(b64);
+    if (typeof globalThis !== 'undefined' && globalThis.atob) return globalThis.atob(b64);
+    return '';
+};
+
 const KEYS_STORAGE_KEY = 'dom_decision_keys';
 
 const EncryptionService = {
@@ -60,6 +73,54 @@ const EncryptionService = {
         } catch (e) {
             console.warn("Failed to get stored key string", e);
             return null;
+        }
+    },
+
+    getAllStoredKeys: () => {
+        try {
+            return JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) || '{}');
+        } catch (e) {
+            console.warn("Failed to get all stored keys", e);
+            return {};
+        }
+    },
+
+    importStoredKeys: (keysObj) => {
+        try {
+            if (!keysObj || typeof keysObj !== 'object') return;
+            const current = JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) || '{}');
+            const merged = { ...current, ...keysObj };
+            localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(merged));
+        } catch (e) {
+            console.warn("Failed to import stored keys", e);
+        }
+    },
+
+    encodeKeysPayload: (keysObj) => {
+        try {
+            if (!keysObj || typeof keysObj !== 'object' || Object.keys(keysObj).length === 0) return '';
+            const jsonStr = JSON.stringify(keysObj);
+            return safeBtoa(encodeURIComponent(jsonStr));
+        } catch (e) {
+            console.warn("Failed to encode keys payload", e);
+            return '';
+        }
+    },
+
+    decodeKeysPayload: (encoded) => {
+        try {
+            if (!encoded || typeof encoded !== 'string') return {};
+            let decodedJson;
+            try {
+                decodedJson = decodeURIComponent(safeAtob(encoded));
+            } catch {
+                decodedJson = decodeURIComponent(encoded);
+            }
+            const parsed = JSON.parse(decodedJson);
+            return (parsed && typeof parsed === 'object') ? parsed : {};
+        } catch (e) {
+            console.warn("Failed to decode keys payload", e);
+            return {};
         }
     },
 

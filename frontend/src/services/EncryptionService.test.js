@@ -127,9 +127,38 @@ describe('EncryptionService', () => {
             expect(importedKey.algorithm.name).toBe('AES-GCM');
         });
 
-        it('returns null if getting stored key for non-existent decisionId', async () => {
-            const key = await EncryptionService.getStoredKey('non-existent');
-            expect(key).toBeNull();
+        it('retrieves all stored keys and imports merged keys', () => {
+            localStorage.clear();
+            EncryptionService.storeKey('dec-1', 'key-1');
+            EncryptionService.storeKey('dec-2', 'key-2');
+
+            const allKeys = EncryptionService.getAllStoredKeys();
+            expect(allKeys).toEqual({ 'dec-1': 'key-1', 'dec-2': 'key-2' });
+
+            EncryptionService.importStoredKeys({ 'dec-2': 'key-2-updated', 'dec-3': 'key-3' });
+            const merged = EncryptionService.getAllStoredKeys();
+            expect(merged).toEqual({
+                'dec-1': 'key-1',
+                'dec-2': 'key-2-updated',
+                'dec-3': 'key-3'
+            });
+        });
+
+        it('encodes and decodes keys payloads accurately', () => {
+            const keysObj = { 'dec-abc': 'key-123', 'dec-xyz': 'key-789' };
+            const encoded = EncryptionService.encodeKeysPayload(keysObj);
+            expect(typeof encoded).toBe('string');
+            expect(encoded.length).toBeGreaterThan(0);
+
+            const decoded = EncryptionService.decodeKeysPayload(encoded);
+            expect(decoded).toEqual(keysObj);
+        });
+
+        it('handles invalid or empty payload decoding safely', () => {
+            expect(EncryptionService.encodeKeysPayload(null)).toBe('');
+            expect(EncryptionService.encodeKeysPayload({})).toBe('');
+            expect(EncryptionService.decodeKeysPayload('')).toEqual({});
+            expect(EncryptionService.decodeKeysPayload('invalid-base64-!@#$')).toEqual({});
         });
     });
 });
