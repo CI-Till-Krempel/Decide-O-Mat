@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Footer from './Footer';
 import { OPEN_COOKIE_PREFERENCES_EVENT } from '../services/ConsentService';
+import packageJson from '../../package.json';
 
 // Mock i18next
 vi.mock('react-i18next', () => ({
@@ -46,7 +47,7 @@ describe('Footer Component', () => {
     it('renders app name and version', () => {
         renderFooter();
         expect(screen.getByText('Decide-O-Mat')).toBeInTheDocument();
-        expect(screen.getByText('v1.6.7')).toBeInTheDocument();
+        expect(screen.getByText('v' + packageJson.version)).toBeInTheDocument();
     });
 
     it('renders cookie settings button and dispatches event on click', () => {
