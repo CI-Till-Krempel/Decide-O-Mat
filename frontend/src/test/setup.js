@@ -42,3 +42,39 @@ Object.defineProperty(navigator, 'clipboard', {
     writable: true,
     configurable: true,
 });
+
+// Mock HTMLCanvasElement.prototype.getContext to avoid JSDOM warnings during QR Code component tests
+HTMLCanvasElement.prototype.getContext = () => {
+    return {
+        fillRect: () => {},
+        clearRect: () => {},
+        getImageData: (x, y, w, h) => ({
+            data: new Uint8ClampedArray(w * h * 4),
+        }),
+        putImageData: () => {},
+        createImageData: () => [],
+        setTransform: () => {},
+        drawImage: () => {},
+        save: () => {},
+        restore: () => {},
+        beginPath: () => {},
+        moveTo: () => {},
+        lineTo: () => {},
+        closePath: () => {},
+        stroke: () => {},
+        translate: () => {},
+        scale: () => {},
+        rotate: () => {},
+        arc: () => {},
+        fill: () => {},
+        measureText: () => ({ width: 0 }),
+        transform: () => {},
+        rect: () => {},
+        clip: () => {},
+    };
+};
+
+// Mock HTMLAnchorElement.prototype.click to prevent JSDOM navigation error logs
+HTMLAnchorElement.prototype.click = function () {
+    // No-op to avoid "Not implemented: navigation to another Document" warning during download triggers
+};
