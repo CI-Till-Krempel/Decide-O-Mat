@@ -42,3 +42,33 @@ Object.defineProperty(navigator, 'clipboard', {
     writable: true,
     configurable: true,
 });
+
+// Stub HTMLCanvasElement.prototype.getContext to prevent jsdom warnings during tests
+if (typeof HTMLCanvasElement !== 'undefined') {
+    HTMLCanvasElement.prototype.getContext = () => {
+        return {
+            fillRect: () => {},
+            clearRect: () => {},
+            getImageData: (x, y, w, h) => ({
+                data: new Uint8ClampedArray(w * h * 4),
+            }),
+            putImageData: () => {},
+            createImageData: () => [],
+            setTransform: () => {},
+            drawImage: () => {},
+            save: () => {},
+            restore: () => {},
+            beginPath: () => {},
+            moveTo: () => {},
+            lineTo: () => {},
+            clip: () => {},
+            quadraticCurveTo: () => {},
+            arc: () => {},
+            stroke: () => {},
+            fill: () => {},
+            scale: () => {},
+            translate: () => {},
+            rotate: () => {},
+        };
+    };
+}
