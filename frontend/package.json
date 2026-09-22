@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "VITE_ENABLE_ENCRYPTION=true playwright test"
+    "test:e2e": "VITE_ENABLE_ENCRYPTION=true playwright test",
+    "create-pr": "node scripts/create-pr.cjs"
   },
   "dependencies": {
     "@fontsource/alfa-slab-one": "^5.3.0",
@@ -40,7 +41,7 @@
     "@testing-library/user-event": "^14.6.7",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.5",
-    "eslint": "^10.7.0",
+    "eslint": "^10.11.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.4",
     "globals": "^17.3.0",
