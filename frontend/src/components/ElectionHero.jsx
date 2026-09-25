@@ -123,6 +123,7 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
                             onClick={onVoteYes}
                             disabled={isClosed || !!votingTarget}
                             aria-label={t('decision.voteYes')}
+                            aria-pressed={userVote === 'yes'}
                             type="button"
                         >
                             <ThumbsUpIcon />
@@ -137,6 +138,7 @@ export default function ElectionHero({ question, onVoteYes, onVoteNo, isClosed, 
                             onClick={onVoteNo}
                             disabled={isClosed || !!votingTarget}
                             aria-label={t('decision.voteNo')}
+                            aria-pressed={userVote === 'no'}
                             type="button"
                         >
                             <ThumbsDownIcon />

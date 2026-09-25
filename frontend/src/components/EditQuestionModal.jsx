@@ -29,7 +29,7 @@ export default function EditQuestionModal({ question, onSave, onCancel, isLoadin
 
     return (
         <div className={styles.overlay} onClick={onCancel}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={title || t('decision.editQuestion')}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={title || t('decision.editQuestion')}>
                 <h2 className={styles.title}>{title || t('decision.editQuestion')}</h2>
                 <form onSubmit={handleSubmit}>
                     <input
@@ -40,6 +40,7 @@ export default function EditQuestionModal({ question, onSave, onCancel, isLoadin
                         onChange={(e) => setValue(e.target.value)}
                         maxLength={maxLength}
                         disabled={isLoading}
+                        aria-label={title || t('decision.editQuestion')}
                     />
                     <div className={styles.actions}>
                         <button

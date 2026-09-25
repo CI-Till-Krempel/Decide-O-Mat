@@ -114,6 +114,7 @@ export default function QRCodeModal({
                         className={styles.urlInput}
                         onClick={(e) => e.target.select()}
                         data-testid="qr-url-input"
+                        aria-label={t('decision.copyLinkButton', 'Copy Link')}
                     />
                     <button
                         type="button"

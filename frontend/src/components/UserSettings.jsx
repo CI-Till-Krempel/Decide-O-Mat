@@ -148,8 +148,9 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
                 </p>
                 {needsPassword && (
                     <div className={styles.passwordGroup}>
-                        <label className={styles.inputLabel}>{t('userSettings.deletePasswordLabel')}</label>
+                        <label htmlFor="delete-account-password" className={styles.inputLabel}>{t('userSettings.deletePasswordLabel')}</label>
                         <input
+                            id="delete-account-password"
                             type="password"
                             value={deletePassword}
                             onChange={(e) => setDeletePassword(e.target.value)}
@@ -178,6 +179,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
                     placeholder={t('userSettings.editPlaceholder')}
+                    aria-label={t('userSettings.editPlaceholder')}
                     autoFocus
                     className="input"
                     style={{ marginBottom: '0.5rem' }}
@@ -225,6 +227,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
                         onClick={() => setIsEditing(true)}
                         className={styles.editButton}
                         title={t('userSettings.editNameButton')}
+                        aria-label={t('userSettings.editNameButton')}
                     >
                         ✏️
                     </button>
@@ -353,6 +356,7 @@ function UserSettings({ decisionId, encryptionKey, onClose }) {
                     onClick={() => setShowHelp(true)}
                     className={styles.helpButton}
                     title={t('userSettings.buttonHelp')}
+                    aria-label={t('userSettings.buttonHelp')}
                 >
                     ?
                 </button>

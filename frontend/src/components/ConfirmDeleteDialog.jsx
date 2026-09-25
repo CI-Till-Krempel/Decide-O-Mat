@@ -15,7 +15,7 @@ export default function ConfirmDeleteDialog({ question, onConfirm, onCancel, isL
 
     return (
         <div className={styles.overlay} onClick={onCancel}>
-            <div className={styles.dialog} onClick={(e) => e.stopPropagation()} role="alertdialog" aria-label={t('decision.deleteConfirmTitle')}>
+            <div className={styles.dialog} onClick={(e) => e.stopPropagation()} role="alertdialog" aria-modal="true" aria-label={t('decision.deleteConfirmTitle')}>
                 <h2 className={styles.title}>{t('decision.deleteConfirmTitle')}</h2>
                 <p className={styles.message}>{t('decision.deleteConfirmMessage')}</p>
                 <div className={styles.questionPreview}>{question}</div>
