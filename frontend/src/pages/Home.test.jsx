@@ -94,6 +94,18 @@ describe('Home Component', () => {
         expect(screen.getByText('Question to be decided')).toBeInTheDocument();
     });
 
+    it('associates the question label with the input field for accessibility', () => {
+        render(
+            <BrowserRouter>
+                <Home />
+            </BrowserRouter>
+        );
+
+        const input = screen.getByLabelText('Question to be decided');
+        expect(input).toBeInTheDocument();
+        expect(input).toHaveAttribute('id', 'decision-question-input');
+    });
+
     it('handles question input', async () => {
         const user = userEvent.setup();
         render(

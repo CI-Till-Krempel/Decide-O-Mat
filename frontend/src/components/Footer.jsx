@@ -10,7 +10,7 @@ const Footer = () => {
 
     return (
         <footer className={styles.footer}>
-            <nav className={styles.legalLinks}>
+            <nav className={styles.legalLinks} aria-label={t('footer.legalNavigation', 'Legal navigation')}>
                 <Link to="/legal/terms" className={styles.legalLink}>
                     {t('footer.termsOfService')}
                 </Link>
