@@ -55,7 +55,8 @@
       "exportFailed": "Export fehlgeschlagen.",
       "editFailed": "Frage konnte nicht aktualisiert werden.",
       "deleteFailed": "Entscheidung konnte nicht gelöscht werden."
-    }
+    },
+    "unknownTitle": "Entscheidung"
   },
   "myDecisions": {
     "title": "Meine Entscheidungen",

@@ -55,7 +55,8 @@
       "exportFailed": "Failed to export image.",
       "editFailed": "Failed to update question.",
       "deleteFailed": "Failed to delete decision."
-    }
+    },
+    "unknownTitle": "Decision"
   },
   "myDecisions": {
     "title": "My Decisions",

@@ -6,12 +6,20 @@ import styles from './DecisionCard.module.css';
 export default function DecisionCard({ decision, variant = 'archived', onClick, onContextMenu }) {
     const { t } = useTranslation();
 
+    if (!decision) return null;
+
     const isRunning = variant === 'running';
 
     const getDateDisplay = () => {
+        if (!decision.createdAt) return '';
+
         const date = decision.createdAt?.toDate
             ? decision.createdAt.toDate()
-            : new Date(decision.createdAt);
+            : (decision.createdAt instanceof Date ? decision.createdAt : new Date(decision.createdAt));
+
+        if (!date || isNaN(date.getTime())) {
+            return '';
+        }
 
         if (isRunning) {
             return relativeTime(date);
@@ -23,6 +31,9 @@ export default function DecisionCard({ decision, variant = 'archived', onClick, 
         ? t('myDecisions.roleOwner')
         : t('myDecisions.roleInvitee');
 
+    const question = decision.question || decision.text || t('decision.unknownTitle', 'Decision');
+    const dateDisplay = getDateDisplay();
+
     return (
         <div
             className={`${styles.card} ${isRunning ? styles.cardRunning : styles.cardArchived}`}
@@ -33,7 +44,7 @@ export default function DecisionCard({ decision, variant = 'archived', onClick, 
             }}
         >
             <div className={styles.header}>
-                <h3 className={styles.question}>{decision.question}</h3>
+                <h3 className={styles.question}>{question}</h3>
                 <button
                     className={styles.menuTrigger}
                     onClick={(e) => {
@@ -56,8 +67,12 @@ export default function DecisionCard({ decision, variant = 'archived', onClick, 
                 <span className={styles.status}>
                     {decision.status === 'closed' ? t('myDecisions.statusClosed') : t('myDecisions.statusOpen')}
                 </span>
-                <span className={styles.separator}>·</span>
-                <span className={styles.date}>{getDateDisplay()}</span>
+                {dateDisplay && (
+                    <>
+                        <span className={styles.separator}>·</span>
+                        <span className={styles.date}>{dateDisplay}</span>
+                    </>
+                )}
             </div>
         </div>
     );
