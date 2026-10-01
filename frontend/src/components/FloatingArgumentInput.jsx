@@ -10,77 +10,97 @@ function SendIcon() {
     );
 }
 
-export default function FloatingArgumentInput({ type, onSubmit, onClose, isLoading }) {
+export default function FloatingArgumentInput({
+    type = 'pro',
+    onSubmit = () => {},
+    onClose = () => {},
+    isLoading = false,
+}) {
     const { t } = useTranslation();
     const [text, setText] = useState('');
     const inputRef = useRef(null);
 
     useEffect(() => {
-        if (inputRef.current) inputRef.current.focus();
+        inputRef.current?.focus();
     }, []);
 
     const handleSubmit = () => {
-        if (!text.trim() || isLoading) return;
-        onSubmit(text.trim(), type);
+        const trimmed = (text || '').trim();
+        if (!trimmed || isLoading) return;
+        onSubmit?.(trimmed, type);
         setText('');
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter') handleSubmit();
-        if (e.key === 'Escape') {
+        if (e.key === 'Enter') {
+            handleSubmit();
+        } else if (e.key === 'Escape') {
             if (text) {
                 setText('');
             } else {
-                onClose();
+                onClose?.();
             }
         }
     };
 
     const handleBackdropClick = (e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) {
+            onClose?.();
+        }
     };
+
+    const placeholderText =
+        type === 'pro'
+            ? t('addArgumentForm.placeholderPro')
+            : t('addArgumentForm.placeholderCon');
 
     return (
         <div className={styles.backdrop} onClick={handleBackdropClick}>
-        <div className={styles.overlay}>
-            <div className={styles.inputWrapper}>
-                <label className={styles.inputLabel} htmlFor="floating-arg-input">
-                    {t('decision.argumentLabel')}
-                </label>
-                <input
-                    id="floating-arg-input"
-                    ref={inputRef}
-                    type="text"
-                    className={styles.inputField}
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    disabled={isLoading}
-                    placeholder={type === 'pro' ? t('addArgumentForm.placeholderPro') : t('addArgumentForm.placeholderCon')}
-                />
-                {text && (
-                    <button
-                        type="button"
-                        className={styles.clearButton}
-                        onClick={() => setText('')}
-                        aria-label={t('addArgumentForm.clearLabel')}
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
-                        </svg>
-                    </button>
-                )}
-            </div>
-            <button
-                className={styles.sendButton}
-                onClick={handleSubmit}
-                disabled={!text.trim() || isLoading}
-                aria-label={t('addArgumentForm.buttonAdd')}
-                type="button"
+            <div
+                className={styles.overlay}
+                role="dialog"
+                aria-modal="true"
+                aria-label={placeholderText}
             >
-                <SendIcon />
-            </button>
-        </div>
+                <div className={styles.inputWrapper}>
+                    <label className={styles.inputLabel} htmlFor="floating-arg-input">
+                        {t('decision.argumentLabel')}
+                    </label>
+                    <input
+                        id="floating-arg-input"
+                        ref={inputRef}
+                        type="text"
+                        className={styles.inputField}
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        disabled={isLoading}
+                        placeholder={placeholderText}
+                    />
+                    {text && (
+                        <button
+                            type="button"
+                            className={styles.clearButton}
+                            onClick={() => setText('')}
+                            aria-label={t('addArgumentForm.clearLabel')}
+                            disabled={isLoading}
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
+                            </svg>
+                        </button>
+                    )}
+                </div>
+                <button
+                    className={styles.sendButton}
+                    onClick={handleSubmit}
+                    disabled={!(text || '').trim() || isLoading}
+                    aria-label={t('addArgumentForm.buttonAdd')}
+                    type="button"
+                >
+                    <SendIcon />
+                </button>
+            </div>
         </div>
     );
 }
