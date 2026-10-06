@@ -46,7 +46,7 @@ describe('Footer Component', () => {
     it('renders app name and version', () => {
         renderFooter();
         expect(screen.getByText('Decide-O-Mat')).toBeInTheDocument();
-        expect(screen.getByText('v1.6.7')).toBeInTheDocument();
+        expect(screen.getByText('v2.0.0')).toBeInTheDocument();
     });
 
     it('renders cookie settings button and dispatches event on click', () => {
