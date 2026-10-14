@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function QRCodeIcon({ size = 20, className }) {
+export default function QRCodeIcon({ size = 20, className = '', ...props }) {
     return (
         <svg
             width={size}
@@ -11,8 +11,9 @@ export default function QRCodeIcon({ size = 20, className }) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={className}
+            className={className || undefined}
             aria-hidden="true"
+            {...props}
         >
             <rect width="5" height="5" x="3" y="3" rx="1" />
             <rect width="5" height="5" x="16" y="3" rx="1" />
