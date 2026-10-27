@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import styles from './ContextMenu.module.css';
 
-export default function ContextMenu({ items, position, onClose }) {
+export default function ContextMenu({ items = [], position = {}, onClose }) {
     const menuRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
-                onClose();
+                onClose?.();
             }
         };
         const handleEscape = (e) => {
-            if (e.key === 'Escape') onClose();
+            if (e.key === 'Escape') onClose?.();
         };
 
         document.addEventListener('mousedown', handleClickOutside);
@@ -30,6 +30,7 @@ export default function ContextMenu({ items, position, onClose }) {
 
     const handleKeyDown = useCallback((e) => {
         const menuItems = Array.from(menuRef.current?.querySelectorAll('[role="menuitem"]') || []);
+        if (menuItems.length === 0) return;
         const currentIndex = menuItems.indexOf(document.activeElement);
 
         if (e.key === 'ArrowDown') {
@@ -47,19 +48,22 @@ export default function ContextMenu({ items, position, onClose }) {
         <div
             ref={menuRef}
             className={styles.menu}
-            style={{ top: position.top, left: position.left }}
+            style={{ top: position?.top, left: position?.left }}
             role="menu"
             onKeyDown={handleKeyDown}
         >
-            {items.map((item, i) => {
+            {items?.map((item, i) => {
                 if (item.divider) {
-                    return <div key={`divider-${i}`} className={styles.divider} role="separator" />;
+                    return <div key={'divider-' + i} className={styles.divider} role="separator" />;
                 }
+                const itemClass = item.danger
+                    ? styles.item + ' ' + styles.itemDanger
+                    : styles.item;
                 return (
                     <button
-                        key={item.label}
-                        className={`${styles.item} ${item.danger ? styles.itemDanger : ''}`}
-                        onClick={() => { item.onClick(); onClose(); }}
+                        key={item.label || i}
+                        className={itemClass}
+                        onClick={() => { item.onClick?.(); onClose?.(); }}
                         role="menuitem"
                         type="button"
                         tabIndex={-1}
