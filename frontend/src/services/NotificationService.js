@@ -13,10 +13,10 @@ const db = getFirestore(app);
 
 const NotificationService = {
     requestPermission: async (decisionId, userId) => {
-        if (!messaging) return false;
+        if (!messaging || typeof Notification === "undefined") return false;
         try {
             const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
+            if (permission === "granted") {
                 const token = await getToken(messaging, {
                     vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
                 });
@@ -27,7 +27,7 @@ const NotificationService = {
                 }
             }
         } catch (error) {
-            console.error('Unable to get permission or token.', error);
+            console.error("Unable to get permission or token.", error);
         }
         return false;
     },
@@ -36,7 +36,7 @@ const NotificationService = {
         if (!decisionId || !userId || !token) return;
 
         // Save token to the participant document
-        const participantRef = doc(db, 'decisions', decisionId, 'participants', userId);
+        const participantRef = doc(db, "decisions", decisionId, "participants", userId);
         try {
             await updateDoc(participantRef, {
                 fcmToken: token
