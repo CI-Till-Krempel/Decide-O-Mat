@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { generateMagicLink } from '../services/firebase';
 import EncryptionService from '../services/EncryptionService';
 import Spinner from './Spinner';
@@ -8,6 +8,15 @@ function MagicLinkData() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(false);
+    const copyTimeoutRef = useRef(null);
+
+    useEffect(() => {
+        return () => {
+            if (copyTimeoutRef.current) {
+                clearTimeout(copyTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -27,18 +36,29 @@ function MagicLinkData() {
             const url = `${window.location.origin}/magic#${params.toString()}`;
             setMagicLink(url);
         } catch (err) {
-            console.error("Failed to generate magic link", err);
-            setError("Failed to generate link. Please try again.");
+            console.error('Failed to generate magic link', err);
+            setError('Failed to generate link. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleCopy = () => {
+    const handleCopy = async () => {
         if (magicLink) {
-            navigator.clipboard.writeText(magicLink);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            try {
+                if (navigator?.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(magicLink);
+                }
+                setCopied(true);
+                if (copyTimeoutRef.current) {
+                    clearTimeout(copyTimeoutRef.current);
+                }
+                copyTimeoutRef.current = setTimeout(() => {
+                    setCopied(false);
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy magic link', err);
+            }
         }
     };
 
@@ -60,36 +80,43 @@ function MagicLinkData() {
                 </button>
             ) : (
                 <div>
-                    <div style={{
-                        background: 'var(--color-bg-secondary)',
-                        padding: '0.5rem',
-                        borderRadius: '4px',
-                        wordBreak: 'break-all',
-                        fontSize: '0.8rem',
-                        marginBottom: '0.5rem',
-                        fontFamily: 'monospace'
-                    }}>
+                    <div
+                        data-testid="magic-link-text"
+                        style={{
+                            background: 'var(--color-bg-secondary)',
+                            padding: '0.5rem',
+                            borderRadius: '4px',
+                            wordBreak: 'break-all',
+                            fontSize: '0.8rem',
+                            marginBottom: '0.5rem',
+                            fontFamily: 'monospace'
+                        }}
+                    >
                         {magicLink}
                     </div>
                     <button
                         onClick={handleCopy}
                         className="btn"
+                        data-testid="copy-magic-link-btn"
                         style={{ width: '100%', background: copied ? 'var(--color-success)' : 'var(--color-primary)' }}
                     >
                         {copied ? 'Copied!' : 'Copy Link'}
                     </button>
-                    <div style={{
-                        marginTop: '0.5rem',
-                        color: 'var(--color-danger)',
-                        fontSize: '0.8rem',
-                        fontWeight: 'bold'
-                    }}>
+                    <div
+                        role="alert"
+                        style={{
+                            marginTop: '0.5rem',
+                            color: 'var(--color-danger)',
+                            fontSize: '0.8rem',
+                            fontWeight: 'bold'
+                        }}
+                    >
                         ⚠️ CAUTION: Do not share this link. It provides full access to your account.
                     </div>
                 </div>
             )}
 
-            {error && <div style={{ color: 'var(--color-danger)', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</div>}
+            {error && <div data-testid="magic-link-error" style={{ color: 'var(--color-danger)', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</div>}
         </div>
     );
 }
