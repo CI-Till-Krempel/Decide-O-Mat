@@ -9,21 +9,23 @@ const sectionKeys = {
     imprint: 'footer.imprint',
 };
 
-function LegalSection({ section }) {
+export function LegalSection({ section }) {
+    if (!section) return null;
+
     return (
         <section className={styles.section}>
             {section.heading && <h2 className={styles.sectionHeading}>{section.heading}</h2>}
-            {section.address && (
+            {Array.isArray(section.address) && (
                 <address className={styles.address}>
                     {section.address.map((line, i) => (
                         <span key={i}>{line}{i < section.address.length - 1 && <br />}</span>
                     ))}
                 </address>
             )}
-            {section.paragraphs && section.paragraphs.map((p, i) => (
+            {Array.isArray(section.paragraphs) && section.paragraphs.map((p, i) => (
                 <p key={i} className={styles.paragraph}>{p}</p>
             ))}
-            {section.items && (
+            {Array.isArray(section.items) && (
                 <ul className={styles.list}>
                     {section.items.map((item, i) => <li key={i}>{item}</li>)}
                 </ul>
