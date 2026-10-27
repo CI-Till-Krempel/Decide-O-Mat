@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import styles from './EditQuestionModal.module.css';
+import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import styles from "./EditQuestionModal.module.css";
 
-export default function EditQuestionModal({ question, onSave, onCancel, isLoading, title, maxLength = 1000 }) {
+export default function EditQuestionModal({ question = "", onSave, onCancel, isLoading = false, title, maxLength = 1000 }) {
     const { t } = useTranslation();
-    const [value, setValue] = useState(question);
+    const [value, setValue] = useState(question ?? "");
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -13,24 +13,43 @@ export default function EditQuestionModal({ question, onSave, onCancel, isLoadin
 
     useEffect(() => {
         const handleEscape = (e) => {
-            if (e.key === 'Escape') onCancel();
+            if (e.key === "Escape" && !isLoading) {
+                onCancel?.();
+            }
         };
-        document.addEventListener('keydown', handleEscape);
-        return () => document.removeEventListener('keydown', handleEscape);
-    }, [onCancel]);
+        document.addEventListener("keydown", handleEscape);
+        return () => document.removeEventListener("keydown", handleEscape);
+    }, [onCancel, isLoading]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const trimmed = value.trim();
-        if (trimmed && trimmed !== question) {
-            onSave(trimmed);
+    const modalTitle = title || t("decision.editQuestion");
+
+    const handleBackdropClick = () => {
+        if (!isLoading) {
+            onCancel?.();
         }
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (isLoading) return;
+        const trimmed = value.trim();
+        if (trimmed && trimmed !== (question || "").trim()) {
+            onSave?.(trimmed);
+        }
+    };
+
+    const isSaveDisabled = isLoading || !value.trim() || value.trim() === (question || "").trim();
+
     return (
-        <div className={styles.overlay} onClick={onCancel}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={title || t('decision.editQuestion')}>
-                <h2 className={styles.title}>{title || t('decision.editQuestion')}</h2>
+        <div className={styles.overlay} onClick={handleBackdropClick} data-testid="edit-modal-overlay">
+            <div
+                className={styles.modal}
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="edit-modal-title"
+            >
+                <h2 id="edit-modal-title" className={styles.title}>{modalTitle}</h2>
                 <form onSubmit={handleSubmit}>
                     <input
                         ref={inputRef}
@@ -40,6 +59,7 @@ export default function EditQuestionModal({ question, onSave, onCancel, isLoadin
                         onChange={(e) => setValue(e.target.value)}
                         maxLength={maxLength}
                         disabled={isLoading}
+                        aria-label={modalTitle}
                     />
                     <div className={styles.actions}>
                         <button
@@ -48,14 +68,14 @@ export default function EditQuestionModal({ question, onSave, onCancel, isLoadin
                             onClick={onCancel}
                             disabled={isLoading}
                         >
-                            {t('common.cancel')}
+                            {t("common.cancel")}
                         </button>
                         <button
                             type="submit"
                             className={styles.btnSave}
-                            disabled={isLoading || !value.trim() || value.trim() === question}
+                            disabled={isSaveDisabled}
                         >
-                            {t('common.save')}
+                            {t("common.save")}
                         </button>
                     </div>
                 </form>
