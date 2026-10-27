@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { copyRichLink } from './ClipboardUtils';
+import { copyRichLink, escapeHtml } from './ClipboardUtils';
 
 describe('ClipboardUtils', () => {
     let originalClipboardWrite;
@@ -151,5 +151,24 @@ describe('ClipboardUtils', () => {
         expect(writeMock).toHaveBeenCalled();
         expect(writeTextMock).toHaveBeenCalledWith('https://example.com/decide');
         expect(console.warn).toHaveBeenCalled();
+    });
+});
+
+describe('escapeHtml', () => {
+    it('returns an empty string if input is falsy', () => {
+        expect(escapeHtml('')).toBe('');
+        expect(escapeHtml(null)).toBe('');
+        expect(escapeHtml(undefined)).toBe('');
+    });
+
+    it('escapes ampersand, less than, greater than, double quote, and single quote', () => {
+        expect(escapeHtml('foo & bar')).toBe('foo &amp; bar');
+        expect(escapeHtml('<div>')).toBe('&lt;div&gt;');
+        expect(escapeHtml('"quoted"')).toBe('&quot;quoted&quot;');
+        expect(escapeHtml("'single'")).toBe('&#039;single&#039;');
+    });
+
+    it('leaves safe characters unchanged', () => {
+        expect(escapeHtml('foo-bar_123')).toBe('foo-bar_123');
     });
 });
