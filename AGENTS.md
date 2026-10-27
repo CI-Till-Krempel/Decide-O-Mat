@@ -104,3 +104,16 @@ Use the following labels to optimize the CI/CD pipeline and review process. Be m
     2.  Selects one high-priority, small task.
     3.  Creates a fix, runs tests, and opens a Pull Request.
 - **Configuration**: controlled via the workflow file (System Prompt).
+
+### Security Agent
+- **Purpose**: Daily triage of GitHub security alerts (Dependabot, code scanning, secret scanning) and open Dependabot PRs; auto-merges safe dependency updates and ships a patch release.
+- **Schedule**: Runs every weekday at 4:00 AM UTC (before the Boy-Scout Agent).
+- **Workflow**: `.github/workflows/security-agent.yml`
+- **Helper Scripts**: `.github/scripts/security-merge-gate.mjs` and `.github/scripts/security-release.mjs` (unit-tested in `.github/scripts/*.test.mjs`).
+- **Behavior**:
+    1.  Collects open Dependabot alerts, code scanning alerts, secret scanning alerts, and open Dependabot PRs.
+    2.  Invokes Gemini CLI with a **read-only** GitHub token to classify each Dependabot PR (`approve` or `reject`) and produce a daily report.
+    3.  Runs the deterministic merge gate (`security-merge-gate.mjs`) to verify hard rules (authored by `dependabot`, not draft, `MERGEABLE`, all checks green, patch/minor update or `*-minor-patch` group or major `devDependency` update, max 5 merges per run) and merges eligible PRs.
+    4.  If at least one PR was merged, runs the deterministic release job (`security-release.mjs`) to bump the patch version, update `CHANGELOG.md`, open and merge a `release/vX.Y.Z` PR after checks pass, and push the `vX.Y.Z` tag using the GitHub App token.
+    5.  The tag push triggers `deploy.yml` (`deploy-prod` pauses for maintainer approval in the `PRODUCTION` environment) and `release.yml` (creates the GitHub Release).
+- **Exception to Human PR Review**: Qualifying Dependabot PRs that pass the deterministic merge gate and the resulting automated `release/vX.Y.Z` PR are auto-merged without human PR review; the human gate is enforced at the `PRODUCTION` deployment environment approval.

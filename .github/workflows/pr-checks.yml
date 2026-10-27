@@ -23,6 +23,9 @@ jobs:
             frontend/package-lock.json
             functions/package-lock.json
 
+      - name: Workflow Scripts - Test
+        run: node --test '.github/scripts/*.test.mjs'
+
       - name: Frontend - Install Dependencies
         working-directory: frontend
         run: npm ci
