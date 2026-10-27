@@ -147,8 +147,9 @@ function Login() {
 
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>{t('login.labelEmail')}</label>
+                        <label htmlFor="login-email" style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>{t('login.labelEmail')}</label>
                         <input
+                            id="login-email"
                             type="email"
                             className="input"
                             value={email}
@@ -160,8 +161,9 @@ function Login() {
 
                     {mode !== 'reset' && (
                         <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>{t('login.labelPassword')}</label>
+                            <label htmlFor="login-password" style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--color-text-muted)' }}>{t('login.labelPassword')}</label>
                             <input
+                                id="login-password"
                                 type="password"
                                 className="input"
                                 value={password}

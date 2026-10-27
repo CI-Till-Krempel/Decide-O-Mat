@@ -25,6 +25,8 @@ describe('NamePrompt Component', () => {
         expect(screen.getByRole('heading', { name: "What's your name?" })).toBeInTheDocument();
         expect(screen.getByText('Your name will be shown with your contributions to help others identify you.')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Enter your name')).toBeInTheDocument();
+        expect(screen.getByLabelText('Enter your name')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
     });

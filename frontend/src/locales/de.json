@@ -136,7 +136,9 @@
     "navDecision": "Entscheidung",
     "navActivities": "Aktivitäten",
     "navLogin": "Anmelden",
-    "switchLanguage": "Sprache wechseln"
+    "switchLanguage": "Sprache wechseln",
+    "mainNavigation": "Hauptnavigation",
+    "mobileNavigation": "Mobile Navigation"
   },
   "footer": {
     "encrypted": "Ende-zu-Ende-verschlüsselt",
@@ -144,7 +146,8 @@
     "termsOfService": "AGB",
     "privacyPolicy": "Datenschutz",
     "imprint": "Impressum",
-    "cookieSettings": "Cookie-Einstellungen"
+    "cookieSettings": "Cookie-Einstellungen",
+    "legalNavigation": "Rechtliche Navigation"
   },
   "cookieConsent": {
     "title": "Privatsphäre & Cookie-Einstellungen",

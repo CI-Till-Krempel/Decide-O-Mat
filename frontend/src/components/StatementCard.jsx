@@ -143,6 +143,7 @@ export default function StatementCard({ argument, decisionId, readOnly, canVote,
                     onClick={handleVote}
                     disabled={readOnly || voting || (!hasVoted && !canVote)}
                     aria-label={hasVoted ? t('decision.votedLabel') : t('decision.voteLabel')}
+                    aria-pressed={hasVoted}
                     type="button"
                 >
                     {hasVoted ? <HeartFilledIcon /> : <HeartOutlineIcon />}

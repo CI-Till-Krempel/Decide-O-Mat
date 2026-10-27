@@ -68,8 +68,9 @@ export default function Home() {
 
                 <div className={styles.questionSection}>
                     <div className={styles.inputWrapper}>
-                        <label className={styles.inputLabel}>{t('home.inputLabel')}</label>
+                        <label htmlFor="decision-question-input" className={styles.inputLabel}>{t('home.inputLabel')}</label>
                         <input
+                            id="decision-question-input"
                             type="text"
                             className={styles.inputField}
                             placeholder={t('home.inputPlaceholder')}

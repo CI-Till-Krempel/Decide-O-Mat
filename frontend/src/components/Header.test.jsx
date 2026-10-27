@@ -16,6 +16,8 @@ vi.mock('react-i18next', () => ({
                 'header.navActivities': 'Activities',
                 'header.navLogin': 'Log in',
                 'header.switchLanguage': 'Switch language',
+                'header.mainNavigation': 'Main navigation',
+                'header.mobileNavigation': 'Mobile navigation',
                 'userSettings.guestLabel': 'Guest',
                 'common.edit': 'Edit',
             };
@@ -70,6 +72,11 @@ describe('Header Component', () => {
     it('renders the logo', () => {
         renderHeader();
         expect(screen.getByText('Decide-O-Mat')).toBeInTheDocument();
+    });
+
+    it('provides accessible names for navigation landmarks', () => {
+        renderHeader();
+        expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
     });
 
     it('renders the Decision nav link', () => {

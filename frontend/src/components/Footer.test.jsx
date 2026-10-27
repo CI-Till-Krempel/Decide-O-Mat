@@ -13,6 +13,7 @@ vi.mock('react-i18next', () => ({
                 'footer.privacyPolicy': 'Privacy Policy',
                 'footer.imprint': 'Imprint',
                 'footer.cookieSettings': 'Cookie Settings',
+                'footer.legalNavigation': 'Legal navigation',
                 'header.appName': 'Decide-O-Mat',
             };
             return translations[key] || key;
@@ -29,6 +30,11 @@ function renderFooter() {
 }
 
 describe('Footer Component', () => {
+    it('provides accessible name for legal navigation landmark', () => {
+        renderFooter();
+        expect(screen.getByRole('navigation', { name: 'Legal navigation' })).toBeInTheDocument();
+    });
+
     it('renders legal links', () => {
         renderFooter();
         expect(screen.getByText('Terms of Service')).toBeInTheDocument();

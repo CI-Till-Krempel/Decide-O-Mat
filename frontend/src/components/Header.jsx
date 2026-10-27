@@ -112,7 +112,7 @@ export default function Header() {
                 <Link to="/" className={styles.logo}>
                     {t('header.appName')}
                 </Link>
-                <nav className={styles.navLinks}>
+                <nav className={styles.navLinks} aria-label={t('header.mainNavigation', 'Main navigation')}>
                     <Link
                         to="/"
                         className={`${styles.navLink} ${isActive('/') ? styles.navLinkActive : ''}`}
@@ -187,7 +187,7 @@ export default function Header() {
             </div>
 
             {isMobileMenuOpen && (
-                <nav className={styles.mobileDrawer} data-testid="mobile-drawer">
+                <nav className={styles.mobileDrawer} aria-label={t('header.mobileNavigation', 'Mobile navigation')} data-testid="mobile-drawer">
                     <Link
                         to="/"
                         className={`${styles.mobileNavLink} ${isActive('/') ? styles.navLinkActive : ''}`}
