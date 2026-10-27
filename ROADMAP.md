@@ -96,6 +96,7 @@
         - [x] [#458](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/458): QR Code sharing should also be accessible in the share button
         - [x] [#459](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/459): The icons in the header gets overlapped if there is a longer title on mobile devices
         - [x] [#460](https://github.com/CI-Till-Krempel/Decide-O-Mat/issues/460): The Activity and Participants menu items are not accessible on mobile
+        - [x] [IMP-SEC-001](implementations/IMP-SEC-001-Security-Agent-2026-10-27.md): Daily Gemini CLI Security Agent for Dependabot & security alert triage, auto-merge, and approval-gated production release
 
 ---
 

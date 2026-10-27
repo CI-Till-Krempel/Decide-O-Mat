@@ -76,6 +76,28 @@ The release process is automated using GitHub Actions. To trigger a release, fol
     - It will extract the release notes from `CHANGELOG.md`.
     - It will create a GitHub Release with the corresponding tag and notes.
 
+## Automated Security Patch Releases
+
+The **Security Agent** (`.github/workflows/security-agent.yml`) runs every weekday at 04:00 UTC to keep dependencies and security patches up to date:
+
+1.  **Triage & Merge**: Gemini CLI (running with a read-only token) evaluates open Dependabot PRs and security alerts. A deterministic merge gate (`.github/scripts/security-merge-gate.mjs`) verifies that approved PRs are authored by Dependabot, have all checks green, and are patch/minor updates (or `*-minor-patch` groups / `devDependency` updates) before merging up to 5 PRs.
+2.  **Release PR & Tag**: When at least one PR is merged, the `release` job runs `.github/scripts/security-release.mjs` to bump the patch version across `frontend/` and `functions/` (`package.json` and `package-lock.json`) and add a `### Security` section to `CHANGELOG.md`. It opens a `release/vX.Y.Z` PR, waits for all checks to pass, squash-merges it, and pushes tag `vX.Y.Z` using the GitHub App token.
+3.  **Staging & Production Deployment**: Pushing to `main` deploys to **Staging** automatically. Pushing tag `vX.Y.Z` triggers `release.yml` (GitHub Release) and `deploy.yml` (`deploy-prod`), which waits for maintainer approval in the **PRODUCTION** GitHub Environment.
+
+### Required GitHub App Permissions (`GEMINI_APP`)
+To allow the Security Agent to read alerts, merge Dependabot PRs (including workflow updates), and trigger tag workflows, the GitHub App configured via `GEMINI_APP_ID` / `GEMINI_APP_PRIVATE_KEY` requires:
+- **Repository permissions**:
+  - `Contents`: Read and write
+  - `Pull requests`: Read and write
+  - `Issues`: Read and write
+  - `Workflows`: Read and write *(required to merge `github-actions` Dependabot PRs)*
+  - `Checks`: Read-only
+  - `Commit statuses`: Read-only
+  - `Dependabot alerts`: Read-only
+  - `Code scanning alerts`: Read-only
+  - `Secret scanning alerts`: Read-only
+- **Branch protection**: If `main` requires approving reviews, add `GEMINI_APP` to the ruleset bypass list so it can merge verified Dependabot PRs and its own `release/vX.Y.Z` PR.
+
 ## Manual Release (Fallback)
 
 If the automation fails, you can manually create a release in the GitHub UI:
