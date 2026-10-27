@@ -24,7 +24,11 @@ export function getConsent() {
     try {
         const raw = localStorage.getItem(CONSENT_STORAGE_KEY);
         if (!raw) return null;
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+            return null;
+        }
+        return parsed;
     } catch {
         return null;
     }
@@ -32,11 +36,11 @@ export function getConsent() {
 
 /**
  * Saves cookie consent preferences to localStorage and dispatches an update event.
- * @param {Object} options
- * @param {boolean} options.analytics - Whether analytics is accepted
+ * @param {Object} [options]
+ * @param {boolean} [options.analytics] - Whether analytics is accepted
  * @returns {ConsentState} The saved consent object
  */
-export function setConsent({ analytics = false }) {
+export function setConsent({ analytics = false } = {}) {
     const consent = {
         essential: true,
         analytics: Boolean(analytics),
