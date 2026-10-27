@@ -25,14 +25,19 @@ function App() {
     document.title = 'Decide-O-Mat: ' + version + stage + ' - Group decisions made easy!';
 
     const initAppCheck = async () => {
-      await ensureAppCheck();
-      setIsReady(true);
+      try {
+        await ensureAppCheck();
+      } catch (err) {
+        console.error('App: Failed to initialize App Check', err);
+      } finally {
+        setIsReady(true);
+      }
     };
     initAppCheck();
   }, []);
 
   if (!isReady) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>Initializing Security...</div>;
+    return <div data-testid="security-initializing" style={{ padding: '2rem', textAlign: 'center' }}>Initializing Security...</div>;
   }
 
   return (
