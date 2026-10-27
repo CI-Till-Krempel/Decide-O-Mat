@@ -189,10 +189,10 @@ export function UserProvider({ children }) {
         if (!firebaseUser) return;
         try {
             // 1. Re-authenticate (Security Requirement)
-            if (firebaseUser.providerData.some(p => p.providerId === 'google.com')) {
+            if (firebaseUser.providerData?.some(p => p.providerId === 'google.com')) {
                 const provider = new GoogleAuthProvider();
                 await reauthenticateWithPopup(firebaseUser, provider);
-            } else if (firebaseUser.providerData.some(p => p.providerId === 'password')) {
+            } else if (firebaseUser.providerData?.some(p => p.providerId === 'password')) {
                 if (!password) throw new Error("Password required for deletion");
                 const credential = EmailAuthProvider.credential(firebaseUser.email, password);
                 await reauthenticateWithCredential(firebaseUser, credential);
@@ -206,6 +206,7 @@ export function UserProvider({ children }) {
             await signOut(auth);
             setFirebaseUser(null);
             localStorage.removeItem('dom_display_name_uid');
+            localStorage.removeItem('dom_initial_name');
             setLocalDisplayName(null);
         } catch (error) {
             console.error("Delete Account failed:", error);
@@ -220,8 +221,8 @@ export function UserProvider({ children }) {
         photoURL: firebaseUser.photoURL,
         email: firebaseUser.email || null,
         // Treat as anonymous if explicit flag OR if no providers
-        isAnonymous: firebaseUser.isAnonymous || firebaseUser.providerData.length === 0,
-        providers: firebaseUser.providerData.map(p => p.providerId)
+        isAnonymous: Boolean(firebaseUser.isAnonymous || !firebaseUser.providerData || firebaseUser.providerData.length === 0),
+        providers: (firebaseUser.providerData || []).map(p => p.providerId)
     } : null;
 
     const setDisplayName = async (name) => {
