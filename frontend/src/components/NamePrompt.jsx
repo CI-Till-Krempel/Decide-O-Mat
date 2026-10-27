@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './NamePrompt.module.css';
 
@@ -6,26 +6,48 @@ function NamePrompt({ onSave, onCancel }) {
     const { t } = useTranslation();
     const [name, setName] = useState('');
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && typeof onCancel === 'function') {
+                onCancel();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [onCancel]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (name.trim()) {
-            onSave(name.trim());
+        const trimmed = name.trim();
+        if (trimmed && typeof onSave === 'function') {
+            onSave(trimmed);
         }
     };
 
     return (
-        <div className={styles.overlay} onClick={onCancel}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={t('namePrompt.title')}>
-                <h2 className={styles.title}>{t('namePrompt.title')}</h2>
-                <p className={styles.description}>
+        <div className={styles.overlay} onClick={() => onCancel?.()}>
+            <div
+                className={styles.modal}
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="name-prompt-title"
+                aria-describedby="name-prompt-description"
+            >
+                <h2 id="name-prompt-title" className={styles.title}>
+                    {t('namePrompt.title')}
+                </h2>
+                <p id="name-prompt-description" className={styles.description}>
                     {t('namePrompt.description')}
                 </p>
                 <form onSubmit={handleSubmit}>
                     <input
+                        id="name-prompt-input"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder={t('namePrompt.placeholder')}
+                        aria-label={t('namePrompt.placeholder')}
                         autoFocus
                         className={styles.input}
                     />
