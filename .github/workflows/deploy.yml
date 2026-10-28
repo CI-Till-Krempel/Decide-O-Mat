@@ -13,6 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - name: Check for SKIP_AUDIT label
+        id: check_audit_label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_LABELS=$(gh pr list --search "${{ github.sha }}" --state merged --json labels --jq '(.[0].labels // [])[].name')
+          if echo "$PR_LABELS" | grep -q "SKIP_AUDIT"; then
+            echo "skip_audit=true" >> $GITHUB_OUTPUT
+            echo "::warning::Found SKIP_AUDIT label. npm audit findings will not block this deployment."
+          else
+            echo "skip_audit=false" >> $GITHUB_OUTPUT
+          fi
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
@@ -21,6 +33,7 @@ jobs:
           cd frontend
           npm ci
       - name: Audit Frontend
+        continue-on-error: ${{ steps.check_audit_label.outputs.skip_audit == 'true' }}
         run: |
           cd frontend
           npm audit --omit=dev --audit-level=moderate
@@ -61,6 +74,7 @@ jobs:
           cd functions
           npm ci
       - name: Audit Functions
+        continue-on-error: ${{ steps.check_audit_label.outputs.skip_audit == 'true' }}
         run: |
           cd functions
           npm audit --omit=dev --audit-level=moderate

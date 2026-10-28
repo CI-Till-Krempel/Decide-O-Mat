@@ -83,6 +83,7 @@ Use the following labels to optimize the CI/CD pipeline and review process. Be m
 *   **`NO_CHECKS`**: Use when the PR **does not modify any code** (e.g., modifying `task.md`, `README.md` text only). This skips expensive build and lint checks.
 *   **`NO_DEPLOY`**: Use when the PR **only affects documentation or GitHub Actions** configurations. This prevents unnecessary deployment attempts to staging.
 *   **`NO_REVIEW`**: Use to **disable the AI Code Reviewer**. This saves costs for changes that do not require intelligent analysis (e.g., auto-generated files, lockfile updates, or trivial bumps).
+*   **`SKIP_AUDIT`**: Use **only** when a deployment must ship while `npm audit` is red and no fix exists yet (e.g., waiting for an upstream patch). The `Deploy` workflow still runs the audit and shows its findings, but they no longer fail the build. Applies to the deploy run triggered by the merge commit of the labeled PR; for a production tag, set it on the PR whose merge commit is tagged (usually the `release/vX.Y.Z` PR). Remove the label from new PRs once the upstream fix is available.
 
 ### 6. Release Preparation
 - **Announcement Post**: For every major and minor release, generate a short blog post announcing the new version.
