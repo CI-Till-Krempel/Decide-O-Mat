@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-10-28
+
+### Security
+- **Dependency updates (#524)**: Bumped `vite` to 8.3.5 (launch-editor command injection, `server.fs.allow` bypass, cross-origin middleware advisories) and `vitest` to 4.1.12 (`@vitest/mocker` advisories); updated transitive `body-parser`, `qs`, `zod` (frontend) and `@grpc/grpc-js` (functions).
+- **Known issue**: `firebase` / `@firebase/firestore` still pins a vulnerable `@grpc/grpc-js` (~1.9). No upstream fix exists yet; the browser bundle does not use grpc-js. This release is deployed with the `SKIP_AUDIT` label.
+
+### Changed
+- **CI (#525)**: New `SKIP_AUDIT` PR label makes the `npm audit` steps in the Deploy workflow non-blocking (findings are still reported) for cases where no upstream fix exists.
+
+## [2.0.1] - 2026-10-27
+
+### Added
+- **Security Agent (#517)**: Daily Gemini CLI workflow that triages security alerts and Dependabot PRs, auto-merges safe updates, and ships patch releases.
+
+### Security
+- Dependency updates: `undici` 7.30.1 (#514), `body-parser` 2.4.0 (#515), `brace-expansion` (#498), `@fastify/busboy` 3.2.2 (#496), `proxy-addr` 2.0.8 (#504), and `npm audit fix` (#495).
+
 ## [2.0.0] - 2026-09-15
 
 ### Added
