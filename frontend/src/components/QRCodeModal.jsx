@@ -13,36 +13,63 @@ export default function QRCodeModal({
     const { t } = useTranslation();
     const [copied, setCopied] = useState(false);
     const canvasRef = useRef(null);
+    const copyTimeoutRef = useRef(null);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Escape') onClose();
+            if (e.key === 'Escape' && onClose) {
+                onClose();
+            }
         };
         document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
     }, [onClose]);
+
+    useEffect(() => {
+        return () => {
+            if (copyTimeoutRef.current) {
+                clearTimeout(copyTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const markCopied = () => {
+        setCopied(true);
+        if (copyTimeoutRef.current) {
+            clearTimeout(copyTimeoutRef.current);
+        }
+        copyTimeoutRef.current = setTimeout(() => {
+            setCopied(false);
+        }, 2000);
+    };
 
     const handleCopy = async () => {
         if (!url) return;
         try {
             await copyRichLink(url, question || t('decision.unknownTitle', 'Decision'));
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            markCopied();
         } catch {
             try {
-                await navigator.clipboard.writeText(url);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
+                if (navigator?.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(url);
+                    markCopied();
+                } else {
+                    throw new Error('Clipboard API not available');
+                }
             } catch {
-                // fallback
-                const textarea = document.createElement('textarea');
-                textarea.value = url;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = url;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    if (typeof document.execCommand === 'function') { document.execCommand('copy'); }
+                    document.body.removeChild(textarea);
+                    markCopied();
+                } catch (fallbackError) {
+                    console.error('Fallback copy failed:', fallbackError);
+                }
             }
         }
     };
@@ -54,7 +81,7 @@ export default function QRCodeModal({
         try {
             const pngUrl = canvas.toDataURL('image/png');
             const link = document.createElement('a');
-            link.download = `decision-qr-${decisionId || 'code'}.png`;
+            link.download = 'decision-qr-' + (decisionId || 'code') + '.png';
             link.href = pngUrl;
             document.body.appendChild(link);
             link.click();
@@ -64,14 +91,19 @@ export default function QRCodeModal({
         }
     };
 
+    const handleOverlayClick = () => {
+        if (onClose) onClose();
+    };
+
     return (
-        <div className={styles.overlay} onClick={onClose} data-testid="qr-modal-overlay">
+        <div className={styles.overlay} onClick={handleOverlayClick} data-testid="qr-modal-overlay">
             <div
                 className={styles.modal}
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="qr-modal-title"
+                aria-describedby="qr-modal-instructions"
             >
                 <div className={styles.header}>
                     <h2 id="qr-modal-title" className={styles.title}>
@@ -80,7 +112,7 @@ export default function QRCodeModal({
                     <button
                         type="button"
                         className={styles.closeIconBtn}
-                        onClick={onClose}
+                        onClick={() => onClose?.()}
                         aria-label={t('common.close', 'Close')}
                     >
                         ✕
@@ -102,7 +134,7 @@ export default function QRCodeModal({
                     />
                 </div>
 
-                <p className={styles.instructions}>
+                <p id="qr-modal-instructions" className={styles.instructions}>
                     {t('decision.qrInstructions', 'Scan this code with a phone camera to open and vote on this decision.')}
                 </p>
 
@@ -112,7 +144,7 @@ export default function QRCodeModal({
                         readOnly
                         value={url || ''}
                         className={styles.urlInput}
-                        onClick={(e) => e.target.select()}
+                        onClick={(e) => e.target?.select?.()}
                         data-testid="qr-url-input"
                     />
                     <button
@@ -137,7 +169,7 @@ export default function QRCodeModal({
                     <button
                         type="button"
                         className={styles.btnClose}
-                        onClick={onClose}
+                        onClick={() => onClose?.()}
                     >
                         {t('common.close', 'Close')}
                     </button>
