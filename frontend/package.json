@@ -53,7 +53,6 @@
     "*.{js,jsx}": "eslint --fix"
   },
   "overrides": {
-    "uuid": "^11.1.1",
-    "@grpc/grpc-js": "^1.14.6"
+    "uuid": "^11.1.1"
   }
 }
