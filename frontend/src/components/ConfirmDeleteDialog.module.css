@@ -59,6 +59,11 @@
   cursor: pointer;
 }
 
+.btnCancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btnDanger {
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
