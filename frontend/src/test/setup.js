@@ -1,5 +1,35 @@
 import '@testing-library/jest-dom';
 
+// Mock HTMLCanvasElement.prototype.getContext for jsdom environments
+if (typeof HTMLCanvasElement !== 'undefined') {
+    HTMLCanvasElement.prototype.getContext = () => ({
+        fillRect: () => {},
+        clearRect: () => {},
+        getImageData: (x, y, w, h) => ({ data: new Array(w * h * 4) }),
+        putImageData: () => {},
+        createImageData: () => [],
+        setTransform: () => {},
+        drawImage: () => {},
+        save: () => {},
+        fillText: () => {},
+        restore: () => {},
+        beginPath: () => {},
+        moveTo: () => {},
+        lineTo: () => {},
+        closePath: () => {},
+        stroke: () => {},
+        translate: () => {},
+        scale: () => {},
+        rotate: () => {},
+        arc: () => {},
+        fill: () => {},
+        measureText: () => ({ width: 0 }),
+        transform: () => {},
+        rect: () => {},
+        clip: () => {},
+    });
+}
+
 // Mock localStorage
 class LocalStorageMock {
     constructor() {
